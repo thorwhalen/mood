@@ -1,4 +1,4 @@
-"""Sentiment analysis tools """
+"""Sentiment analysis tools"""
 
 import json
 from dol import Pipe
@@ -12,7 +12,7 @@ def sentiment_analysis(headlines):
     from oa import ask
 
     if not isinstance(headlines, str):  # Pattern: ingress
-        headlines = '\n\n'.join(
+        headlines = "\n\n".join(
             headlines
         )  # join with two newlines to separate headlines
     headline_sentiments = ask.ai.sentiment_analysis(headlines)

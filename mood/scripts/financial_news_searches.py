@@ -12,5 +12,5 @@ def main():
     argh.dispatch_command(search_and_save_news)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

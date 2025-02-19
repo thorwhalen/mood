@@ -19,11 +19,11 @@ from dol import JsonFiles, mk_dirs_if_missing
 from scoopy import search_news, yahoo_finance_news_search
 from mood.util import djoin
 
-filename_safe_pattern = re.compile(r'[^a-zA-Z0-9_\-]')
+filename_safe_pattern = re.compile(r"[^a-zA-Z0-9_\-]")
 
 
 def mk_filename_safe(string: str) -> str:
-    return filename_safe_pattern.sub('_', string)
+    return filename_safe_pattern.sub("_", string)
 
 
 def current_time_str(format="%Y-%m-%d--%H-%M-%S"):
@@ -33,18 +33,18 @@ def current_time_str(format="%Y-%m-%d--%H-%M-%S"):
     return now.strftime(format)
 
 
-def get_key(query, prefix='', suffix='', *, day_folder=False):
+def get_key(query, prefix="", suffix="", *, day_folder=False):
     if day_folder:
         day_folder_str = current_time_str("%Y-%m-%d") + os.path.sep
     else:
-        day_folder_str = ''
+        day_folder_str = ""
     now_string_seconds = current_time_str("%Y-%m-%d--%H-%M-%S")
     query_str = mk_filename_safe(query)
-    return f'{prefix}{day_folder_str}{now_string_seconds}__{query_str}{suffix}'
+    return f"{prefix}{day_folder_str}{now_string_seconds}__{query_str}{suffix}"
 
 
-DFLT_STORE = djoin('news', 'searches')
-json_file_key = partial(get_key, suffix='.json', day_folder=True)
+DFLT_STORE = djoin("news", "searches")
+json_file_key = partial(get_key, suffix=".json", day_folder=True)
 
 
 def _search_and_save_news(
@@ -77,11 +77,11 @@ _newsdata_search_default_params = {
 }
 
 search_news_from = {
-    'newsdata': partial(
-        search_news, source='newsdata', **_newsdata_search_default_params
+    "newsdata": partial(
+        search_news, source="newsdata", **_newsdata_search_default_params
     ),
-    'yahoo_finance': partial(search_news, source='yahoo_finance'),
-    'yahoo_finance_headlines': partial(search_news, source='yahoo_finance_headlines'),
+    "yahoo_finance": partial(search_news, source="yahoo_finance"),
+    "yahoo_finance_headlines": partial(search_news, source="yahoo_finance_headlines"),
 }
 
 
@@ -89,8 +89,8 @@ def _probably_a_file(string):
     """Check if the string should be considered as a file"""
     if isinstance(string, str) and os.path.isfile(string):
         if (
-            string.endswith('.json')
-            or string[-4:] in {'.txt', '.csv', '.tsv'}
+            string.endswith(".json")
+            or string[-4:] in {".txt", ".csv", ".tsv"}
             or os.path.sep in string
         ):
             return True
@@ -99,8 +99,8 @@ def _probably_a_file(string):
 
 
 def search_and_save_news(
-    query: Union[str, Iterable[str]] = '',
-    source: str = 'yahoo_finance_headlines',
+    query: Union[str, Iterable[str]] = "",
+    source: str = "yahoo_finance_headlines",
     *,
     verbose: bool = False,
     store=DFLT_STORE,
@@ -108,16 +108,16 @@ def search_and_save_news(
     assert source in search_news_from, f"Unknown news source: {source}"
     prefix = source + os.path.sep
     _search_func = search_news_from[source]
-    _file_key = partial(get_key, prefix=prefix, suffix='.json', day_folder=True)
+    _file_key = partial(get_key, prefix=prefix, suffix=".json", day_folder=True)
 
     if isinstance(query, str):
         if _probably_a_file(query):
-            if query.endswith('.json'):
+            if query.endswith(".json"):
                 with open(query) as f:
                     query = json.load(f)
             else:
                 with open(query) as f:
-                    query = f.read().strip().split('\n')
+                    query = f.read().strip().split("\n")
         else:
             query = [query]
 

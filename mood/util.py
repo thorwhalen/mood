@@ -9,14 +9,14 @@ from i2 import get_app_data_folder
 
 import dol
 
-pkg_name = 'mood'
+pkg_name = "mood"
 
 _root_app_data_dir = get_app_data_folder()
 app_data_dir = os.environ.get(
-    f'{pkg_name.upper()}_APP_DATA_DIR',
+    f"{pkg_name.upper()}_APP_DATA_DIR",
     os.path.join(_root_app_data_dir, pkg_name),
 )
-app_data_dir = dol.ensure_dir(app_data_dir, verbose=f'Making app dir: {app_data_dir}')
+app_data_dir = dol.ensure_dir(app_data_dir, verbose=f"Making app dir: {app_data_dir}")
 djoin = partial(os.path.join, app_data_dir)
 
 

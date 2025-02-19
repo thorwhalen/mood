@@ -1,4 +1,4 @@
-"""Get historical headlines """
+"""Get historical headlines"""
 
 import os
 import requests
@@ -7,7 +7,7 @@ from datetime import datetime
 
 def headlines_from_newsdata_io(api_key, start_date, end_date):
     """Get headlines from NewsData.io within a specified date range."""
-    url = f'https://newsdata.io/api/1/archive?apikey={api_key}&q=finance&from_date={start_date}&to_date={end_date}&language=en'
+    url = f"https://newsdata.io/api/1/archive?apikey={api_key}&q=finance&from_date={start_date}&to_date={end_date}&language=en"
 
     response = requests.get(url)
 
@@ -27,7 +27,7 @@ def headlines_from_newsdata_io(api_key, start_date, end_date):
         print("Failed to parse response JSON")
         return []
 
-    headlines = [article['title'] for article in data.get('results', [])]
+    headlines = [article["title"] for article in data.get("results", [])]
 
     if not headlines:
         print("No news data found for the specified date range.")
@@ -37,11 +37,11 @@ def headlines_from_newsdata_io(api_key, start_date, end_date):
 
 def _headlines_from_newsdata_io_example():
     api_key = os.environ[
-        'NEWSDATA_API_KEY'
+        "NEWSDATA_API_KEY"
     ]  # get one for free here: https://newsdata.io/api-key
     # --> But the
-    start_date = '2023-01-01'
-    end_date = '2023-01-31'
+    start_date = "2023-01-01"
+    end_date = "2023-01-31"
     news_data = headlines_from_newsdata_io(api_key, start_date, end_date)
 
     if news_data:
