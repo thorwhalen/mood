@@ -35,5 +35,10 @@
     "Litigation": "Reports of significant legal challenges or lawsuits that can materially alter a company's financial outlook.",
     "Supply Chain Disruption": "Information about major disruptions in supply chains—like factory shutdowns or logistics issues—that can hurt earnings.",
     "Scandal": "Mentions of corporate fraud or other scandals that typically lead to swift, negative market reactions.",
-    "Oil Prices": "Fluctuations in oil prices that impact inflation, corporate costs, and energy sector performance."
+    "Oil Prices": "Fluctuations in oil prices that impact inflation, corporate costs, and energy sector performance.",
+    "Bitcoin": "To track Bitcoin news",
+    "Ethereum": "To track Ethereum news",
+    "S&P 500": "To track S&P 500 news",
+    "NASDAQ": "To track NASDAQ news",
+    "China": "China and the US are sort of in a cold war of trade, so keeping an eye on news mentioning China could give us some indicators."
 }
