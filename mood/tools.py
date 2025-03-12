@@ -3,7 +3,7 @@
 from dol import Pipe
 from scoopy.data_sources import headlines
 from mood.sentiment import sentiment_analysis
-
+import json
 
 headlines_mood = Pipe(headlines, sentiment_analysis)
 
@@ -129,4 +129,4 @@ def search_and_save_news(
             q, search_func=_search_func, query_to_key=_file_key, store=store
         )
         if verbose:
-            print(f"{t}")
+            print(f"{source=}, {q=}, {t=}")
