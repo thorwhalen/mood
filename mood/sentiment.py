@@ -21,13 +21,13 @@ def sentiment_analysis(headlines):
 
 
 @lru_cache(maxsize=1)
-def _flair_text_classifier(model='en-sentiment'):
+def _flair_text_classifier(model="en-sentiment"):
     from flair.models import TextClassifier
 
     return TextClassifier.load(model)
 
 
-def flair_sentiment_score(text: str, model='en-sentiment') -> float:
+def flair_sentiment_score(text: str, model="en-sentiment") -> float:
     """
     Analyzes the sentiment of the input text using Flair's pre-trained sentiment model.
 

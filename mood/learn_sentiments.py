@@ -1,4 +1,5 @@
 """Learning sentiments from data."""
+
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
@@ -67,8 +68,8 @@ def fit_logistic_classifier(
     random_state: int = 42,
     c_value: float = 1.0,
     max_iter: int = 1000,
-    solver: str = 'lbfgs',
-    penalty: str = 'l2',
+    solver: str = "lbfgs",
+    penalty: str = "l2",
     class_weight: Optional[Union[Dict, str]] = None,
     fit_intercept: bool = True,
     skip_validation: bool = False,
