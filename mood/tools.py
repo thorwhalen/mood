@@ -85,15 +85,16 @@ search_news_from = {
 }
 
 
-def _probably_a_file(string):
-    """Check if the string should be considered as a file"""
-    if isinstance(string, str) and os.path.isfile(string):
-        if (
-            string.endswith(".json")
-            or string[-4:] in {".txt", ".csv", ".tsv"}
-            or os.path.sep in string
-        ):
-            return True
+def _resolve_to_file_if_it_is_one(string):
+    if isinstance(string, str):
+        f = os.path.abspath(os.path.expanduser(string))
+        if os.path.isfile(f):
+            if (
+                f.endswith(".json")
+                or f[-4:] in {".txt", ".csv", ".tsv"}
+                or os.path.sep in f
+            ):
+                return f
 
     return False
 
@@ -111,13 +112,10 @@ def search_and_save_news(
     _file_key = partial(get_key, prefix=prefix, suffix=".json", day_folder=True)
 
     if isinstance(query, str):
-        if _probably_a_file(query):
-            if query.endswith(".json"):
-                with open(query) as f:
-                    query = json.load(f)
-            else:
-                with open(query) as f:
-                    query = f.read().strip().split("\n")
+        filepath = _resolve_to_file_if_it_is_one(query)
+        if filepath:
+            with open(filepath) as f:
+                query = json.load(f)
         else:
             query = [query]
 
