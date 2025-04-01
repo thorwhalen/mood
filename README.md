@@ -7,6 +7,7 @@ To install:	```pip install mood```
 Note: Requires an OpenAI API Token. 
 [How can to get one of those?](https://help.openai.com/en/articles/4936850-where-do-i-find-my-openai-api-key)
 
+For more NLP work, see [idiom](https://github.com/thorwhalen/idiom/) and [lexis](https://github.com/thorwhalen/lexis/).
 
 # Examples
 

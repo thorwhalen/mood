@@ -15,3 +15,5 @@ Sentiment analysis for stock market data.
 
 from mood.sentiment import sentiment_analysis
 from mood.tools import headlines_mood, headlines, search_and_save_news
+from mood.dataset_makers import make_semantic_attributes_dataset
+
