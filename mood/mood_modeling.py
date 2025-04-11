@@ -16,7 +16,12 @@ stronger presence of the target semantic attribute.
 
 import numpy as np
 import pandas as pd
-from sklearn.base import BaseEstimator, TransformerMixin, ClassifierMixin, RegressorMixin
+from sklearn.base import (
+    BaseEstimator,
+    TransformerMixin,
+    ClassifierMixin,
+    RegressorMixin,
+)
 from sklearn.model_selection import train_test_split, KFold, cross_validate
 from sklearn.metrics import (
     mean_squared_error,
@@ -39,6 +44,43 @@ from scipy.special import expit
 from scipy.stats import spearmanr, kendalltau
 import warnings
 from contextlib import suppress
+
+
+def class_to_path(obj):
+    """Convert an object to a string path.
+    This is useful for serialization and deserialization of objects.
+
+    >>> from sklearn.linear_model import LogisticRegression
+    >>> path = class_to_path(LogisticRegression)
+    >>> path
+    'sklearn.linear_model._logistic.LogisticRegression'
+    >>> path_to_class(path) == LogisticRegression
+    True
+
+    """
+    return '.'.join([obj.__module__, obj.__qualname__])
+
+
+def path_to_class(path):
+    """
+    Convert a string path to an object.
+    """
+    import importlib
+
+    module_name, class_name = path.rsplit('.', 1)
+    module = importlib.import_module(module_name)
+    return getattr(module, class_name)
+
+
+def _replace_class_values_with_path(d: dict):
+    def _transformed():
+        for k, v in d.items():
+            if isinstance(v, type):
+                yield k, class_to_path(v)
+            else:
+                yield k, v
+
+    return dict(_transformed())
 
 
 def _sigmoid_transform(x: np.ndarray) -> np.ndarray:
@@ -355,6 +397,19 @@ class MoodEstimator(BaseEstimator, TransformerMixin):
     def _is_classifier(self):
         return self.data_type == 'binary'
 
+    @property
+    def __sklearn_tags__(self):
+        return self.model.__sklearn_tags__
+
+    # make it so that any other attribute will be looked up on self
+    def __getattr__(self, attr):
+        """Delegate attribute access to the underlying model."""
+        if hasattr(self.model, attr):
+            return getattr(self.model, attr)
+        raise AttributeError(
+            f"'{self.__class__.__name__}' object has no attribute '{attr}'"
+        )
+
 
 class MoodModelingManager:
     """
@@ -431,7 +486,7 @@ class MoodModelingManager:
                 )
 
             for model_name, config in self.models.items():
-                max_dims = config.get('max_dims', 100)
+                max_dims = config.get('max_dims', MAX_DIMS)
                 if max_dims > n_samples / 2:
                     print(
                         f"WARNING: Model '{model_name}' uses {max_dims} dimensions with only {n_samples} samples. Consider reducing max_dims to avoid overfitting."
@@ -761,6 +816,11 @@ class MoodModelingManager:
             data_type = model_config.get('data_type', 'numerical')
             X, y = self._get_model_data(model_config)
 
+            # Apply dimension reduction before cross-validation
+            max_dims = model_config.get('max_dims', MAX_DIMS)
+            dimension_reducer = DimensionReducer(max_dims=max_dims)
+            X_reduced = dimension_reducer.transform(X)
+
             # Define scoring metrics based on data type if not specified
             if metrics is None:
                 if data_type == 'numerical' or data_type == 'ordinal':
@@ -789,8 +849,10 @@ class MoodModelingManager:
             else:
                 scoring = list(metrics)
 
-            # Create model
-            model = self._create_model(model_config)
+            # Create the base model (without MoodEstimator wrapper for cross_validate)
+            model_class = model_config.get('model_class')
+            model_params = model_config.get('model_params', {})
+            base_model = model_class(**model_params)
 
             # Perform cross-validation
             cv = KFold(n_splits=n_splits, shuffle=True, random_state=self.random_state)
@@ -800,7 +862,17 @@ class MoodModelingManager:
                 custom_scoring = {}
 
                 # For binary classifiers, use standard classification metrics
-                if data_type == 'binary' and model._is_classifier:
+                if data_type == 'binary' and (
+                    isinstance(
+                        base_model,
+                        (
+                            LogisticRegression,
+                            SVC,
+                            RandomForestClassifier,
+                            ClassifierMixin,
+                        ),
+                    )
+                ):
                     for metric in scoring:
                         if metric in [
                             'accuracy',
@@ -814,7 +886,10 @@ class MoodModelingManager:
                             )
 
                 # For regression models, use regression metrics
-                elif data_type in ['numerical', 'ordinal'] or not model._is_classifier:
+                elif data_type in ['numerical', 'ordinal'] or not isinstance(
+                    base_model,
+                    (LogisticRegression, SVC, RandomForestClassifier, ClassifierMixin),
+                ):
                     for metric in scoring:
                         if metric in [
                             'neg_mean_squared_error',
@@ -825,17 +900,25 @@ class MoodModelingManager:
 
                 # If no appropriate metrics, fall back to a simple one
                 if not custom_scoring:
-                    if model._is_classifier:
+                    if isinstance(
+                        base_model,
+                        (
+                            LogisticRegression,
+                            SVC,
+                            RandomForestClassifier,
+                            ClassifierMixin,
+                        ),
+                    ):
                         custom_scoring['accuracy'] = 'accuracy'
                     else:
                         custom_scoring['neg_mse'] = 'neg_mean_squared_error'
 
                 # Catch warnings to suppress them in verbose mode
                 with warnings.catch_warnings(record=True) as caught_warnings:
-                    # Use custom scoring
+                    # Use custom scoring on the reduced data
                     cv_scores = cross_validate(
-                        model,
-                        X,
+                        base_model,
+                        X_reduced,  # Use the reduced dimensions data
                         y,
                         cv=cv,
                         scoring=custom_scoring,
@@ -883,7 +966,18 @@ class MoodModelingManager:
 
                 # Add additional metrics not supported directly by sklearn cross_validate
                 # For example, spearman correlation for every model type
-                if model._is_classifier and 'accuracy' in metrics_results:
+                if (
+                    isinstance(
+                        base_model,
+                        (
+                            LogisticRegression,
+                            SVC,
+                            RandomForestClassifier,
+                            ClassifierMixin,
+                        ),
+                    )
+                    and 'accuracy' in metrics_results
+                ):
                     # Add a placeholder for ordinal metrics if needed
                     metrics_results['spearman'] = None
                     metrics_results['kendall_tau'] = None
@@ -891,7 +985,7 @@ class MoodModelingManager:
                 cv_results[model_name] = {
                     'metrics': metrics_results,
                     'data_type': data_type,
-                    'config': model_config,
+                    'config': _replace_class_values_with_path(model_config),
                     'n_splits': n_splits,
                 }
 
@@ -913,7 +1007,7 @@ class MoodModelingManager:
                 cv_results[model_name] = {
                     'error': str(e),
                     'data_type': data_type,
-                    'config': model_config,
+                    'config': _replace_class_values_with_path(model_config),
                 }
 
         self.cv_results = cv_results
@@ -1123,13 +1217,15 @@ class MoodModelingManager:
         return egress(summary)
 
 
+MAX_DIMS = 300
+
 # Default model configurations
 default_models = {
     'linear_regression': {
         'data_type': 'numerical',
         'model_class': Ridge,
         'model_params': {'alpha': 1.0},
-        'max_dims': 50,
+        'max_dims': MAX_DIMS,
         'output_transform': 'sigmoid',
         'normalize': True,
     },
@@ -1137,7 +1233,7 @@ default_models = {
         'data_type': 'numerical',
         'model_class': SVR,
         'model_params': {'C': 1.0, 'kernel': 'linear'},
-        'max_dims': 50,
+        'max_dims': MAX_DIMS,
         'output_transform': 'minmax',
         'normalize': True,
     },
@@ -1145,7 +1241,7 @@ default_models = {
         'data_type': 'binary',
         'model_class': LogisticRegression,
         'model_params': {'C': 1.0, 'class_weight': 'balanced'},
-        'max_dims': 50,
+        'max_dims': MAX_DIMS,
         'threshold': None,  # Will be set to median
         'output_transform': 'sigmoid',
     },
@@ -1153,7 +1249,7 @@ default_models = {
         'data_type': 'binary',
         'model_class': SVC,
         'model_params': {'C': 1.0, 'kernel': 'linear', 'probability': True},
-        'max_dims': 50,
+        'max_dims': MAX_DIMS,
         'threshold': None,  # Will be set to median
         'output_transform': 'sigmoid',
     },
@@ -1167,7 +1263,7 @@ with suppress(ImportError, ModuleNotFoundError):
         'data_type': 'ordinal',
         'model_class': LogisticIT,
         'model_params': {'alpha': 1.0},
-        'max_dims': 50,
+        'max_dims': MAX_DIMS,
         'output_transform': 'minmax',
     }
 
@@ -1175,7 +1271,7 @@ with suppress(ImportError, ModuleNotFoundError):
         'data_type': 'ordinal',
         'model_class': LogisticAT,
         'model_params': {'alpha': 1.0},
-        'max_dims': 50,
+        'max_dims': MAX_DIMS,
         'output_transform': 'minmax',
     }
 
@@ -1186,7 +1282,7 @@ with suppress(ImportError, ModuleNotFoundError):
         'data_type': 'ordinal',
         'model_class': OrdinalRidge,
         'model_params': {'alpha': 1.0},
-        'max_dims': 50,
+        'max_dims': MAX_DIMS,
         'output_transform': 'minmax',
     }
 
@@ -1198,7 +1294,7 @@ with suppress(ImportError, ModuleNotFoundError):
         'data_type': 'ordinal',
         'model_class': OGBClassifier,
         'model_params': {'n_estimators': 100, 'learning_rate': 0.1},
-        'max_dims': 50,
+        'max_dims': MAX_DIMS,
         'output_transform': 'minmax',
     }
 
@@ -1212,7 +1308,7 @@ default_models['ordinal_svm'] = {
         'decision_function_shape': 'ovo',  # One-vs-One approach works better for ordinal data
         'probability': True,
     },
-    'max_dims': 50,
+    'max_dims': MAX_DIMS,
     'output_transform': 'minmax',
 }
 
@@ -1255,7 +1351,7 @@ default_models['ordinal_forest'] = {
     'data_type': 'ordinal',
     'model_class': OrdinalRandomForest,
     'model_params': {'n_estimators': 100, 'max_depth': 10, 'min_samples_split': 5},
-    'max_dims': 50,
+    'max_dims': MAX_DIMS,
     'output_transform': 'minmax',
 }
 
