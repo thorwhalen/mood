@@ -82,13 +82,14 @@ def parse_line(line: str):
         segment = match.group(2)
         return dict(score=score, segment=segment)
 
+
 def parsed_lines(text_contents: str):
     for line in text_lines(text_contents):
         parsed_line = parse_line(line)
         if parsed_line:
             yield parsed_line
-            
-    
+
+
 # --------------------------------------------------------------------------------------
 # Prompt and AI function
 
@@ -254,16 +255,16 @@ def make_semantic_attributes_dataset(
     2
     >>> store  # doctest: +SKIP
     ... {
-    ...     'color/color_00.txt': '0 The meeting was dull and unproductive, leaving everyone feeling dissatisfied.  \n'
-    ...                           '2 The car was old and rusty, with a paint job that had faded over time, hinting at its once vibrant color.  \n'
-    ...                           '5 The sunset painted the sky in brilliant shades of orange, pink, and purple, creating a breathtaking display of color that captivated all who watched.  \n'
-    ...                           '1 The room felt gloomy, with dark furniture casting shadows, though a hint of blue could be seen in the curtains.  ',
-    ...     'color/color_01.txt': '0 The meeting was dull and uneventful, lacking any excitement or engagement.  \n'
-    ...                           '1 The car was just an ordinary vehicle, nothing special about its appearance.  \n'
-    ...                           "2 The flowers were vibrant, but I couldn't quite tell what colors they were.  \n"
-    ...                           '3 The sky turned a beautiful shade of orange as the sun began to set, casting a warm glow.  \n'
-    ...                           "4 She wore a stunning red dress that caught everyone's attention at the party.  \n"
-    ...                           '5 The ocean sparkled in shades of deep blue and turquoise, a breathtaking view that left us speechless.  '
+        'color/color_00.txt': '0 The meeting was dull and unproductive, leaving everyone feeling dissatisfied.  \n'
+                              '2 The car was old and rusty, with a paint job that had faded over time, hinting at its once vibrant color.  \n'
+                              '5 The sunset painted the sky in brilliant shades of orange, pink, and purple, creating a breathtaking display of color that captivated all who watched.  \n'
+                              '1 The room felt gloomy, with dark furniture casting shadows, though a hint of blue could be seen in the curtains.  ',
+        'color/color_01.txt': '0 The meeting was dull and uneventful, lacking any excitement or engagement.  \n'
+                              '1 The car was just an ordinary vehicle, nothing special about its appearance.  \n'
+                              "2 The flowers were vibrant, but I couldn't quite tell what colors they were.  \n"
+                              '3 The sky turned a beautiful shade of orange as the sun began to set, casting a warm glow.  \n'
+                              "4 She wore a stunning red dress that caught everyone's attention at the party.  \n"
+                              '5 The ocean sparkled in shades of deep blue and turquoise, a breathtaking view that left us speechless.  '
     }
     """
     if isinstance(store, str):
