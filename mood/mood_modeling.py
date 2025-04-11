@@ -58,7 +58,7 @@ def class_to_path(obj):
     True
 
     """
-    return '.'.join([obj.__module__, obj.__qualname__])
+    return ".".join([obj.__module__, obj.__qualname__])
 
 
 def path_to_class(path):
@@ -67,7 +67,7 @@ def path_to_class(path):
     """
     import importlib
 
-    module_name, class_name = path.rsplit('.', 1)
+    module_name, class_name = path.rsplit(".", 1)
     module = importlib.import_module(module_name)
     return getattr(module, class_name)
 
@@ -210,7 +210,7 @@ class DimensionReducer(BaseEstimator, TransformerMixin):
         """
         self.max_dims = max_dims
 
-    def fit(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> 'DimensionReducer':
+    def fit(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> "DimensionReducer":
         """
         Fit method (no-op as this is a simple feature selector).
 
@@ -248,9 +248,9 @@ class MoodEstimator(BaseEstimator, TransformerMixin):
         self,
         model: BaseEstimator,
         max_dims: Optional[int] = None,
-        output_transform: str = 'sigmoid',
+        output_transform: str = "sigmoid",
         threshold: Optional[float] = None,
-        data_type: str = 'numerical',
+        data_type: str = "numerical",
     ):
         """
         Initialize the mood estimator.
@@ -270,22 +270,22 @@ class MoodEstimator(BaseEstimator, TransformerMixin):
         self.dimension_reducer = DimensionReducer(max_dims=max_dims)
 
         self._transform_functions = {
-            'sigmoid': _sigmoid_transform,
-            'minmax': _minmax_transform,
-            'tanh': _tanh_transform,
+            "sigmoid": _sigmoid_transform,
+            "minmax": _minmax_transform,
+            "tanh": _tanh_transform,
         }
 
         # Detect if model is a classifier or regressor for sklearn compatibility
         self._is_classifier = (
-            (data_type == 'binary')
-            or hasattr(model, 'predict_proba')
+            (data_type == "binary")
+            or hasattr(model, "predict_proba")
             or isinstance(
                 model,
                 (LogisticRegression, SVC, RandomForestClassifier, ClassifierMixin),
             )
         )
 
-    def fit(self, X: np.ndarray, y: np.ndarray) -> 'MoodEstimator':
+    def fit(self, X: np.ndarray, y: np.ndarray) -> "MoodEstimator":
         """
         Fit the model to the data.
 
@@ -328,7 +328,7 @@ class MoodEstimator(BaseEstimator, TransformerMixin):
         # Get raw predictions
         if (
             self._is_classifier
-            and hasattr(self.model, 'predict_proba')
+            and hasattr(self.model, "predict_proba")
             and self.threshold is None
         ):
             # For models with predict_proba, use probability of positive class
@@ -365,7 +365,7 @@ class MoodEstimator(BaseEstimator, TransformerMixin):
             )
 
         X_reduced = self.dimension_reducer.transform(X)
-        if hasattr(self.model, 'predict_proba'):
+        if hasattr(self.model, "predict_proba"):
             try:
                 return self.model.predict_proba(X_reduced)
             except (AttributeError, NotImplementedError):
@@ -395,7 +395,7 @@ class MoodEstimator(BaseEstimator, TransformerMixin):
     # This is what sklearn uses for duck-typing
     # Make this look like a classifier when intended to be used as one
     def _is_classifier(self):
-        return self.data_type == 'binary'
+        return self.data_type == "binary"
 
     @property
     def __sklearn_tags__(self):
@@ -425,8 +425,8 @@ class MoodModelingManager:
     def __init__(
         self,
         df: pd.DataFrame,
-        embedding_col: str = 'embedding',
-        score_col: str = 'score',
+        embedding_col: str = "embedding",
+        score_col: str = "score",
         test_size: float = 0.2,
         random_state: int = 42,
         models: Optional[Dict] = None,
@@ -486,7 +486,7 @@ class MoodModelingManager:
                 )
 
             for model_name, config in self.models.items():
-                max_dims = config.get('max_dims', MAX_DIMS)
+                max_dims = config.get("max_dims", MAX_DIMS)
                 if max_dims > n_samples / 2:
                     print(
                         f"WARNING: Model '{model_name}' uses {max_dims} dimensions with only {n_samples} samples. Consider reducing max_dims to avoid overfitting."
@@ -574,19 +574,19 @@ class MoodModelingManager:
         Returns:
             Tuple of (X, y) for the model
         """
-        data_type = model_config.get('data_type', 'numerical')
+        data_type = model_config.get("data_type", "numerical")
 
-        if data_type == 'numerical':
-            normalize = model_config.get('normalize', True)
+        if data_type == "numerical":
+            normalize = model_config.get("normalize", True)
             return self.prepare_numerical_data(normalize=normalize)
 
-        elif data_type == 'ordinal':
+        elif data_type == "ordinal":
             return self.prepare_ordinal_data()
 
-        elif data_type == 'binary':
-            threshold = model_config.get('threshold', None)
-            positive_labels = model_config.get('positive_labels', None)
-            negative_labels = model_config.get('negative_labels', None)
+        elif data_type == "binary":
+            threshold = model_config.get("threshold", None)
+            positive_labels = model_config.get("positive_labels", None)
+            negative_labels = model_config.get("negative_labels", None)
             return self.prepare_binary_data(
                 threshold=threshold,
                 positive_labels=positive_labels,
@@ -606,12 +606,12 @@ class MoodModelingManager:
         Returns:
             Configured MoodEstimator
         """
-        model_class = model_config.get('model_class')
-        model_params = model_config.get('model_params', {})
-        max_dims = model_config.get('max_dims', 100)
-        output_transform = model_config.get('output_transform', 'sigmoid')
-        threshold = model_config.get('threshold', None)
-        data_type = model_config.get('data_type', 'numerical')
+        model_class = model_config.get("model_class")
+        model_params = model_config.get("model_params", {})
+        max_dims = model_config.get("max_dims", 100)
+        output_transform = model_config.get("output_transform", "sigmoid")
+        threshold = model_config.get("threshold", None)
+        data_type = model_config.get("data_type", "numerical")
 
         # Create the base model
         base_model = model_class(**model_params)
@@ -640,16 +640,16 @@ class MoodModelingManager:
             Dictionary of evaluation metrics
         """
         return {
-            'mse': mean_squared_error(y_true, y_pred),
-            'rmse': np.sqrt(mean_squared_error(y_true, y_pred)),
-            'mae': mean_absolute_error(y_true, y_pred),
-            'r2': r2_score(y_true, y_pred),
-            'spearman': spearmanr(y_true, y_mood)[0],
-            'kendall_tau': kendalltau(y_true, y_mood)[0],
-            'min_pred': np.min(y_pred),
-            'max_pred': np.max(y_pred),
-            'min_mood': np.min(y_mood),
-            'max_mood': np.max(y_mood),
+            "mse": mean_squared_error(y_true, y_pred),
+            "rmse": np.sqrt(mean_squared_error(y_true, y_pred)),
+            "mae": mean_absolute_error(y_true, y_pred),
+            "r2": r2_score(y_true, y_pred),
+            "spearman": spearmanr(y_true, y_mood)[0],
+            "kendall_tau": kendalltau(y_true, y_mood)[0],
+            "min_pred": np.min(y_pred),
+            "max_pred": np.max(y_pred),
+            "min_mood": np.min(y_mood),
+            "max_mood": np.max(y_mood),
         }
 
     def _evaluate_ordinal(
@@ -667,11 +667,11 @@ class MoodModelingManager:
             Dictionary of evaluation metrics
         """
         return {
-            'accuracy': accuracy_score(y_true, np.round(y_pred).astype(int)),
-            'mae': mean_absolute_error(y_true, y_pred),
-            'mse': mean_squared_error(y_true, y_pred),
-            'spearman': spearmanr(y_true, y_mood)[0],
-            'kendall_tau': kendalltau(y_true, y_mood)[0],
+            "accuracy": accuracy_score(y_true, np.round(y_pred).astype(int)),
+            "mae": mean_absolute_error(y_true, y_pred),
+            "mse": mean_squared_error(y_true, y_pred),
+            "spearman": spearmanr(y_true, y_mood)[0],
+            "kendall_tau": kendalltau(y_true, y_mood)[0],
         }
 
     def _evaluate_binary(
@@ -696,17 +696,17 @@ class MoodModelingManager:
             auc = np.nan
 
         metrics = {
-            'accuracy': accuracy_score(y_true, y_pred_binary),
-            'precision': precision_score(y_true, y_pred_binary, zero_division=0),
-            'recall': recall_score(y_true, y_pred_binary, zero_division=0),
-            'f1': f1_score(y_true, y_pred_binary, zero_division=0),
-            'auc': auc,
+            "accuracy": accuracy_score(y_true, y_pred_binary),
+            "precision": precision_score(y_true, y_pred_binary, zero_division=0),
+            "recall": recall_score(y_true, y_pred_binary, zero_division=0),
+            "f1": f1_score(y_true, y_pred_binary, zero_division=0),
+            "auc": auc,
         }
 
         # Add confusion matrix elements
         cm = confusion_matrix(y_true, y_pred_binary)
         if cm.shape == (2, 2):
-            metrics['tn'], metrics['fp'], metrics['fn'], metrics['tp'] = cm.ravel()
+            metrics["tn"], metrics["fp"], metrics["fn"], metrics["tp"] = cm.ravel()
 
         return metrics
 
@@ -732,11 +732,11 @@ class MoodModelingManager:
         y_mood = model.transform(X)
 
         # Evaluate based on data type
-        if data_type == 'numerical':
+        if data_type == "numerical":
             return self._evaluate_numerical(y, y_pred, y_mood)
-        elif data_type == 'ordinal':
+        elif data_type == "ordinal":
             return self._evaluate_ordinal(y, y_pred, y_mood)
-        elif data_type == 'binary':
+        elif data_type == "binary":
             return self._evaluate_binary(y, y_pred, y_mood)
         else:
             raise ValueError(f"Unknown data type: {data_type}")
@@ -755,7 +755,7 @@ class MoodModelingManager:
                 print(f"Training and evaluating model: {model_name}")
 
             # Get data for this model
-            data_type = model_config.get('data_type', 'numerical')
+            data_type = model_config.get("data_type", "numerical")
             X, y = self._get_model_data(model_config)
 
             # Train-test split
@@ -775,10 +775,10 @@ class MoodModelingManager:
 
             # Store results
             results[model_name] = {
-                'test_metrics': test_metrics,
-                'train_metrics': train_metrics,
-                'data_type': data_type,
-                'config': model_config,
+                "test_metrics": test_metrics,
+                "train_metrics": train_metrics,
+                "data_type": data_type,
+                "config": model_config,
             }
 
             # Store the trained model
@@ -813,45 +813,45 @@ class MoodModelingManager:
                 print(f"Cross-validating model: {model_name}")
 
             # Get data for this model
-            data_type = model_config.get('data_type', 'numerical')
+            data_type = model_config.get("data_type", "numerical")
             X, y = self._get_model_data(model_config)
 
             # Apply dimension reduction before cross-validation
-            max_dims = model_config.get('max_dims', MAX_DIMS)
+            max_dims = model_config.get("max_dims", MAX_DIMS)
             dimension_reducer = DimensionReducer(max_dims=max_dims)
             X_reduced = dimension_reducer.transform(X)
 
             # Define scoring metrics based on data type if not specified
             if metrics is None:
-                if data_type == 'numerical' or data_type == 'ordinal':
+                if data_type == "numerical" or data_type == "ordinal":
                     scoring = [
-                        'neg_mean_squared_error',
-                        'neg_mean_absolute_error',
-                        'r2',
+                        "neg_mean_squared_error",
+                        "neg_mean_absolute_error",
+                        "r2",
                     ]
-                elif data_type == 'binary':
+                elif data_type == "binary":
                     # Only use classification metrics for binary classification
-                    if model_config.get('model_class') in [
+                    if model_config.get("model_class") in [
                         LogisticRegression,
                         SVC,
                         RandomForestClassifier,
                     ]:
-                        scoring = ['accuracy', 'precision', 'recall', 'f1', 'roc_auc']
+                        scoring = ["accuracy", "precision", "recall", "f1", "roc_auc"]
                     else:
                         # For other models converted to binary, use regression metrics
                         scoring = [
-                            'neg_mean_squared_error',
-                            'neg_mean_absolute_error',
-                            'r2',
+                            "neg_mean_squared_error",
+                            "neg_mean_absolute_error",
+                            "r2",
                         ]
                 else:
-                    scoring = ['neg_mean_squared_error']
+                    scoring = ["neg_mean_squared_error"]
             else:
                 scoring = list(metrics)
 
             # Create the base model (without MoodEstimator wrapper for cross_validate)
-            model_class = model_config.get('model_class')
-            model_params = model_config.get('model_params', {})
+            model_class = model_config.get("model_class")
+            model_params = model_config.get("model_params", {})
             base_model = model_class(**model_params)
 
             # Perform cross-validation
@@ -862,7 +862,7 @@ class MoodModelingManager:
                 custom_scoring = {}
 
                 # For binary classifiers, use standard classification metrics
-                if data_type == 'binary' and (
+                if data_type == "binary" and (
                     isinstance(
                         base_model,
                         (
@@ -875,26 +875,26 @@ class MoodModelingManager:
                 ):
                     for metric in scoring:
                         if metric in [
-                            'accuracy',
-                            'precision',
-                            'recall',
-                            'f1',
-                            'roc_auc',
+                            "accuracy",
+                            "precision",
+                            "recall",
+                            "f1",
+                            "roc_auc",
                         ]:
                             custom_scoring[metric] = (
                                 metric  # Use standard sklearn metrics
                             )
 
                 # For regression models, use regression metrics
-                elif data_type in ['numerical', 'ordinal'] or not isinstance(
+                elif data_type in ["numerical", "ordinal"] or not isinstance(
                     base_model,
                     (LogisticRegression, SVC, RandomForestClassifier, ClassifierMixin),
                 ):
                     for metric in scoring:
                         if metric in [
-                            'neg_mean_squared_error',
-                            'neg_mean_absolute_error',
-                            'r2',
+                            "neg_mean_squared_error",
+                            "neg_mean_absolute_error",
+                            "r2",
                         ]:
                             custom_scoring[metric] = metric
 
@@ -909,9 +909,9 @@ class MoodModelingManager:
                             ClassifierMixin,
                         ),
                     ):
-                        custom_scoring['accuracy'] = 'accuracy'
+                        custom_scoring["accuracy"] = "accuracy"
                     else:
-                        custom_scoring['neg_mse'] = 'neg_mean_squared_error'
+                        custom_scoring["neg_mse"] = "neg_mean_squared_error"
 
                 # Catch warnings to suppress them in verbose mode
                 with warnings.catch_warnings(record=True) as caught_warnings:
@@ -923,7 +923,7 @@ class MoodModelingManager:
                         cv=cv,
                         scoring=custom_scoring,
                         return_train_score=True,
-                        error_score='raise',  # Better to fail visibly than silently
+                        error_score="raise",  # Better to fail visibly than silently
                     )
 
                     # Show warnings if in high verbose mode
@@ -937,31 +937,31 @@ class MoodModelingManager:
                 metrics_results = {}
                 for metric_name, metric in custom_scoring.items():
                     # Convert sklearn metric names to our convention
-                    display_name = metric_name.replace('neg_', '')
-                    if metric_name.startswith('neg_'):
+                    display_name = metric_name.replace("neg_", "")
+                    if metric_name.startswith("neg_"):
                         # Negate negative metrics back to positive
                         metrics_results[display_name] = -cv_scores[
-                            f'test_{metric_name}'
+                            f"test_{metric_name}"
                         ].mean()
-                        metrics_results[f'train_{display_name}'] = -cv_scores[
-                            f'train_{metric_name}'
+                        metrics_results[f"train_{display_name}"] = -cv_scores[
+                            f"train_{metric_name}"
                         ].mean()
                     else:
                         metrics_results[display_name] = cv_scores[
-                            f'test_{metric_name}'
+                            f"test_{metric_name}"
                         ].mean()
-                        metrics_results[f'train_{display_name}'] = cv_scores[
-                            f'train_{metric_name}'
+                        metrics_results[f"train_{display_name}"] = cv_scores[
+                            f"train_{metric_name}"
                         ].mean()
 
                     # Add standard deviation
-                    if metric_name.startswith('neg_'):
-                        metrics_results[f'{display_name}_std'] = cv_scores[
-                            f'test_{metric_name}'
+                    if metric_name.startswith("neg_"):
+                        metrics_results[f"{display_name}_std"] = cv_scores[
+                            f"test_{metric_name}"
                         ].std()
                     else:
-                        metrics_results[f'{display_name}_std'] = cv_scores[
-                            f'test_{metric_name}'
+                        metrics_results[f"{display_name}_std"] = cv_scores[
+                            f"test_{metric_name}"
                         ].std()
 
                 # Add additional metrics not supported directly by sklearn cross_validate
@@ -976,17 +976,17 @@ class MoodModelingManager:
                             ClassifierMixin,
                         ),
                     )
-                    and 'accuracy' in metrics_results
+                    and "accuracy" in metrics_results
                 ):
                     # Add a placeholder for ordinal metrics if needed
-                    metrics_results['spearman'] = None
-                    metrics_results['kendall_tau'] = None
+                    metrics_results["spearman"] = None
+                    metrics_results["kendall_tau"] = None
 
                 cv_results[model_name] = {
-                    'metrics': metrics_results,
-                    'data_type': data_type,
-                    'config': _replace_class_values_with_path(model_config),
-                    'n_splits': n_splits,
+                    "metrics": metrics_results,
+                    "data_type": data_type,
+                    "config": _replace_class_values_with_path(model_config),
+                    "n_splits": n_splits,
                 }
 
                 if self.verbose >= 2:
@@ -1005,9 +1005,9 @@ class MoodModelingManager:
                         traceback.print_exc()
 
                 cv_results[model_name] = {
-                    'error': str(e),
-                    'data_type': data_type,
-                    'config': _replace_class_values_with_path(model_config),
+                    "error": str(e),
+                    "data_type": data_type,
+                    "config": _replace_class_values_with_path(model_config),
                 }
 
         self.cv_results = cv_results
@@ -1031,7 +1031,7 @@ class MoodModelingManager:
 
             # Check dimensions again
             n_samples, n_features = X.shape
-            max_dims = model_config.get('max_dims', 100)
+            max_dims = model_config.get("max_dims", 100)
 
             if self.verbose >= 1 and max_dims > n_samples / 3:
                 print(
@@ -1043,11 +1043,11 @@ class MoodModelingManager:
             model.fit(X, y)
 
             # Evaluate on all data (train=test evaluation)
-            data_type = model_config.get('data_type', 'numerical')
+            data_type = model_config.get("data_type", "numerical")
             metrics = self._evaluate_model(model, X, y, data_type)
 
             # Store results
-            final_models[model_name] = {'model': model, 'full_data_metrics': metrics}
+            final_models[model_name] = {"model": model, "full_data_metrics": metrics}
 
             if self.verbose >= 3:
                 print(
@@ -1059,7 +1059,7 @@ class MoodModelingManager:
 
     def get_best_model(
         self,
-        metric: str = 'spearman',
+        metric: str = "spearman",
         data_type: Optional[str] = None,
         use_cv: bool = False,
     ) -> Tuple[str, MoodEstimator]:
@@ -1078,17 +1078,17 @@ class MoodModelingManager:
             if self.verbose >= 2:
                 print(f"Selecting best model based on cross-validation {metric} score")
 
-            best_score = -float('inf')
+            best_score = -float("inf")
             best_model_name = None
 
             for model_name, result in self.cv_results.items():
-                if 'error' in result:
+                if "error" in result:
                     continue
 
-                if data_type is not None and result['data_type'] != data_type:
+                if data_type is not None and result["data_type"] != data_type:
                     continue
 
-                score = result['metrics'].get(metric, -float('inf'))
+                score = result["metrics"].get(metric, -float("inf"))
 
                 if score > best_score:
                     best_score = score
@@ -1102,14 +1102,14 @@ class MoodModelingManager:
             if self.verbose >= 2:
                 print(f"Selecting best model based on single split {metric} score")
 
-            best_score = -float('inf')
+            best_score = -float("inf")
             best_model_name = None
 
             for model_name, result in self.results.items():
-                if data_type is not None and result['data_type'] != data_type:
+                if data_type is not None and result["data_type"] != data_type:
                     continue
 
-                score = result['test_metrics'].get(metric, -float('inf'))
+                score = result["test_metrics"].get(metric, -float("inf"))
 
                 if score > best_score:
                     best_score = score
@@ -1128,7 +1128,7 @@ class MoodModelingManager:
         if self.verbose >= 1:
             print(f"Selected model '{best_model_name}' with {metric}={best_score:.4f}")
 
-        return best_model_name, self.final_models[best_model_name]['model']
+        return best_model_name, self.final_models[best_model_name]["model"]
 
     def predict_mood(
         self, X: np.ndarray, model_name: Optional[str] = None
@@ -1149,7 +1149,7 @@ class MoodModelingManager:
         if model_name is None:
             model_name, _ = self.get_best_model()
 
-        model = self.final_models[model_name]['model']
+        model = self.final_models[model_name]["model"]
         return model.transform(X)
 
     def get_model_summary(self, use_cv: bool = False, *, egress=pd.DataFrame):
@@ -1171,17 +1171,17 @@ class MoodModelingManager:
             summary = []
 
             for model_name, result in self.cv_results.items():
-                if 'error' in result:
+                if "error" in result:
                     continue
 
                 row = {
-                    'model_name': model_name,
-                    'data_type': result['data_type'],
-                    'n_splits': result['n_splits'],
+                    "model_name": model_name,
+                    "data_type": result["data_type"],
+                    "n_splits": result["n_splits"],
                 }
 
                 # Add metrics
-                for metric, value in result['metrics'].items():
+                for metric, value in result["metrics"].items():
                     row[metric] = value
 
                 summary.append(row)
@@ -1198,16 +1198,16 @@ class MoodModelingManager:
             summary = []
 
             for model_name, result in self.results.items():
-                row = {'model_name': model_name, 'data_type': result['data_type']}
+                row = {"model_name": model_name, "data_type": result["data_type"]}
 
                 # Add test metrics
-                for metric, value in result['test_metrics'].items():
-                    row[f'test_{metric}'] = value
+                for metric, value in result["test_metrics"].items():
+                    row[f"test_{metric}"] = value
 
                 # Add selected train metrics for comparison
-                for metric in ['mse', 'accuracy', 'f1', 'spearman', 'kendall_tau']:
-                    if metric in result['train_metrics']:
-                        row[f'train_{metric}'] = result['train_metrics'][metric]
+                for metric in ["mse", "accuracy", "f1", "spearman", "kendall_tau"]:
+                    if metric in result["train_metrics"]:
+                        row[f"train_{metric}"] = result["train_metrics"][metric]
 
                 summary.append(row)
 
@@ -1221,37 +1221,37 @@ MAX_DIMS = 300
 
 # Default model configurations
 default_models = {
-    'linear_regression': {
-        'data_type': 'numerical',
-        'model_class': Ridge,
-        'model_params': {'alpha': 1.0},
-        'max_dims': MAX_DIMS,
-        'output_transform': 'sigmoid',
-        'normalize': True,
+    "linear_regression": {
+        "data_type": "numerical",
+        "model_class": Ridge,
+        "model_params": {"alpha": 1.0},
+        "max_dims": MAX_DIMS,
+        "output_transform": "sigmoid",
+        "normalize": True,
     },
-    'svr': {
-        'data_type': 'numerical',
-        'model_class': SVR,
-        'model_params': {'C': 1.0, 'kernel': 'linear'},
-        'max_dims': MAX_DIMS,
-        'output_transform': 'minmax',
-        'normalize': True,
+    "svr": {
+        "data_type": "numerical",
+        "model_class": SVR,
+        "model_params": {"C": 1.0, "kernel": "linear"},
+        "max_dims": MAX_DIMS,
+        "output_transform": "minmax",
+        "normalize": True,
     },
-    'logistic_high_vs_low': {
-        'data_type': 'binary',
-        'model_class': LogisticRegression,
-        'model_params': {'C': 1.0, 'class_weight': 'balanced'},
-        'max_dims': MAX_DIMS,
-        'threshold': None,  # Will be set to median
-        'output_transform': 'sigmoid',
+    "logistic_high_vs_low": {
+        "data_type": "binary",
+        "model_class": LogisticRegression,
+        "model_params": {"C": 1.0, "class_weight": "balanced"},
+        "max_dims": MAX_DIMS,
+        "threshold": None,  # Will be set to median
+        "output_transform": "sigmoid",
     },
-    'svm_high_vs_low': {
-        'data_type': 'binary',
-        'model_class': SVC,
-        'model_params': {'C': 1.0, 'kernel': 'linear', 'probability': True},
-        'max_dims': MAX_DIMS,
-        'threshold': None,  # Will be set to median
-        'output_transform': 'sigmoid',
+    "svm_high_vs_low": {
+        "data_type": "binary",
+        "model_class": SVC,
+        "model_params": {"C": 1.0, "kernel": "linear", "probability": True},
+        "max_dims": MAX_DIMS,
+        "threshold": None,  # Will be set to median
+        "output_transform": "sigmoid",
     },
 }
 
@@ -1259,57 +1259,57 @@ default_models = {
 with suppress(ImportError, ModuleNotFoundError):
     from mord import LogisticIT, LogisticAT
 
-    default_models['ordered_logistic_it'] = {
-        'data_type': 'ordinal',
-        'model_class': LogisticIT,
-        'model_params': {'alpha': 1.0},
-        'max_dims': MAX_DIMS,
-        'output_transform': 'minmax',
+    default_models["ordered_logistic_it"] = {
+        "data_type": "ordinal",
+        "model_class": LogisticIT,
+        "model_params": {"alpha": 1.0},
+        "max_dims": MAX_DIMS,
+        "output_transform": "minmax",
     }
 
-    default_models['ordered_logistic_at'] = {
-        'data_type': 'ordinal',
-        'model_class': LogisticAT,
-        'model_params': {'alpha': 1.0},
-        'max_dims': MAX_DIMS,
-        'output_transform': 'minmax',
+    default_models["ordered_logistic_at"] = {
+        "data_type": "ordinal",
+        "model_class": LogisticAT,
+        "model_params": {"alpha": 1.0},
+        "max_dims": MAX_DIMS,
+        "output_transform": "minmax",
     }
 
 with suppress(ImportError, ModuleNotFoundError):
     from mord import OrdinalRidge
 
-    default_models['ordinal_ridge'] = {
-        'data_type': 'ordinal',
-        'model_class': OrdinalRidge,
-        'model_params': {'alpha': 1.0},
-        'max_dims': MAX_DIMS,
-        'output_transform': 'minmax',
+    default_models["ordinal_ridge"] = {
+        "data_type": "ordinal",
+        "model_class": OrdinalRidge,
+        "model_params": {"alpha": 1.0},
+        "max_dims": MAX_DIMS,
+        "output_transform": "minmax",
     }
 
 with suppress(ImportError, ModuleNotFoundError):
     import ogb
     from ogb import OGBClassifier
 
-    default_models['ogboost'] = {
-        'data_type': 'ordinal',
-        'model_class': OGBClassifier,
-        'model_params': {'n_estimators': 100, 'learning_rate': 0.1},
-        'max_dims': MAX_DIMS,
-        'output_transform': 'minmax',
+    default_models["ogboost"] = {
+        "data_type": "ordinal",
+        "model_class": OGBClassifier,
+        "model_params": {"n_estimators": 100, "learning_rate": 0.1},
+        "max_dims": MAX_DIMS,
+        "output_transform": "minmax",
     }
 
 # Ordered SVM approach - using scikit-learn's SVC with a specific configuration
-default_models['ordinal_svm'] = {
-    'data_type': 'ordinal',
-    'model_class': SVC,
-    'model_params': {
-        'C': 1.0,
-        'kernel': 'linear',
-        'decision_function_shape': 'ovo',  # One-vs-One approach works better for ordinal data
-        'probability': True,
+default_models["ordinal_svm"] = {
+    "data_type": "ordinal",
+    "model_class": SVC,
+    "model_params": {
+        "C": 1.0,
+        "kernel": "linear",
+        "decision_function_shape": "ovo",  # One-vs-One approach works better for ordinal data
+        "probability": True,
     },
-    'max_dims': MAX_DIMS,
-    'output_transform': 'minmax',
+    "max_dims": MAX_DIMS,
+    "output_transform": "minmax",
 }
 
 
@@ -1347,12 +1347,12 @@ class OrdinalRandomForest(RandomForestRegressor):
         return mapped_pred
 
 
-default_models['ordinal_forest'] = {
-    'data_type': 'ordinal',
-    'model_class': OrdinalRandomForest,
-    'model_params': {'n_estimators': 100, 'max_depth': 10, 'min_samples_split': 5},
-    'max_dims': MAX_DIMS,
-    'output_transform': 'minmax',
+default_models["ordinal_forest"] = {
+    "data_type": "ordinal",
+    "model_class": OrdinalRandomForest,
+    "model_params": {"n_estimators": 100, "max_depth": 10, "min_samples_split": 5},
+    "max_dims": MAX_DIMS,
+    "output_transform": "minmax",
 }
 
 

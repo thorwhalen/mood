@@ -24,13 +24,13 @@ def compute_model_stats(model_stats: Mapping) -> Dict[str, Union[str, float]]:
     stats_df = pd.DataFrame(_gen())
 
     classifier_stats = (
-        stats_df[stats_df['data_type'] == 'binary']
-        .dropna(axis=1, how='all')
+        stats_df[stats_df["data_type"] == "binary"]
+        .dropna(axis=1, how="all")
         .reset_index(drop=True)
     )
     regression_stats = (
-        stats_df[stats_df['data_type'] != 'binary']
-        .dropna(axis=1, how='all')
+        stats_df[stats_df["data_type"] != "binary"]
+        .dropna(axis=1, how="all")
         .reset_index(drop=True)
     )
 
@@ -164,7 +164,7 @@ class ModelPerformanceAnalyzer:
     def _format_table(self, table: pd.DataFrame) -> pd.DataFrame:
         """Format table values to be more readable."""
         # Round numeric columns to 3 decimal places
-        numeric_cols = table.select_dtypes(include=['float64']).columns
+        numeric_cols = table.select_dtypes(include=["float64"]).columns
         return table.round({col: 3 for col in numeric_cols})
 
     def generate_model_comparison_table(
@@ -199,18 +199,18 @@ class ModelPerformanceAnalyzer:
             index=[self.attribute_column],
             columns=[self.model_type_column],
             values=metric,
-            aggfunc='mean',
+            aggfunc="mean",
         )
 
         # Calculate row averages (average for each attribute across models)
-        pivot_table['Average'] = pivot_table.mean(axis=1)
-        
+        pivot_table["Average"] = pivot_table.mean(axis=1)
+
         # Sort by the average (descending)
-        pivot_table = pivot_table.sort_values('Average', ascending=False)
-        
+        pivot_table = pivot_table.sort_values("Average", ascending=False)
+
         # Reset index with ranking
         pivot_table = pivot_table.reset_index()
-        
+
         return self._format_table(pivot_table)
 
     def generate_attribute_modelability_table(
@@ -257,7 +257,7 @@ class ModelPerformanceAnalyzer:
                 filtered_data[self.attribute_column] == attribute
             ]
 
-            row = {'semantic_attribute': attribute}
+            row = {"semantic_attribute": attribute}
 
             for metric in metrics_to_include:
                 row[metric] = attribute_data[metric].mean()
@@ -267,7 +267,7 @@ class ModelPerformanceAnalyzer:
         # Convert to DataFrame and sort by primary metric (descending)
         result_df = pd.DataFrame(result)
         result_df = result_df.sort_values(primary_metric, ascending=False)
-        
+
         # Reset index to show ranking
         result_df = result_df.reset_index(drop=True)
 
@@ -309,8 +309,8 @@ class ModelPerformanceAnalyzer:
                 0.5,
                 0.5,
                 "No data available with the specified filters",
-                ha='center',
-                va='center',
+                ha="center",
+                va="center",
             )
             return fig
 
@@ -339,12 +339,12 @@ class ModelPerformanceAnalyzer:
 
         # Customize the plot
         ax.set_title(f'Model Comparison: {metric.replace("_", " ").title()}')
-        ax.set_xlabel('Semantic Attribute')
+        ax.set_xlabel("Semantic Attribute")
         ax.set_ylabel(metric.replace("_", " ").title())
 
         # Rotate x-axis labels if there are many attributes
         if len(filtered_data[self.attribute_column].unique()) > 5:
-            plt.xticks(rotation=45, ha='right')
+            plt.xticks(rotation=45, ha="right")
 
         plt.tight_layout()
 
@@ -390,8 +390,8 @@ class ModelPerformanceAnalyzer:
                 0.5,
                 0.5,
                 "No data available with the specified filters",
-                ha='center',
-                va='center',
+                ha="center",
+                va="center",
             )
             return fig
 
@@ -420,7 +420,7 @@ class ModelPerformanceAnalyzer:
         # Create horizontal bar chart
         sns.barplot(
             data=display_data,
-            y='semantic_attribute',
+            y="semantic_attribute",
             x=metric,
             palette=palette,
             ax=ax,
@@ -437,9 +437,11 @@ class ModelPerformanceAnalyzer:
             ax.set_xlim(x_min, x_max)
 
         # Customize the plot
-        ax.set_title(f'{title_prefix} Attribute Modelability: {metric.replace("_", " ").title()}')
+        ax.set_title(
+            f'{title_prefix} Attribute Modelability: {metric.replace("_", " ").title()}'
+        )
         ax.set_xlabel(metric.replace("_", " ").title())
-        ax.set_ylabel('Semantic Attribute')
+        ax.set_ylabel("Semantic Attribute")
 
         plt.tight_layout()
 
@@ -476,8 +478,8 @@ class ModelPerformanceAnalyzer:
                 0.5,
                 0.5,
                 "No data available with the specified filters",
-                ha='center',
-                va='center',
+                ha="center",
+                va="center",
             )
             return fig
 
@@ -494,15 +496,15 @@ class ModelPerformanceAnalyzer:
 
             # Customize this subplot
             axes[i].set_title(f'{metric.replace("_", " ").title()} Distribution')
-            axes[i].set_xlabel('')  # Remove x-label (except for the last subplot)
+            axes[i].set_xlabel("")  # Remove x-label (except for the last subplot)
             axes[i].set_ylabel(metric.replace("_", " ").title())
 
         # Set the x-label only for the last subplot
-        axes[-1].set_xlabel('Semantic Attribute')
+        axes[-1].set_xlabel("Semantic Attribute")
 
         # Rotate x-axis labels if there are many attributes
         if len(filtered_data[self.attribute_column].unique()) > 5:
-            plt.setp(axes[-1].get_xticklabels(), rotation=45, ha='right')
+            plt.setp(axes[-1].get_xticklabels(), rotation=45, ha="right")
 
         plt.tight_layout()
 
@@ -538,14 +540,14 @@ class ModelPerformanceAnalyzer:
         sns.heatmap(
             correlation_matrix,
             annot=True,
-            cmap='coolwarm',
-            fmt='.2f',
+            cmap="coolwarm",
+            fmt=".2f",
             linewidths=0.5,
             ax=ax,
         )
 
         # Customize the plot
-        ax.set_title('Correlation Matrix of Performance Metrics')
+        ax.set_title("Correlation Matrix of Performance Metrics")
 
         plt.tight_layout()
 
@@ -588,8 +590,8 @@ class ModelPerformanceAnalyzer:
                 0.5,
                 0.5,
                 "No data available with the specified filters",
-                ha='center',
-                va='center',
+                ha="center",
+                va="center",
             )
             return fig
 
@@ -606,8 +608,8 @@ class ModelPerformanceAnalyzer:
                 0.5,
                 0.5,
                 "No data available for the specified models",
-                ha='center',
-                va='center',
+                ha="center",
+                va="center",
             )
             return fig
 
@@ -634,8 +636,8 @@ class ModelPerformanceAnalyzer:
             ax.fill(angles, values, alpha=0.1, color=colors[i])
 
         # Add legend and title
-        plt.legend(loc='upper right', bbox_to_anchor=(0.1, 0.1))
-        plt.title(f'Model Comparison for {attribute}')
+        plt.legend(loc="upper right", bbox_to_anchor=(0.1, 0.1))
+        plt.title(f"Model Comparison for {attribute}")
 
         return fig
 
@@ -674,12 +676,12 @@ def compare_models_across_datasets(
         common_attributes = sorted(classifier_attrs.intersection(regression_attrs))
 
     # Identify key metrics for each dataset
-    classifier_key_metrics = ['accuracy', 'f1', 'roc_auc']
+    classifier_key_metrics = ["accuracy", "f1", "roc_auc"]
     classifier_key_metrics = [
         m for m in classifier_key_metrics if m in classifier_analyzer.get_metrics()
     ]
 
-    regression_key_metrics = ['r2', 'mean_squared_error', 'mean_absolute_error']
+    regression_key_metrics = ["r2", "mean_squared_error", "mean_absolute_error"]
     regression_key_metrics = [
         m for m in regression_key_metrics if m in regression_analyzer.get_metrics()
     ]
@@ -689,7 +691,7 @@ def compare_models_across_datasets(
 
     # Best classifiers per attribute
     if classifier_key_metrics:
-        comparison['best_classifiers'] = (
+        comparison["best_classifiers"] = (
             classifier_analyzer.generate_model_comparison_table(
                 metric=classifier_key_metrics[0],
                 attributes=common_attributes,
@@ -699,7 +701,7 @@ def compare_models_across_datasets(
 
     # Best regression models per attribute
     if regression_key_metrics:
-        comparison['best_regression_models'] = (
+        comparison["best_regression_models"] = (
             regression_analyzer.generate_model_comparison_table(
                 metric=regression_key_metrics[0],
                 attributes=common_attributes,
@@ -709,7 +711,7 @@ def compare_models_across_datasets(
 
     # Most modelable attributes for classification
     if classifier_key_metrics:
-        comparison['modelable_attributes_classification'] = (
+        comparison["modelable_attributes_classification"] = (
             classifier_analyzer.generate_attribute_modelability_table(
                 primary_metric=classifier_key_metrics[0],
                 secondary_metrics=classifier_key_metrics[1:],
@@ -719,7 +721,7 @@ def compare_models_across_datasets(
 
     # Most modelable attributes for regression
     if regression_key_metrics:
-        comparison['modelable_attributes_regression'] = (
+        comparison["modelable_attributes_regression"] = (
             regression_analyzer.generate_attribute_modelability_table(
                 primary_metric=regression_key_metrics[0],
                 secondary_metrics=regression_key_metrics[1:],
@@ -813,29 +815,25 @@ def analyze_classifiers(classifier_stats):
 
     # Visualize top 5 most modelable attributes
     fig2a = classifier_analyzer.visualize_attribute_modelability(
-        metric="accuracy", 
-        subset_idx=5,  # Top 5 
-        figsize=(10, 6),
-        tight_xlim=True
+        metric="accuracy", subset_idx=5, figsize=(10, 6), tight_xlim=True  # Top 5
     )
     fig2a.savefig("top_modelable_attributes.png", dpi=300, bbox_inches="tight")
     print(
         "* **Figure 2a:** Most modelable attributes (saved as `top_modelable_attributes.png`)"
     )
     print("  * Shows the 5 semantic attributes that are most accurately modeled")
-    
+
     # Visualize bottom 5 least modelable attributes
     fig2b = classifier_analyzer.visualize_attribute_modelability(
-        metric="accuracy", 
-        subset_idx=-5,  # Bottom 5 
-        figsize=(10, 6),
-        tight_xlim=True
+        metric="accuracy", subset_idx=-5, figsize=(10, 6), tight_xlim=True  # Bottom 5
     )
     fig2b.savefig("bottom_modelable_attributes.png", dpi=300, bbox_inches="tight")
     print(
         "* **Figure 2b:** Least modelable attributes (saved as `bottom_modelable_attributes.png`)"
     )
-    print("  * Shows the 5 semantic attributes that are most difficult to model accurately")
+    print(
+        "  * Shows the 5 semantic attributes that are most difficult to model accurately"
+    )
 
     # Visualize metric distributions
     fig3 = classifier_analyzer.visualize_metric_distributions(
@@ -909,12 +907,16 @@ def analyze_regression_models(regression_stats):
         figsize=(10, 6),
         tight_xlim=True,
     )
-    fig2a.savefig("top_regression_modelable_attributes.png", dpi=300, bbox_inches="tight")
+    fig2a.savefig(
+        "top_regression_modelable_attributes.png", dpi=300, bbox_inches="tight"
+    )
     print(
         "* **Figure 2a:** Most modelable attributes for regression (saved as `top_regression_modelable_attributes.png`)"
     )
-    print("  * Shows the 5 semantic attributes that are most effectively modeled with regression")
-    
+    print(
+        "  * Shows the 5 semantic attributes that are most effectively modeled with regression"
+    )
+
     # Visualize bottom 5 least modelable attributes for regression
     fig2b = regression_analyzer.visualize_attribute_modelability(
         metric="r2",
@@ -922,11 +924,15 @@ def analyze_regression_models(regression_stats):
         figsize=(10, 6),
         tight_xlim=True,
     )
-    fig2b.savefig("bottom_regression_modelable_attributes.png", dpi=300, bbox_inches="tight")
+    fig2b.savefig(
+        "bottom_regression_modelable_attributes.png", dpi=300, bbox_inches="tight"
+    )
     print(
         "* **Figure 2b:** Least modelable attributes for regression (saved as `bottom_regression_modelable_attributes.png`)"
     )
-    print("  * Shows the 5 semantic attributes that are most difficult to model with regression")
+    print(
+        "  * Shows the 5 semantic attributes that are most difficult to model with regression"
+    )
 
     # Visualize correlation matrix of metrics
     fig3 = regression_analyzer.visualize_correlation_matrix(
@@ -939,6 +945,7 @@ def analyze_regression_models(regression_stats):
     print("  * Shows relationships between different performance metrics")
 
     return regression_analyzer
+
 
 # Example 3: Advanced analysis across both datasets
 def compare_datasets(classifier_stats, regression_stats):
@@ -964,31 +971,31 @@ def compare_datasets(classifier_stats, regression_stats):
         common_attributes=common_attributes,
     )
 
-    if 'best_classifiers' in comparison_results:
+    if "best_classifiers" in comparison_results:
         _print_markdown_subheading("Best Classifiers per Attribute")
         _print_dataframe_as_markdown(
-            comparison_results['best_classifiers'],
+            comparison_results["best_classifiers"],
             "This table shows which classification models perform best for each semantic attribute.",
         )
 
-    if 'best_regression_models' in comparison_results:
+    if "best_regression_models" in comparison_results:
         _print_markdown_subheading("Best Regression Models per Attribute")
         _print_dataframe_as_markdown(
-            comparison_results['best_regression_models'],
+            comparison_results["best_regression_models"],
             "This table shows which regression models perform best for each semantic attribute.",
         )
 
-    if 'modelable_attributes_classification' in comparison_results:
+    if "modelable_attributes_classification" in comparison_results:
         _print_markdown_subheading("Most Modelable Attributes (Classification)")
         _print_dataframe_as_markdown(
-            comparison_results['modelable_attributes_classification'],
+            comparison_results["modelable_attributes_classification"],
             "This table ranks semantic attributes by how well they can be modeled using classification approaches.",
         )
 
-    if 'modelable_attributes_regression' in comparison_results:
+    if "modelable_attributes_regression" in comparison_results:
         _print_markdown_subheading("Most Modelable Attributes (Regression)")
         _print_dataframe_as_markdown(
-            comparison_results['modelable_attributes_regression'],
+            comparison_results["modelable_attributes_regression"],
             "This table ranks semantic attributes by how well they can be modeled using regression approaches.",
         )
 

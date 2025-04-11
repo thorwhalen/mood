@@ -14,7 +14,7 @@ from mood.util import djoin
 # --------------------------------------------------------------------------------------
 # Constants
 
-DFLT_SEMANTIC_ATTRIBUTE_DATASET_DIR = djoin('semantic_attributes')
+DFLT_SEMANTIC_ATTRIBUTE_DATASET_DIR = djoin("semantic_attributes")
 
 if not os.path.exists(DFLT_SEMANTIC_ATTRIBUTE_DATASET_DIR):
     os.makedirs(DFLT_SEMANTIC_ATTRIBUTE_DATASET_DIR)
@@ -40,7 +40,7 @@ def mk_concatenation_file(
     *,
     keys_func=sorted,
     savefile_extension=".txt",
-    kv_to_item=lambda k, v: '\n'.join(text_lines(v)),
+    kv_to_item=lambda k, v: "\n".join(text_lines(v)),
     assert_all_chunk_keys=True,
     remove_directory_once_done=False,
 ):
@@ -51,7 +51,7 @@ def mk_concatenation_file(
     save_path = os.path.join(parent_dir, child_dir + savefile_extension)
     store = cache_iter(TextFiles(dirpath), keys_cache=keys_func)
     if assert_all_chunk_keys:
-        is_chunk_key = lambda k: re.match(child_dir + r'_\d+.*', k)
+        is_chunk_key = lambda k: re.match(child_dir + r"_\d+.*", k)
         assert all(
             map(is_chunk_key, store)
         ), f"Not all keys match the expected pattern: {child_dir}_<number>"
@@ -59,7 +59,7 @@ def mk_concatenation_file(
         store_aggregate(
             store,
             kv_to_item=kv_to_item,
-            aggregator='\n'.join,
+            aggregator="\n".join,
         )
     )
     if remove_directory_once_done:
@@ -74,7 +74,7 @@ def mk_concatenation_file(
 
 
 def parse_line(line: str):
-    line_parse_re = re.compile('^(\d+) (.*)$')
+    line_parse_re = re.compile("^(\d+) (.*)$")
 
     match = line_parse_re.match(line)
     if match:
@@ -171,7 +171,7 @@ Again, the target attribute is: {attribute}
 import oa
 
 DFLT_TEMPERATURE_FOR_MOOD_DATASET_GEN = 0.7
-DFLT_MODEL_FOR_MOOD_DATASET_GEN = 'gpt-4o-mini'  # cheapish model
+DFLT_MODEL_FOR_MOOD_DATASET_GEN = "gpt-4o-mini"  # cheapish model
 
 semantic_attribute_examples_for_attribute = oa.prompt_function(
     prompt_template_for_dataset_generation,
@@ -208,8 +208,8 @@ def default_save_key(
     batch_idx=None,
     *,
     include_subdir_prefix=True,
-    counter_key_format='_{:02.0f}',
-    extension='.txt',
+    counter_key_format="_{:02.0f}",
+    extension=".txt",
 ):
     path_sep = os.path.sep
     suffix = f"{name}{path_sep}" if include_subdir_prefix else ""
