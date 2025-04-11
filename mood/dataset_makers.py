@@ -254,18 +254,19 @@ def make_semantic_attributes_dataset(
     >>> len(store)  # Two batches saved
     2
     >>> store  # doctest: +SKIP
-    ... {
-        'color/color_00.txt': '0 The meeting was dull and unproductive, leaving everyone feeling dissatisfied.  \n'
-                              '2 The car was old and rusty, with a paint job that had faded over time, hinting at its once vibrant color.  \n'
-                              '5 The sunset painted the sky in brilliant shades of orange, pink, and purple, creating a breathtaking display of color that captivated all who watched.  \n'
+    {
+        'color/color_00.txt': '0 The meeting was dull and unproductive, leaving everyone feeling dissatisfied.'
+                              '2 The car was old and rusty, with a paint job that had faded over time, hinting at its once vibrant color.'
+                              '5 The sunset painted the sky in brilliant shades of orange, pink, and purple, creating a breathtaking display of color that captivated all who watched.'
                               '1 The room felt gloomy, with dark furniture casting shadows, though a hint of blue could be seen in the curtains.  ',
-        'color/color_01.txt': '0 The meeting was dull and uneventful, lacking any excitement or engagement.  \n'
-                              '1 The car was just an ordinary vehicle, nothing special about its appearance.  \n'
-                              "2 The flowers were vibrant, but I couldn't quite tell what colors they were.  \n"
-                              '3 The sky turned a beautiful shade of orange as the sun began to set, casting a warm glow.  \n'
-                              "4 She wore a stunning red dress that caught everyone's attention at the party.  \n"
+        'color/color_01.txt': '0 The meeting was dull and uneventful, lacking any excitement or engagement.'
+                              '1 The car was just an ordinary vehicle, nothing special about its appearance. '
+                              "2 The flowers were vibrant, but I couldn't quite tell what colors they were. "
+                              '3 The sky turned a beautiful shade of orange as the sun began to set, casting a warm glow.'
+                              "4 She wore a stunning red dress that caught everyone's attention at the party."
                               '5 The ocean sparkled in shades of deep blue and turquoise, a breathtaking view that left us speechless.  '
     }
+
     """
     if isinstance(store, str):
         store = mk_dirs_if_missing(TextFiles(store))
