@@ -1,0 +1,4 @@
+mood.dataset_makers
+===================
+.. automodule:: mood.dataset_makers
+   :members:

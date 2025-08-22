@@ -1,0 +1,15 @@
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   module_docs/mood
+   module_docs/mood/dataset_makers
+   module_docs/mood/examples
+   module_docs/mood/learn_sentiments
+   module_docs/mood/model_analysis
+   module_docs/mood/mood_modeling
+   module_docs/mood/scripts
+   module_docs/mood/scripts/financial_news_searches
+   module_docs/mood/sentiment
+   module_docs/mood/tools
+   module_docs/mood/util

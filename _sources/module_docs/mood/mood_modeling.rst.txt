@@ -1,0 +1,4 @@
+mood.mood_modeling
+==================
+.. automodule:: mood.mood_modeling
+   :members:

@@ -1,0 +1,4 @@
+mood.scripts.financial_news_searches
+====================================
+.. automodule:: mood.scripts.financial_news_searches
+   :members:

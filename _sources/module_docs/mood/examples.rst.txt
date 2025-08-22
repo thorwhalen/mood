@@ -1,0 +1,4 @@
+mood.examples
+=============
+.. automodule:: mood.examples
+   :members:

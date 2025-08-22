@@ -1,0 +1,4 @@
+mood.scripts
+============
+.. automodule:: mood.scripts
+   :members:
