@@ -9,8 +9,196 @@ Note: Requires an OpenAI API Token.
 
 For more NLP work, see [idiom](https://github.com/thorwhalen/idiom/) and [lexis](https://github.com/thorwhalen/lexis/).
 
-# Examples
+## Getting Started with Mood Models
 
+The `mood` package provides a complete pipeline for training machine learning models to detect semantic attributes (or "moods") in text. Here's the typical workflow. 
+If you already have your training data, you can skip steps 1 and 2. 
+
+### 1. Define Your Semantic Attributes
+
+Start by defining the semantic attributes you want to model. These are the "moods" or characteristics you want to detect in text:
+
+```python
+semantic_attributes = {
+    "diplomatic_politeness": "Diplomatic Politeness (Degree of formality, civility, and ceremonial tone)",
+    "military_intensity": "Military Reference Intensity (Mentions of soldiers, arms, tactics, or losses)",
+    "sentiment_polarity": "Sentiment Polarity (Positive or negative affective tone)",
+    # ... add more attributes as needed
+}
+```
+
+### 2. Generate Training Data
+
+Use the AI-powered dataset generation to create labeled training examples:
+
+```python
+from mood.dataset_makers import make_semantic_attributes_dataset
+
+# Generate training data for your semantic attributes
+make_semantic_attributes_dataset(
+    semantic_attributes=semantic_attributes,
+    store="path/to/save/datasets",  # or use a MutableMapping
+    n_examples=1000,  # total examples per attribute
+    batch_size=100,   # examples per API call
+    verbose=2         # show progress
+)
+```
+
+This will create text segments with scores (0-5) for each semantic attribute, saved as text files with format:
+```
+0 The meeting was dull and unproductive, leaving everyone feeling dissatisfied.
+3 The negotiations showed moderate diplomatic courtesy between the parties.
+5 Your Excellency, it is indeed our greatest honor to welcome you here today.
+```
+
+### 3. Parse and Prepare Data
+
+Convert the raw text data into structured format and compute embeddings:
+
+```python
+from mood.dataset_makers import parsed_lines
+import pandas as pd
+from oa.batch_embeddings import compute_embeddings
+
+# Parse the generated text files
+dataset = pd.DataFrame(list(parsed_lines(dataset_content)))
+# Results in: DataFrame with 'score' and 'segment' columns
+
+# Compute embeddings for the text segments
+embeddings = compute_embeddings(
+    segments=dataset.segment.to_list(),
+    batch_size=1000,
+    verbosity=2
+)
+
+# Combine into final training dataset
+training_data = pd.DataFrame({
+    'score': dataset.score,
+    'segment': dataset.segment,
+    'embedding': embeddings
+})
+```
+
+### 4. Train Mood Models
+
+Use the `MoodModelingManager` to train and evaluate multiple types of models:
+
+```python
+from mood.mood_modeling import MoodModelingManager
+
+# Create manager with your training data
+manager = MoodModelingManager(
+    df=training_data,
+    embedding_col='embedding',
+    score_col='score',
+    verbose=2  # Show detailed progress
+)
+
+# Train and evaluate models with single train/test split
+results = manager.train_and_evaluate()
+
+# For more stable metrics, run cross-validation
+cv_results = manager.cross_validate_models(n_splits=10)
+
+# Get performance summary
+summary = manager.get_model_summary(use_cv=True)
+print(summary)
+```
+
+### 5. Select and Deploy Best Model
+
+```python
+# Fit final models on all data
+manager.fit_final_models()
+
+# Get the best model based on performance metric
+best_model_name, best_model = manager.get_best_model(
+    metric='spearman',  # or 'accuracy', 'f1', etc.
+    use_cv=True
+)
+
+print(f"Best model: {best_model_name}")
+
+# Use the model to predict mood scores for new text
+new_embeddings = compute_embeddings(["Your new text here"])
+mood_scores = manager.predict_mood(new_embeddings)
+print(f"Mood scores: {mood_scores}")  # Values between 0 and 1
+```
+
+### Model Types Available
+
+The system automatically trains several types of models:
+
+- **Numerical Regression**: Ridge regression, SVR for continuous score prediction
+- **Binary Classification**: Logistic regression, SVM for high/low classification  
+- **Ordinal Regression**: Specialized models for ordered categories (requires `mord` package)
+
+Each model type handles the data differently:
+- Numerical models predict continuous scores
+- Binary models classify as high vs. low mood
+- Ordinal models respect the ordered nature of the scores
+
+### Output Interpretation
+
+All final models output **mood scores between 0 and 1**, where:
+- 0 = completely lacks the semantic attribute
+- 1 = maximally expresses the semantic attribute
+- Values are ordinally aligned with training scores
+
+### Advanced Features
+
+**Custom Model Configuration:**
+```python
+# Define custom models
+custom_models = {
+    "custom_ridge": {
+        "data_type": "numerical",
+        "model_class": Ridge,
+        "model_params": {"alpha": 0.5},
+        "max_dims": 200,
+        "output_transform": "sigmoid"
+    }
+}
+
+manager = MoodModelingManager(df=data, models=custom_models)
+```
+
+**Performance Analysis:**
+```python
+# Analyze model performance across different metrics
+from mood.model_analysis import analyze_all
+
+classifier_stats, regression_stats = compute_model_stats(model_stats)
+report = analyze_all(classifier_stats, regression_stats)
+```
+
+## Quick Example: Current Headlines Sentiment
+
+For a quick start, try analyzing current headlines:
+
+```python
+from mood import headlines_mood
+
+# Get current headlines with sentiment scores
+sentiment_scores = headlines_mood()
+print(sentiment_scores)
+```
+
+This returns a dictionary mapping headlines to sentiment scores from -10 to +10.d
+
+Investigations in financial sentiment analysis
+
+To install:	```pip install mood```
+
+Note: Requires an OpenAI API Token. 
+[How can to get one of those?](https://help.openai.com/en/articles/4936850-where-do-i-find-my-openai-api-key)
+
+For more NLP work, see [idiom](https://github.com/thorwhalen/idiom/) and [lexis](https://github.com/thorwhalen/lexis/).
+
+
+
+
+# Examples
 
 ## current headlines and their sentiment scores
 

@@ -492,6 +492,55 @@ class MoodModelingManager:
                         f"WARNING: Model '{model_name}' uses {max_dims} dimensions with only {n_samples} samples. Consider reducing max_dims to avoid overfitting."
                     )
 
+    # TODO: REALLY silly. We make a dataframe from X and y to make X and y in _prepare_data
+    @classmethod
+    def from_arrays(
+        cls,
+        X: np.ndarray,
+        y: np.ndarray,
+        test_size: float = 0.2,
+        random_state: int = 42,
+        models: Optional[Dict] = None,
+        verbose: int = 1,
+    ) -> "MoodModelingManager":
+        """
+        Create a MoodModelingManager directly from numpy arrays.
+
+        Args:
+            X: Array of embeddings, shape (n_samples, n_features)
+            y: Array of scores, shape (n_samples,)
+            test_size: Proportion of data to use for testing
+            random_state: Random seed for reproducibility
+            models: Dictionary of modeling pipelines (uses default_models if None)
+            verbose: Level of verbosity
+
+        Returns:
+            MoodModelingManager instance
+
+        Example:
+            >>> manager = MoodModelingManager.from_arrays(X, y, verbose=2)
+            >>> results = manager.train_and_evaluate()
+        """
+        # Create a minimal DataFrame just for initialization
+        df = pd.DataFrame(
+            {
+                'embedding': list(
+                    X
+                ),  # Convert rows to lists for DataFrame compatibility
+                'score': y,
+            }
+        )
+
+        return cls(
+            df=df,
+            embedding_col='embedding',
+            score_col='score',
+            test_size=test_size,
+            random_state=random_state,
+            models=models,
+            verbose=verbose,
+        )
+
     def prepare_numerical_data(
         self, normalize: bool = True
     ) -> Tuple[np.ndarray, np.ndarray]:

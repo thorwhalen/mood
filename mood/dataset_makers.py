@@ -221,7 +221,7 @@ def default_save_key(
 
 
 def make_semantic_attributes_dataset(
-    semantic_attributes: Mapping,
+    semantic_attributes: Union[str, Mapping],
     store: Union[str, MutableMapping] = DFLT_SEMANTIC_ATTRIBUTE_DATASET_DIR,
     *,
     n_examples: int = 1000,
@@ -268,6 +268,14 @@ def make_semantic_attributes_dataset(
     }
 
     """
+    if isinstance(semantic_attributes, str):
+        assert semantic_attributes.endswith(
+            '.json'
+        ), "string semantic_attributes needs to be a json file"
+        with open(semantic_attributes, "r") as f:
+            import json
+
+            semantic_attributes = json.load(f)
     if isinstance(store, str):
         store = mk_dirs_if_missing(TextFiles(store))
 
@@ -308,3 +316,9 @@ def make_semantic_attributes_dataset(
                 **dataset_maker_kwargs,
             )
             store[_save_key] = response
+
+
+if __name__ == '__main__':
+    import argh
+
+    argh.dispatch_commands([make_semantic_attributes_dataset])
