@@ -1,6 +1,7 @@
 """Tools for model analysis"""
 
-from typing import Dict, List, Optional, Union, Callable, Tuple, Set, Mapping
+from typing import Dict, List, Optional, Union, Tuple, Set
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 from collections.abc import Mapping
 from functools import partial
@@ -12,7 +13,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 
-def compute_model_stats(model_stats: Mapping) -> Dict[str, Union[str, float]]:
+def compute_model_stats(model_stats: Mapping) -> dict[str, str | float]:
     def _gen():
         for semantic_attribute, stats in model_stats.items():
             yield from (
@@ -58,7 +59,7 @@ class ModelPerformanceAnalyzer:
     """
 
     data: pd.DataFrame
-    relevant_metrics: List[str] = field(default_factory=list)
+    relevant_metrics: list[str] = field(default_factory=list)
     model_type_column: str = "model_name"
     attribute_column: str = "semantic_attribute"
     data_type_column: str = "data_type"
@@ -87,7 +88,7 @@ class ModelPerformanceAnalyzer:
         if missing:
             raise ValueError(f"Missing required columns: {', '.join(missing)}")
 
-    def get_metrics(self) -> List[str]:
+    def get_metrics(self) -> list[str]:
         """
         Get the list of available metrics in the dataset.
 
@@ -96,7 +97,7 @@ class ModelPerformanceAnalyzer:
         """
         return self.relevant_metrics
 
-    def get_attributes(self) -> List[str]:
+    def get_attributes(self) -> list[str]:
         """
         Get the list of unique semantic attributes in the dataset.
 
@@ -105,7 +106,7 @@ class ModelPerformanceAnalyzer:
         """
         return sorted(self.data[self.attribute_column].unique())
 
-    def get_models(self) -> List[str]:
+    def get_models(self) -> list[str]:
         """
         Get the list of unique model names in the dataset.
 
@@ -114,7 +115,7 @@ class ModelPerformanceAnalyzer:
         """
         return sorted(self.data[self.model_type_column].unique())
 
-    def get_data_types(self) -> List[str]:
+    def get_data_types(self) -> list[str]:
         """
         Get the list of unique data types in the dataset.
 
@@ -127,9 +128,9 @@ class ModelPerformanceAnalyzer:
 
     def filter_data(
         self,
-        attributes: Optional[List[str]] = None,
-        models: Optional[List[str]] = None,
-        data_types: Optional[List[str]] = None,
+        attributes: list[str] | None = None,
+        models: list[str] | None = None,
+        data_types: list[str] | None = None,
     ) -> pd.DataFrame:
         """
         Filter the dataframe based on specified attributes, models, and data types.
@@ -170,9 +171,9 @@ class ModelPerformanceAnalyzer:
     def generate_model_comparison_table(
         self,
         metric: str,
-        attributes: Optional[List[str]] = None,
-        models: Optional[List[str]] = None,
-        data_types: Optional[List[str]] = None,
+        attributes: list[str] | None = None,
+        models: list[str] | None = None,
+        data_types: list[str] | None = None,
     ) -> pd.DataFrame:
         """
         Generate a comparison table of models across different semantic attributes for a given metric.
@@ -216,9 +217,9 @@ class ModelPerformanceAnalyzer:
     def generate_attribute_modelability_table(
         self,
         primary_metric: str,
-        secondary_metrics: Optional[List[str]] = None,
-        models: Optional[List[str]] = None,
-        data_types: Optional[List[str]] = None,
+        secondary_metrics: list[str] | None = None,
+        models: list[str] | None = None,
+        data_types: list[str] | None = None,
     ) -> pd.DataFrame:
         """
         Generate a table showing which semantic attributes are most modelable.
@@ -276,10 +277,10 @@ class ModelPerformanceAnalyzer:
     def visualize_model_comparison(
         self,
         metric: str,
-        attributes: Optional[List[str]] = None,
-        models: Optional[List[str]] = None,
-        data_types: Optional[List[str]] = None,
-        figsize: Tuple[int, int] = (10, 6),
+        attributes: list[str] | None = None,
+        models: list[str] | None = None,
+        data_types: list[str] | None = None,
+        figsize: tuple[int, int] = (10, 6),
         palette: str = "viridis",
         tight_ylim: bool = True,
     ) -> plt.Figure:
@@ -353,10 +354,10 @@ class ModelPerformanceAnalyzer:
     def visualize_attribute_modelability(
         self,
         metric: str,
-        subset_idx: Optional[int] = None,
-        models: Optional[List[str]] = None,
-        data_types: Optional[List[str]] = None,
-        figsize: Tuple[int, int] = (10, 6),
+        subset_idx: int | None = None,
+        models: list[str] | None = None,
+        data_types: list[str] | None = None,
+        figsize: tuple[int, int] = (10, 6),
         palette: str = "viridis",
         tight_xlim: bool = True,
     ) -> plt.Figure:
@@ -449,10 +450,10 @@ class ModelPerformanceAnalyzer:
 
     def visualize_metric_distributions(
         self,
-        metrics: List[str],
-        models: Optional[List[str]] = None,
-        data_types: Optional[List[str]] = None,
-        figsize: Tuple[int, int] = (12, 8),
+        metrics: list[str],
+        models: list[str] | None = None,
+        data_types: list[str] | None = None,
+        figsize: tuple[int, int] = (12, 8),
     ) -> plt.Figure:
         """
         Create box plots showing the distribution of metrics across semantic attributes.
@@ -511,7 +512,7 @@ class ModelPerformanceAnalyzer:
         return fig
 
     def visualize_correlation_matrix(
-        self, metrics: Optional[List[str]] = None, figsize: Tuple[int, int] = (10, 8)
+        self, metrics: list[str] | None = None, figsize: tuple[int, int] = (10, 8)
     ) -> plt.Figure:
         """
         Create a heatmap showing the correlation between different metrics.
@@ -555,11 +556,11 @@ class ModelPerformanceAnalyzer:
 
     def visualize_performance_radar(
         self,
-        metrics: List[str],
-        models: List[str],
+        metrics: list[str],
+        models: list[str],
         attribute: str,
-        data_type: Optional[str] = None,
-        figsize: Tuple[int, int] = (10, 8),
+        data_type: str | None = None,
+        figsize: tuple[int, int] = (10, 8),
     ) -> plt.Figure:
         """
         Create a radar chart comparing models across multiple metrics for a specific attribute.
@@ -645,9 +646,9 @@ class ModelPerformanceAnalyzer:
 def compare_models_across_datasets(
     classifier_data: pd.DataFrame,
     regression_data: pd.DataFrame,
-    common_models: Optional[List[str]] = None,
-    common_attributes: Optional[List[str]] = None,
-) -> Dict[str, pd.DataFrame]:
+    common_models: list[str] | None = None,
+    common_attributes: list[str] | None = None,
+) -> dict[str, pd.DataFrame]:
     """
     Compare model performance across classifier and regression datasets.
 

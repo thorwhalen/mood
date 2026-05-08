@@ -39,7 +39,8 @@ from sklearn.linear_model import Ridge, LogisticRegression
 from sklearn.svm import SVR, SVC
 from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
 from sklearn.pipeline import Pipeline
-from typing import Dict, List, Tuple, Optional, Union, Callable, Any, Iterable, Set
+from typing import Dict, List, Tuple, Optional, Union, Any, Set
+from collections.abc import Callable, Iterable
 from scipy.special import expit
 from scipy.stats import spearmanr, kendalltau
 import warnings
@@ -132,9 +133,9 @@ def x_and_y_with_boolean_y(
     data: pd.DataFrame,
     x_col: str,
     y_col: str,
-    y_is_true_vals: Union[List, str],
-    y_is_false_vals: Optional[Union[List, str]] = None,
-) -> Tuple[np.ndarray, np.ndarray]:
+    y_is_true_vals: list | str,
+    y_is_false_vals: list | str | None = None,
+) -> tuple[np.ndarray, np.ndarray]:
     """
     Get the x and y values from a dataframe, converting y to binary values.
     The output y elements will be 1 if and only if the y_col value is in y_is_true_vals.
@@ -201,7 +202,7 @@ class DimensionReducer(BaseEstimator, TransformerMixin):
     contain the most important information.
     """
 
-    def __init__(self, max_dims: Optional[int] = None):
+    def __init__(self, max_dims: int | None = None):
         """
         Initialize the dimension reducer.
 
@@ -210,7 +211,7 @@ class DimensionReducer(BaseEstimator, TransformerMixin):
         """
         self.max_dims = max_dims
 
-    def fit(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> "DimensionReducer":
+    def fit(self, X: np.ndarray, y: np.ndarray | None = None) -> "DimensionReducer":
         """
         Fit method (no-op as this is a simple feature selector).
 
@@ -247,9 +248,9 @@ class MoodEstimator(BaseEstimator, TransformerMixin):
     def __init__(
         self,
         model: BaseEstimator,
-        max_dims: Optional[int] = None,
+        max_dims: int | None = None,
         output_transform: str = "sigmoid",
-        threshold: Optional[float] = None,
+        threshold: float | None = None,
         data_type: str = "numerical",
     ):
         """
@@ -429,7 +430,7 @@ class MoodModelingManager:
         score_col: str = "score",
         test_size: float = 0.2,
         random_state: int = 42,
-        models: Optional[Dict] = None,
+        models: dict | None = None,
         verbose: int = 1,
     ):
         """
@@ -500,7 +501,7 @@ class MoodModelingManager:
         y: np.ndarray,
         test_size: float = 0.2,
         random_state: int = 42,
-        models: Optional[Dict] = None,
+        models: dict | None = None,
         verbose: int = 1,
     ) -> "MoodModelingManager":
         """
@@ -543,7 +544,7 @@ class MoodModelingManager:
 
     def prepare_numerical_data(
         self, normalize: bool = True
-    ) -> Tuple[np.ndarray, np.ndarray]:
+    ) -> tuple[np.ndarray, np.ndarray]:
         """
         Prepare numerical data from the dataframe.
 
@@ -560,7 +561,7 @@ class MoodModelingManager:
 
         return self.X, y
 
-    def prepare_ordinal_data(self) -> Tuple[np.ndarray, np.ndarray]:
+    def prepare_ordinal_data(self) -> tuple[np.ndarray, np.ndarray]:
         """
         Prepare ordinal data from the dataframe.
 
@@ -575,10 +576,10 @@ class MoodModelingManager:
 
     def prepare_binary_data(
         self,
-        threshold: Optional[Union[float, int]] = None,
-        positive_labels: Optional[List] = None,
-        negative_labels: Optional[List] = None,
-    ) -> Tuple[np.ndarray, np.ndarray]:
+        threshold: float | int | None = None,
+        positive_labels: list | None = None,
+        negative_labels: list | None = None,
+    ) -> tuple[np.ndarray, np.ndarray]:
         """
         Prepare binary data from the dataframe.
 
@@ -613,7 +614,7 @@ class MoodModelingManager:
         y_binary = (self.y > threshold).astype(int)
         return self.X, y_binary
 
-    def _get_model_data(self, model_config: Dict) -> Tuple[np.ndarray, np.ndarray]:
+    def _get_model_data(self, model_config: dict) -> tuple[np.ndarray, np.ndarray]:
         """
         Get the appropriate (X, y) data for a given model configuration.
 
@@ -645,7 +646,7 @@ class MoodModelingManager:
         else:
             raise ValueError(f"Unknown data type: {data_type}")
 
-    def _create_model(self, model_config: Dict) -> MoodEstimator:
+    def _create_model(self, model_config: dict) -> MoodEstimator:
         """
         Create a model based on the provided configuration.
 
@@ -676,7 +677,7 @@ class MoodModelingManager:
 
     def _evaluate_numerical(
         self, y_true: np.ndarray, y_pred: np.ndarray, y_mood: np.ndarray
-    ) -> Dict:
+    ) -> dict:
         """
         Evaluate numerical regression predictions.
 
@@ -703,7 +704,7 @@ class MoodModelingManager:
 
     def _evaluate_ordinal(
         self, y_true: np.ndarray, y_pred: np.ndarray, y_mood: np.ndarray
-    ) -> Dict:
+    ) -> dict:
         """
         Evaluate ordinal regression predictions.
 
@@ -725,7 +726,7 @@ class MoodModelingManager:
 
     def _evaluate_binary(
         self, y_true: np.ndarray, y_pred: np.ndarray, y_mood: np.ndarray
-    ) -> Dict:
+    ) -> dict:
         """
         Evaluate binary classification predictions.
 
@@ -761,7 +762,7 @@ class MoodModelingManager:
 
     def _evaluate_model(
         self, model: MoodEstimator, X: np.ndarray, y: np.ndarray, data_type: str
-    ) -> Dict:
+    ) -> dict:
         """
         Evaluate a model on the given data.
 
@@ -790,7 +791,7 @@ class MoodModelingManager:
         else:
             raise ValueError(f"Unknown data type: {data_type}")
 
-    def train_and_evaluate(self) -> Dict:
+    def train_and_evaluate(self) -> dict:
         """
         Train and evaluate all models using a single train/test split, collecting performance metrics.
 
@@ -843,8 +844,8 @@ class MoodModelingManager:
 
     # Update the cross_validate_models method to use appropriate scoring
     def cross_validate_models(
-        self, n_splits: int = 5, metrics: Optional[Set[str]] = None
-    ) -> Dict:
+        self, n_splits: int = 5, metrics: set[str] | None = None
+    ) -> dict:
         """
         Perform cross-validation on all models to get more stable performance metrics.
 
@@ -1062,7 +1063,7 @@ class MoodModelingManager:
         self.cv_results = cv_results
         return cv_results
 
-    def fit_final_models(self) -> Dict:
+    def fit_final_models(self) -> dict:
         """
         Fit final models on the entire dataset.
 
@@ -1109,9 +1110,9 @@ class MoodModelingManager:
     def get_best_model(
         self,
         metric: str = "spearman",
-        data_type: Optional[str] = None,
+        data_type: str | None = None,
         use_cv: bool = False,
-    ) -> Tuple[str, MoodEstimator]:
+    ) -> tuple[str, MoodEstimator]:
         """
         Get the best model based on a specific metric.
 
@@ -1180,7 +1181,7 @@ class MoodModelingManager:
         return best_model_name, self.final_models[best_model_name]["model"]
 
     def predict_mood(
-        self, X: np.ndarray, model_name: Optional[str] = None
+        self, X: np.ndarray, model_name: str | None = None
     ) -> np.ndarray:
         """
         Predict mood scores for new data.

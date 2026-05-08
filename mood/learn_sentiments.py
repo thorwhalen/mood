@@ -70,11 +70,11 @@ def fit_logistic_classifier(
     max_iter: int = 1000,
     solver: str = "lbfgs",
     penalty: str = "l2",
-    class_weight: Optional[Union[Dict, str]] = None,
+    class_weight: dict | str | None = None,
     fit_intercept: bool = True,
     skip_validation: bool = False,
     verbose: bool = True,
-) -> Tuple[LogisticRegression, ModelStatistics]:
+) -> tuple[LogisticRegression, ModelStatistics]:
     """
     Fits a logistic regression model on embedding data for binary classification without feature scaling.
 

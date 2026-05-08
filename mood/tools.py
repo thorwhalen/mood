@@ -12,7 +12,8 @@ headlines_mood = Pipe(headlines, sentiment_analysis)
 # Search and save news
 
 from functools import partial
-from typing import Union, Iterable
+from typing import Union
+from collections.abc import Iterable
 import os
 import re
 from dol import JsonFiles, mk_dirs_if_missing
@@ -100,7 +101,7 @@ def _resolve_to_file_if_it_is_one(string):
 
 
 def search_and_save_news(
-    query: Union[str, Iterable[str]] = "",
+    query: str | Iterable[str] = "",
     source: str = "yahoo_finance_headlines",
     *,
     verbose: bool = False,

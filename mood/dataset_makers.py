@@ -3,7 +3,8 @@ Tools to make datasets for training and testing models (for semantic attribute e
 """
 
 import os
-from typing import Union, MutableMapping, Mapping, Callable, Optional
+from typing import Union, Optional
+from collections.abc import MutableMapping, Mapping, Callable
 from functools import partial
 
 from dol import TextFiles, mk_dirs_if_missing
@@ -74,7 +75,7 @@ def mk_concatenation_file(
 
 
 def parse_line(line: str):
-    line_parse_re = re.compile("^(\d+) (.*)$")
+    line_parse_re = re.compile(r"^(\d+) (.*)$")
 
     match = line_parse_re.match(line)
     if match:
@@ -221,11 +222,11 @@ def default_save_key(
 
 
 def make_semantic_attributes_dataset(
-    semantic_attributes: Union[str, Mapping],
-    store: Union[str, MutableMapping] = DFLT_SEMANTIC_ATTRIBUTE_DATASET_DIR,
+    semantic_attributes: str | Mapping,
+    store: str | MutableMapping = DFLT_SEMANTIC_ATTRIBUTE_DATASET_DIR,
     *,
     n_examples: int = 1000,
-    batch_size: Optional[int] = 100,
+    batch_size: int | None = 100,
     start_batch_idx_at: int = 0,
     save_key: Callable = default_save_key,
     verbose: int = 0,
@@ -272,7 +273,7 @@ def make_semantic_attributes_dataset(
         assert semantic_attributes.endswith(
             '.json'
         ), "string semantic_attributes needs to be a json file"
-        with open(semantic_attributes, "r") as f:
+        with open(semantic_attributes) as f:
             import json
 
             semantic_attributes = json.load(f)
