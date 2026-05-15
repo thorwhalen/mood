@@ -519,8 +519,8 @@ class MoodModelingManager:
             MoodModelingManager instance
 
         Example:
-            >>> manager = MoodModelingManager.from_arrays(X, y, verbose=2)
-            >>> results = manager.train_and_evaluate()
+            >>> manager = MoodModelingManager.from_arrays(X, y, verbose=2)  # doctest: +SKIP
+            >>> results = manager.train_and_evaluate()  # doctest: +SKIP
         """
         # Create a minimal DataFrame just for initialization
         df = pd.DataFrame(
