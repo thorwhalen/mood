@@ -525,17 +525,17 @@ class MoodModelingManager:
         # Create a minimal DataFrame just for initialization
         df = pd.DataFrame(
             {
-                'embedding': list(
+                "embedding": list(
                     X
                 ),  # Convert rows to lists for DataFrame compatibility
-                'score': y,
+                "score": y,
             }
         )
 
         return cls(
             df=df,
-            embedding_col='embedding',
-            score_col='score',
+            embedding_col="embedding",
+            score_col="score",
             test_size=test_size,
             random_state=random_state,
             models=models,
@@ -1180,9 +1180,7 @@ class MoodModelingManager:
 
         return best_model_name, self.final_models[best_model_name]["model"]
 
-    def predict_mood(
-        self, X: np.ndarray, model_name: str | None = None
-    ) -> np.ndarray:
+    def predict_mood(self, X: np.ndarray, model_name: str | None = None) -> np.ndarray:
         """
         Predict mood scores for new data.
 

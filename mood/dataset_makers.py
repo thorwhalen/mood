@@ -53,9 +53,9 @@ def mk_concatenation_file(
     store = cache_iter(TextFiles(dirpath), keys_cache=keys_func)
     if assert_all_chunk_keys:
         is_chunk_key = lambda k: re.match(child_dir + r"_\d+.*", k)
-        assert all(
-            map(is_chunk_key, store)
-        ), f"Not all keys match the expected pattern: {child_dir}_<number>"
+        assert all(map(is_chunk_key, store)), (
+            f"Not all keys match the expected pattern: {child_dir}_<number>"
+        )
     pathlib.Path(save_path).write_text(
         store_aggregate(
             store,
@@ -270,9 +270,9 @@ def make_semantic_attributes_dataset(
 
     """
     if isinstance(semantic_attributes, str):
-        assert semantic_attributes.endswith(
-            '.json'
-        ), "string semantic_attributes needs to be a json file"
+        assert semantic_attributes.endswith(".json"), (
+            "string semantic_attributes needs to be a json file"
+        )
         with open(semantic_attributes) as f:
             import json
 
@@ -319,7 +319,7 @@ def make_semantic_attributes_dataset(
             store[_save_key] = response
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import argh
 
     argh.dispatch_commands([make_semantic_attributes_dataset])

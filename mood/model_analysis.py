@@ -339,7 +339,7 @@ class ModelPerformanceAnalyzer:
             ax.set_ylim(y_min, y_max)
 
         # Customize the plot
-        ax.set_title(f'Model Comparison: {metric.replace("_", " ").title()}')
+        ax.set_title(f"Model Comparison: {metric.replace('_', ' ').title()}")
         ax.set_xlabel("Semantic Attribute")
         ax.set_ylabel(metric.replace("_", " ").title())
 
@@ -439,7 +439,7 @@ class ModelPerformanceAnalyzer:
 
         # Customize the plot
         ax.set_title(
-            f'{title_prefix} Attribute Modelability: {metric.replace("_", " ").title()}'
+            f"{title_prefix} Attribute Modelability: {metric.replace('_', ' ').title()}"
         )
         ax.set_xlabel(metric.replace("_", " ").title())
         ax.set_ylabel("Semantic Attribute")
@@ -496,7 +496,7 @@ class ModelPerformanceAnalyzer:
             )
 
             # Customize this subplot
-            axes[i].set_title(f'{metric.replace("_", " ").title()} Distribution')
+            axes[i].set_title(f"{metric.replace('_', ' ').title()} Distribution")
             axes[i].set_xlabel("")  # Remove x-label (except for the last subplot)
             axes[i].set_ylabel(metric.replace("_", " ").title())
 
@@ -816,7 +816,10 @@ def analyze_classifiers(classifier_stats):
 
     # Visualize top 5 most modelable attributes
     fig2a = classifier_analyzer.visualize_attribute_modelability(
-        metric="accuracy", subset_idx=5, figsize=(10, 6), tight_xlim=True  # Top 5
+        metric="accuracy",
+        subset_idx=5,
+        figsize=(10, 6),
+        tight_xlim=True,  # Top 5
     )
     fig2a.savefig("top_modelable_attributes.png", dpi=300, bbox_inches="tight")
     print(
@@ -826,7 +829,10 @@ def analyze_classifiers(classifier_stats):
 
     # Visualize bottom 5 least modelable attributes
     fig2b = classifier_analyzer.visualize_attribute_modelability(
-        metric="accuracy", subset_idx=-5, figsize=(10, 6), tight_xlim=True  # Bottom 5
+        metric="accuracy",
+        subset_idx=-5,
+        figsize=(10, 6),
+        tight_xlim=True,  # Bottom 5
     )
     fig2b.savefig("bottom_modelable_attributes.png", dpi=300, bbox_inches="tight")
     print(
