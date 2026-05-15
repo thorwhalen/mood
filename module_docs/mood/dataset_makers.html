@@ -6,18 +6,18 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>mood.dataset_makers &mdash; mood 0.0.14 documentation</title>
+  <title>mood.dataset_makers &mdash; mood 0.0.15 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
 
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=544df88d"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/documentation_options.js?v=f0357c94"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../_static/copybutton.js?v=f281be69"></script>
@@ -50,7 +50,10 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../mood.html">mood</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">mood.dataset_makers</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">mood.dataset_makers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#mood.dataset_makers.make_semantic_attributes_dataset"><code class="docutils literal notranslate"><span class="pre">make_semantic_attributes_dataset()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">mood.examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="learn_sentiments.html">mood.learn_sentiments</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model_analysis.html">mood.model_analysis</a></li>
@@ -86,8 +89,47 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="mood-dataset-makers">
-<h1>mood.dataset_makers<a class="headerlink" href="#mood-dataset-makers" title="Link to this heading"></a></h1>
+  <section id="module-mood.dataset_makers">
+<span id="mood-dataset-makers"></span><h1>mood.dataset_makers<a class="headerlink" href="#module-mood.dataset_makers" title="Link to this heading"></a></h1>
+<p>Tools to make datasets for training and testing models (for semantic attribute etc.)</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="mood.dataset_makers.make_semantic_attributes_dataset">
+<span class="sig-prename descclassname"><span class="pre">mood.dataset_makers.</span></span><span class="sig-name descname"><span class="pre">make_semantic_attributes_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">semantic_attributes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Mapping</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">MutableMapping</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'/home/runner/.config/mood/semantic_attributes'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_examples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_batch_idx_at</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;function</span> <span class="pre">default_save_key&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**dataset_maker_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mood/dataset_makers.html#make_semantic_attributes_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.dataset_makers.make_semantic_attributes_dataset" title="Link to this definition"></a></dt>
+<dd><p>Gather data for each semantic attribute and save it to the store.</p>
+<p>Parameters:
+- semantic_attributes: Mapping of attribute names to their descriptions
+- store: Storage location (string path or MutableMapping)
+- n_examples: Total number of examples to gather per attribute
+- batch_size: Number of examples per batch; if None, gather all examples in one batch
+- start_batch_idx_at: Starting index for batch numbering
+- save_key: Function to generate save keys
+- verbose: Verbosity level (0=quiet, 1=attribute progress, 2=batch progress)
+- dataset_maker_kwargs: Additional kwargs for semantic_attribute_examples_for_attribute</p>
+<p>WARNING: Some models aren’t very good at generating the requested number of examples.
+They may generate fewer or more than requested. This is a known issue with LLM
+models.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">store</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">attributes</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;description of color&quot;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">make_semantic_attributes_dataset</span><span class="p">(</span><span class="n">attributes</span><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <span class="n">n_examples</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>  <span class="c1"># Two batches saved</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">store</span>
+<span class="go">{</span>
+<span class="go">    &#39;color/color_00.txt&#39;: &#39;0 The meeting was dull and unproductive, leaving everyone feeling dissatisfied.&#39;</span>
+<span class="go">                          &#39;2 The car was old and rusty, with a paint job that had faded over time, hinting at its once vibrant color.&#39;</span>
+<span class="go">                          &#39;5 The sunset painted the sky in brilliant shades of orange, pink, and purple, creating a breathtaking display of color that captivated all who watched.&#39;</span>
+<span class="go">                          &#39;1 The room felt gloomy, with dark furniture casting shadows, though a hint of blue could be seen in the curtains.  &#39;,</span>
+<span class="go">    &#39;color/color_01.txt&#39;: &#39;0 The meeting was dull and uneventful, lacking any excitement or engagement.&#39;</span>
+<span class="go">                          &#39;1 The car was just an ordinary vehicle, nothing special about its appearance. &#39;</span>
+<span class="go">                          &quot;2 The flowers were vibrant, but I couldn&#39;t quite tell what colors they were. &quot;</span>
+<span class="go">                          &#39;3 The sky turned a beautiful shade of orange as the sun began to set, casting a warm glow.&#39;</span>
+<span class="go">                          &quot;4 She wore a stunning red dress that caught everyone&#39;s attention at the party.&quot;</span>
+<span class="go">                          &#39;5 The ocean sparkled in shades of deep blue and turquoise, a breathtaking view that left us speechless.  &#39;</span>
+<span class="go">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
 </section>
 
 

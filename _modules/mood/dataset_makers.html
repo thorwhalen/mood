@@ -1,0 +1,444 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>mood.dataset_makers &mdash; mood 0.0.15 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=f0357c94"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            mood
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/mood.html">mood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/mood/dataset_makers.html">mood.dataset_makers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/mood/examples.html">mood.examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/mood/learn_sentiments.html">mood.learn_sentiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/mood/model_analysis.html">mood.model_analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/mood/mood_modeling.html">mood.mood_modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/mood/scripts.html">mood.scripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/mood/scripts/financial_news_searches.html">mood.scripts.financial_news_searches</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/mood/sentiment.html">mood.sentiment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/mood/tools.html">mood.tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/mood/util.html">mood.util</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">mood</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">mood.dataset_makers</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for mood.dataset_makers</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Tools to make datasets for training and testing models (for semantic attribute etc.)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">MutableMapping</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dol</span><span class="w"> </span><span class="kn">import</span> <span class="n">TextFiles</span><span class="p">,</span> <span class="n">mk_dirs_if_missing</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">mood.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">djoin</span>
+
+
+<span class="c1"># --------------------------------------------------------------------------------------</span>
+<span class="c1"># Constants</span>
+
+<span class="n">DFLT_SEMANTIC_ATTRIBUTE_DATASET_DIR</span> <span class="o">=</span> <span class="n">djoin</span><span class="p">(</span><span class="s2">&quot;semantic_attributes&quot;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">DFLT_SEMANTIC_ATTRIBUTE_DATASET_DIR</span><span class="p">):</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">DFLT_SEMANTIC_ATTRIBUTE_DATASET_DIR</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created directory: </span><span class="si">{</span><span class="n">DFLT_SEMANTIC_ATTRIBUTE_DATASET_DIR</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># --------------------------------------------------------------------------------------</span>
+<span class="c1"># Utils</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dol</span><span class="w"> </span><span class="kn">import</span> <span class="n">store_aggregate</span><span class="p">,</span> <span class="n">cache_iter</span><span class="p">,</span> <span class="n">TextFiles</span><span class="p">,</span> <span class="n">DirReader</span><span class="p">,</span> <span class="n">Files</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">text_lines</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">text</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">line</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">line</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">mk_concatenation_file</span><span class="p">(</span>
+    <span class="n">dirpath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">keys_func</span><span class="o">=</span><span class="nb">sorted</span><span class="p">,</span>
+    <span class="n">savefile_extension</span><span class="o">=</span><span class="s2">&quot;.txt&quot;</span><span class="p">,</span>
+    <span class="n">kv_to_item</span><span class="o">=</span><span class="k">lambda</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">text_lines</span><span class="p">(</span><span class="n">v</span><span class="p">)),</span>
+    <span class="n">assert_all_chunk_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">remove_directory_once_done</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="c1"># parent of the rootdir</span>
+    <span class="n">dirpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">dirpath</span><span class="p">)</span>
+    <span class="n">parent_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">dirpath</span><span class="p">)</span>
+    <span class="n">child_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">dirpath</span><span class="p">)</span>
+    <span class="n">save_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parent_dir</span><span class="p">,</span> <span class="n">child_dir</span> <span class="o">+</span> <span class="n">savefile_extension</span><span class="p">)</span>
+    <span class="n">store</span> <span class="o">=</span> <span class="n">cache_iter</span><span class="p">(</span><span class="n">TextFiles</span><span class="p">(</span><span class="n">dirpath</span><span class="p">),</span> <span class="n">keys_cache</span><span class="o">=</span><span class="n">keys_func</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">assert_all_chunk_keys</span><span class="p">:</span>
+        <span class="n">is_chunk_key</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">k</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">child_dir</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;_\d+.*&quot;</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="nb">map</span><span class="p">(</span><span class="n">is_chunk_key</span><span class="p">,</span> <span class="n">store</span><span class="p">)</span>
+        <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;Not all keys match the expected pattern: </span><span class="si">{</span><span class="n">child_dir</span><span class="si">}</span><span class="s2">_&lt;number&gt;&quot;</span>
+    <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">save_path</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
+        <span class="n">store_aggregate</span><span class="p">(</span>
+            <span class="n">store</span><span class="p">,</span>
+            <span class="n">kv_to_item</span><span class="o">=</span><span class="n">kv_to_item</span><span class="p">,</span>
+            <span class="n">aggregator</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">remove_directory_once_done</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">store</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">Files</span><span class="p">(</span><span class="n">dirpath</span><span class="p">)):</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">dirpath</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Not all files were processed. Keeping </span><span class="si">{</span><span class="n">dirpath</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">save_path</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_line</span><span class="p">(</span><span class="n">line</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="n">line_parse_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^(\d+) (.*)$&quot;</span><span class="p">)</span>
+
+    <span class="n">match</span> <span class="o">=</span> <span class="n">line_parse_re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+        <span class="n">score</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">segment</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">score</span><span class="o">=</span><span class="n">score</span><span class="p">,</span> <span class="n">segment</span><span class="o">=</span><span class="n">segment</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">parsed_lines</span><span class="p">(</span><span class="n">text_contents</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">text_lines</span><span class="p">(</span><span class="n">text_contents</span><span class="p">):</span>
+        <span class="n">parsed_line</span> <span class="o">=</span> <span class="n">parse_line</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">parsed_line</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">parsed_line</span>
+
+
+<span class="c1"># --------------------------------------------------------------------------------------</span>
+<span class="c1"># Prompt and AI function</span>
+
+<span class="n">dflt_scoring</span> <span class="o">=</span> <span class="s2">&quot;A semantic score from 0 to 5 (where 0 means “completely lacks the attribute, or is the opposite of it”, and 5 means “maximally expresses the attribute”). The score should reflect the degree to which the concept is present in the text. You should include examples across the full spectrum — some clearly lacking/opposite, some neutral, ambiguous or mixed, and some highly prototypical.&quot;</span>
+<span class="n">dflt_facets_spectrum</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">The examples should be **varied across a wide range of linguistic and contextual dimensions** to avoid bias and ensure semantic generality. Specifically, they should differ:</span>
+
+<span class="s2">* **In style**  </span>
+<span class="s2">  (e.g. formality [formal, informal], tone [serious, sarcastic, joyful, melancholic, humorous, threatening], register [colloquial, poetic, academic, bureaucratic, journalistic], sentence complexity [simple, compound, complex], readability [grade-school level to academic prose], and structure [dialogue, monologue, rhetorical question, stream of consciousness])</span>
+
+<span class="s2">* **In topic**  </span>
+<span class="s2">  (e.g. subject matter [politics, science, technology, health, family life, education, war, economics, relationships, religion, art, sports], domain-specific language [legal, technical, medical, business], topicality [current events, timeless topics, historical references], and focus [personal experience, societal issues, abstract ideas])</span>
+
+<span class="s2">* **In perspective**  </span>
+<span class="s2">  (e.g. grammatical person [first-person, second-person, third-person], speaker voice [individual, collective, institutional], ideological stance [liberal, conservative, centrist, apolitical], and point of view [insider, outsider, neutral observer])</span>
+
+<span class="s2">* **In emotion or sentiment**  </span>
+<span class="s2">  (e.g. affective valence [positive, negative, neutral], emotional tone [grief, anger, joy, pride, fear, hope, anxiety, admiration, contempt], intensity [mild, moderate, extreme], and expression style [explicit, understated, metaphorical])</span>
+
+<span class="s2">* **In cultural and linguistic context**  </span>
+<span class="s2">  (e.g. dialect or variety of English [American English, British English, Indian English, African American Vernacular English], idiomatic expression [use of local idioms, metaphors, colloquialisms], cultural references [holidays, traditions, regional events], and worldview framing)</span>
+
+<span class="s2">* **In format and genre**  </span>
+<span class="s2">  (e.g. type of text [tweet, blog post, political speech, news headline, fictional narrative, email, testimonial, FAQ entry], length [short clause, single sentence, multi-sentence paragraph], formatting [list, dialogue exchange, question-answer format])</span>
+
+<span class="s2">* **In implied speaker identity or status**  </span>
+<span class="s2">  (e.g. implied age [child, teenager, adult, elderly], social role [student, parent, official, protester, teacher, employer], power/status tone [subordinate, authoritative, egalitarian], demographic cues [gendered language, class-based references])</span>
+
+<span class="s2">* **In temporal framing**  </span>
+<span class="s2">  (e.g. tense [past, present, future, hypothetical], temporality [historical reference, present moment, envisioned future], and rate of time [momentary, durative, recurring])</span>
+
+<span class="s2">* **In communicative intent**  </span>
+<span class="s2">  (e.g. purpose [informing, persuading, questioning, commanding, storytelling, reflecting, speculating], rhetorical stance [assertive, inquisitive, ironic, pleading, declarative], and audience orientation [self-directed, peer-directed, public address])</span>
+
+<span class="s2">This diversity should be naturally embedded in the content and should not be explicitly labeled. The result should be a **rich, heterogeneous dataset** reflecting the wide variability of real-world text expression across all these dimensions.</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">prompt_template_for_dataset_generation</span> <span class="o">=</span> <span class="p">(</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;&quot; \</span>
+
+<span class="sd">You are tasked with generating labeled training data for a machine learning model that </span>
+<span class="sd">detects a specific semantic property in text. </span>
+<span class="sd">The goal is to produce short text segments {segments_spec:(1–3 sentences each)}</span>
+<span class="sd">that vary in how much they express the semantic attribute of:</span>
+<span class="sd">{attribute}.</span>
+
+<span class="sd">Please output a list of {n_examples:100} text examples. </span>
+<span class="sd">Each example should include:</span>
+<span class="sd">* short natural language text segment in {language:English}</span>
+<span class="sd">* {scoring:&quot;&quot;&quot;</span>
+    <span class="o">+</span> <span class="n">dflt_scoring</span>
+    <span class="o">+</span> <span class="s2">&quot;&quot;&quot;}</span>
+
+<span class="s2">The score should reflect the degree to which the attribute (</span><span class="si">{attribute}</span><span class="s2">) is present/reflected/represented</span>
+<span class="s2">in the text. </span>
+
+<span class="s2">{facets_spectrum:&quot;&quot;&quot;</span>
+    <span class="o">+</span> <span class="n">dflt_facets_spectrum</span>
+    <span class="o">+</span> <span class="s2">&quot;&quot;&quot;}</span>
+
+<span class="s2">{score_spectrum:You should include examples across the full spectrum — some clearly not matching the attribute, some ambiguous or mixed, and some highly prototypical.}</span>
+
+<span class="s2">The examples should also:</span>
+<span class="s2">	•   Be varied in topics. </span><span class="si">{topics: }</span>
+<span class="s2">	•	Be varied in styles. </span><span class="si">{styles: }</span>
+
+<span class="s2">The output format must be:</span>
+<span class="s2">	•	One example per line</span>
+<span class="s2">	•	Each line should have a score, followed by a space, then the text segment (`score text`)</span>
+<span class="s2">	•	IMPORTANT: No extra commentary, headers, or explanations — only the list</span>
+
+<span class="s2">Again, the target attribute is: </span><span class="si">{attribute}</span>
+
+<span class="si">{extras: }</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># TODO: Change to more general aix prompt_function when available</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">oa</span>
+
+<span class="n">DFLT_TEMPERATURE_FOR_MOOD_DATASET_GEN</span> <span class="o">=</span> <span class="mf">0.7</span>
+<span class="n">DFLT_MODEL_FOR_MOOD_DATASET_GEN</span> <span class="o">=</span> <span class="s2">&quot;gpt-4o-mini&quot;</span>  <span class="c1"># cheapish model</span>
+
+<span class="n">semantic_attribute_examples_for_attribute</span> <span class="o">=</span> <span class="n">oa</span><span class="o">.</span><span class="n">prompt_function</span><span class="p">(</span>
+    <span class="n">prompt_template_for_dataset_generation</span><span class="p">,</span>
+    <span class="n">prompt_func</span><span class="o">=</span><span class="n">partial</span><span class="p">(</span>
+        <span class="n">oa</span><span class="o">.</span><span class="n">chat</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="s2">&quot;DFLT_TEMPERATURE_FOR_MOOD_DATASET_GEN&quot;</span><span class="p">,</span>
+                <span class="n">DFLT_TEMPERATURE_FOR_MOOD_DATASET_GEN</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">),</span>
+        <span class="n">model</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;DFLT_MODEL_FOR_MOOD_DATASET_GEN&quot;</span><span class="p">,</span> <span class="n">DFLT_MODEL_FOR_MOOD_DATASET_GEN</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+<span class="p">)</span>
+
+
+<span class="c1"># def _semantic_attribute_examples_for_attribute(attribute: str, n_examples: int = 100):</span>
+<span class="c1">#     prompt = prompt_template_for_dataset_generation.format(</span>
+<span class="c1">#         concept=attribute,</span>
+<span class="c1">#         n_examples=n_examples,</span>
+<span class="c1">#     )</span>
+<span class="c1">#     response = semantic_attribute_examples_for_attribute(prompt)</span>
+<span class="c1">#     return response</span>
+
+
+<span class="c1"># --------------------------------------------------------------------------------------</span>
+<span class="c1"># Dataset generation functions</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">default_save_key</span><span class="p">(</span>
+    <span class="n">name</span><span class="p">,</span>
+    <span class="n">batch_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">include_subdir_prefix</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">counter_key_format</span><span class="o">=</span><span class="s2">&quot;_</span><span class="si">{:02.0f}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">extension</span><span class="o">=</span><span class="s2">&quot;.txt&quot;</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">path_sep</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span>
+    <span class="n">suffix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}{</span><span class="n">path_sep</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">include_subdir_prefix</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">batch_idx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">suffix</span><span class="si">}{</span><span class="n">name</span><span class="si">}</span><span class="s2">.txt&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">counter_str</span> <span class="o">=</span> <span class="n">counter_key_format</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">batch_idx</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">suffix</span><span class="si">}{</span><span class="n">name</span><span class="si">}{</span><span class="n">counter_str</span><span class="si">}{</span><span class="n">extension</span><span class="si">}</span><span class="s2">&quot;</span>
+
+
+<div class="viewcode-block" id="make_semantic_attributes_dataset">
+<a class="viewcode-back" href="../../module_docs/mood/dataset_makers.html#mood.dataset_makers.make_semantic_attributes_dataset">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_semantic_attributes_dataset</span><span class="p">(</span>
+    <span class="n">semantic_attributes</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Mapping</span><span class="p">,</span>
+    <span class="n">store</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">MutableMapping</span> <span class="o">=</span> <span class="n">DFLT_SEMANTIC_ATTRIBUTE_DATASET_DIR</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">n_examples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
+    <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+    <span class="n">start_batch_idx_at</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">save_key</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="n">default_save_key</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">dataset_maker_kwargs</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Gather data for each semantic attribute and save it to the store.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    - semantic_attributes: Mapping of attribute names to their descriptions</span>
+<span class="sd">    - store: Storage location (string path or MutableMapping)</span>
+<span class="sd">    - n_examples: Total number of examples to gather per attribute</span>
+<span class="sd">    - batch_size: Number of examples per batch; if None, gather all examples in one batch</span>
+<span class="sd">    - start_batch_idx_at: Starting index for batch numbering</span>
+<span class="sd">    - save_key: Function to generate save keys</span>
+<span class="sd">    - verbose: Verbosity level (0=quiet, 1=attribute progress, 2=batch progress)</span>
+<span class="sd">    - dataset_maker_kwargs: Additional kwargs for semantic_attribute_examples_for_attribute</span>
+
+<span class="sd">    WARNING: Some models aren&#39;t very good at generating the requested number of examples.</span>
+<span class="sd">    They may generate fewer or more than requested. This is a known issue with LLM</span>
+<span class="sd">    models.</span>
+
+<span class="sd">    &gt;&gt;&gt; store = {}</span>
+<span class="sd">    &gt;&gt;&gt; attributes = {&quot;color&quot;: &quot;description of color&quot;}</span>
+<span class="sd">    &gt;&gt;&gt; make_semantic_attributes_dataset(attributes, store, n_examples=3, batch_size=2)</span>
+<span class="sd">    &gt;&gt;&gt; len(store)  # Two batches saved</span>
+<span class="sd">    2</span>
+<span class="sd">    &gt;&gt;&gt; store  # doctest: +SKIP</span>
+<span class="sd">    {</span>
+<span class="sd">        &#39;color/color_00.txt&#39;: &#39;0 The meeting was dull and unproductive, leaving everyone feeling dissatisfied.&#39;</span>
+<span class="sd">                              &#39;2 The car was old and rusty, with a paint job that had faded over time, hinting at its once vibrant color.&#39;</span>
+<span class="sd">                              &#39;5 The sunset painted the sky in brilliant shades of orange, pink, and purple, creating a breathtaking display of color that captivated all who watched.&#39;</span>
+<span class="sd">                              &#39;1 The room felt gloomy, with dark furniture casting shadows, though a hint of blue could be seen in the curtains.  &#39;,</span>
+<span class="sd">        &#39;color/color_01.txt&#39;: &#39;0 The meeting was dull and uneventful, lacking any excitement or engagement.&#39;</span>
+<span class="sd">                              &#39;1 The car was just an ordinary vehicle, nothing special about its appearance. &#39;</span>
+<span class="sd">                              &quot;2 The flowers were vibrant, but I couldn&#39;t quite tell what colors they were. &quot;</span>
+<span class="sd">                              &#39;3 The sky turned a beautiful shade of orange as the sun began to set, casting a warm glow.&#39;</span>
+<span class="sd">                              &quot;4 She wore a stunning red dress that caught everyone&#39;s attention at the party.&quot;</span>
+<span class="sd">                              &#39;5 The ocean sparkled in shades of deep blue and turquoise, a breathtaking view that left us speechless.  &#39;</span>
+<span class="sd">    }</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">semantic_attributes</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">semantic_attributes</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span>
+            <span class="s1">&#39;.json&#39;</span>
+        <span class="p">),</span> <span class="s2">&quot;string semantic_attributes needs to be a json file&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">semantic_attributes</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+
+            <span class="n">semantic_attributes</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">store</span> <span class="o">=</span> <span class="n">mk_dirs_if_missing</span><span class="p">(</span><span class="n">TextFiles</span><span class="p">(</span><span class="n">store</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_batch_config</span><span class="p">(</span><span class="n">n_examples</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">start_idx</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate batch configuration based on whether batch_size is None or not.</span>
+<span class="sd">        Returns a generator of (batch_idx, current_batch_size) tuples.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">batch_size</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Single batch mode</span>
+            <span class="k">yield</span> <span class="kc">None</span><span class="p">,</span> <span class="n">n_examples</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Multiple batches mode</span>
+            <span class="n">num_batches</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">n_examples</span> <span class="o">+</span> <span class="n">batch_size</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="p">)</span> <span class="o">//</span> <span class="n">batch_size</span>  <span class="c1"># Ceiling division</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_batches</span><span class="p">):</span>
+                <span class="n">batch_idx</span> <span class="o">=</span> <span class="n">start_idx</span> <span class="o">+</span> <span class="n">i</span>
+                <span class="n">remaining</span> <span class="o">=</span> <span class="n">n_examples</span> <span class="o">-</span> <span class="n">i</span> <span class="o">*</span> <span class="n">batch_size</span>
+                <span class="n">current_batch_size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">remaining</span><span class="p">)</span>
+                <span class="k">yield</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="n">current_batch_size</span>
+
+    <span class="k">for</span> <span class="n">attribute_idx</span><span class="p">,</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">attribute</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">semantic_attributes</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">attribute_idx</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">semantic_attributes</span><span class="p">)</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="n">current_batch_size</span> <span class="ow">in</span> <span class="n">_get_batch_config</span><span class="p">(</span>
+            <span class="n">n_examples</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">start_batch_idx_at</span>
+        <span class="p">):</span>
+            <span class="n">_save_key</span> <span class="o">=</span> <span class="n">save_key</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Gathering </span><span class="si">{</span><span class="n">current_batch_size</span><span class="si">}</span><span class="s2"> examples for: </span><span class="si">{</span><span class="n">_save_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="n">response</span> <span class="o">=</span> <span class="n">semantic_attribute_examples_for_attribute</span><span class="p">(</span>
+                <span class="n">attribute</span><span class="o">=</span><span class="n">attribute</span><span class="p">,</span>
+                <span class="n">n_examples</span><span class="o">=</span><span class="n">current_batch_size</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">dataset_maker_kwargs</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">store</span><span class="p">[</span><span class="n">_save_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">response</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">argh</span>
+
+    <span class="n">argh</span><span class="o">.</span><span class="n">dispatch_commands</span><span class="p">([</span><span class="n">make_semantic_attributes_dataset</span><span class="p">])</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright NO COPYRIGHT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

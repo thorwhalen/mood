@@ -1,0 +1,1387 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>mood.model_analysis &mdash; mood 0.0.15 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=f0357c94"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            mood
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/mood.html">mood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/mood/dataset_makers.html">mood.dataset_makers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/mood/examples.html">mood.examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/mood/learn_sentiments.html">mood.learn_sentiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/mood/model_analysis.html">mood.model_analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/mood/mood_modeling.html">mood.mood_modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/mood/scripts.html">mood.scripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/mood/scripts/financial_news_searches.html">mood.scripts.financial_news_searches</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/mood/sentiment.html">mood.sentiment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/mood/tools.html">mood.tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/mood/util.html">mood.util</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">mood</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">mood.model_analysis</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for mood.model_analysis</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Tools for model analysis&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Set</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Mapping</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_model_stats</span><span class="p">(</span><span class="n">model_stats</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">float</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_gen</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">semantic_attribute</span><span class="p">,</span> <span class="n">stats</span> <span class="ow">in</span> <span class="n">model_stats</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">yield from</span> <span class="p">(</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">semantic_attribute</span><span class="o">=</span><span class="n">semantic_attribute</span><span class="p">,</span> <span class="o">**</span><span class="n">_stats</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">_stats</span> <span class="ow">in</span> <span class="n">stats</span>
+            <span class="p">)</span>
+            <span class="c1"># yield semantic_attribute, compute_model_stats(manager)</span>
+
+    <span class="n">stats_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">_gen</span><span class="p">())</span>
+
+    <span class="n">classifier_stats</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">stats_df</span><span class="p">[</span><span class="n">stats_df</span><span class="p">[</span><span class="s2">&quot;data_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;binary&quot;</span><span class="p">]</span>
+        <span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">regression_stats</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">stats_df</span><span class="p">[</span><span class="n">stats_df</span><span class="p">[</span><span class="s2">&quot;data_type&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;binary&quot;</span><span class="p">]</span>
+        <span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">classifier_stats</span><span class="p">,</span> <span class="n">regression_stats</span>
+
+
+<div class="viewcode-block" id="ModelPerformanceAnalyzer">
+<a class="viewcode-back" href="../../module_docs/mood/model_analysis.html#mood.model_analysis.ModelPerformanceAnalyzer">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ModelPerformanceAnalyzer</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Analyze model performance metrics across different semantic attributes and model types.</span>
+
+<span class="sd">    This class provides methods to generate statistical summaries and visualizations</span>
+<span class="sd">    for comparing model performance across different metrics and semantic attributes.</span>
+
+<span class="sd">    &gt;&gt;&gt; import pandas as pd</span>
+<span class="sd">    &gt;&gt;&gt; # Sample data</span>
+<span class="sd">    &gt;&gt;&gt; data = pd.DataFrame({</span>
+<span class="sd">    ...     &#39;semantic_attribute&#39;: [&#39;irony&#39;, &#39;irony&#39;, &#39;moral&#39;, &#39;moral&#39;],</span>
+<span class="sd">    ...     &#39;model_name&#39;: [&#39;svm&#39;, &#39;log_reg&#39;, &#39;svm&#39;, &#39;log_reg&#39;],</span>
+<span class="sd">    ...     &#39;accuracy&#39;: [0.7, 0.6, 0.9, 0.8]</span>
+<span class="sd">    ... })</span>
+<span class="sd">    &gt;&gt;&gt; analyzer = ModelPerformanceAnalyzer(data)</span>
+<span class="sd">    &gt;&gt;&gt; analyzer.get_metrics()</span>
+<span class="sd">    [&#39;accuracy&#39;]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span>
+    <span class="n">relevant_metrics</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">model_type_column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;model_name&quot;</span>
+    <span class="n">attribute_column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;semantic_attribute&quot;</span>
+    <span class="n">data_type_column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;data_type&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the analyzer by identifying relevant metrics in the data.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_data</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">relevant_metrics</span><span class="p">:</span>
+            <span class="c1"># Auto-identify metrics by excluding non-metric columns</span>
+            <span class="n">non_metric_columns</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model_type_column</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">attribute_column</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_type_column</span><span class="p">,</span>
+                <span class="s2">&quot;n_splits&quot;</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">relevant_metrics</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">non_metric_columns</span>
+            <span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate the dataframe structure to ensure required columns exist.&quot;&quot;&quot;</span>
+        <span class="n">required_columns</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model_type_column</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">attribute_column</span><span class="p">]</span>
+        <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">required_columns</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing required columns: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ModelPerformanceAnalyzer.get_metrics">
+<a class="viewcode-back" href="../../module_docs/mood/model_analysis.html#mood.model_analysis.ModelPerformanceAnalyzer.get_metrics">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the list of available metrics in the dataset.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List[str]: List of metric names</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">relevant_metrics</span></div>
+
+
+<div class="viewcode-block" id="ModelPerformanceAnalyzer.get_attributes">
+<a class="viewcode-back" href="../../module_docs/mood/model_analysis.html#mood.model_analysis.ModelPerformanceAnalyzer.get_attributes">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the list of unique semantic attributes in the dataset.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List[str]: List of semantic attribute names</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">attribute_column</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="ModelPerformanceAnalyzer.get_models">
+<a class="viewcode-back" href="../../module_docs/mood/model_analysis.html#mood.model_analysis.ModelPerformanceAnalyzer.get_models">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_models</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the list of unique model names in the dataset.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List[str]: List of model names</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model_type_column</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="ModelPerformanceAnalyzer.get_data_types">
+<a class="viewcode-back" href="../../module_docs/mood/model_analysis.html#mood.model_analysis.ModelPerformanceAnalyzer.get_data_types">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_data_types</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the list of unique data types in the dataset.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List[str]: List of data types (e.g., binary, numerical, ordinal)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type_column</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_type_column</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
+
+
+<div class="viewcode-block" id="ModelPerformanceAnalyzer.filter_data">
+<a class="viewcode-back" href="../../module_docs/mood/model_analysis.html#mood.model_analysis.ModelPerformanceAnalyzer.filter_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">filter_data</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">attributes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">models</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">data_types</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Filter the dataframe based on specified attributes, models, and data types.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            attributes: List of semantic attributes to include</span>
+<span class="sd">            models: List of model names to include</span>
+<span class="sd">            data_types: List of data types to include</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            pd.DataFrame: Filtered dataframe</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">filtered_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">attributes</span><span class="p">:</span>
+            <span class="n">filtered_data</span> <span class="o">=</span> <span class="n">filtered_data</span><span class="p">[</span>
+                <span class="n">filtered_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">attribute_column</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+            <span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">models</span><span class="p">:</span>
+            <span class="n">filtered_data</span> <span class="o">=</span> <span class="n">filtered_data</span><span class="p">[</span>
+                <span class="n">filtered_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model_type_column</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">models</span><span class="p">)</span>
+            <span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">data_types</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type_column</span> <span class="ow">in</span> <span class="n">filtered_data</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">filtered_data</span> <span class="o">=</span> <span class="n">filtered_data</span><span class="p">[</span>
+                <span class="n">filtered_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_type_column</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">data_types</span><span class="p">)</span>
+            <span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">filtered_data</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_format_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Format table values to be more readable.&quot;&quot;&quot;</span>
+        <span class="c1"># Round numeric columns to 3 decimal places</span>
+        <span class="n">numeric_cols</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;float64&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">columns</span>
+        <span class="k">return</span> <span class="n">table</span><span class="o">.</span><span class="n">round</span><span class="p">({</span><span class="n">col</span><span class="p">:</span> <span class="mi">3</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">numeric_cols</span><span class="p">})</span>
+
+<div class="viewcode-block" id="ModelPerformanceAnalyzer.generate_model_comparison_table">
+<a class="viewcode-back" href="../../module_docs/mood/model_analysis.html#mood.model_analysis.ModelPerformanceAnalyzer.generate_model_comparison_table">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_model_comparison_table</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">metric</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">attributes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">models</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">data_types</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate a comparison table of models across different semantic attributes for a given metric.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            metric: The metric to compare (e.g., accuracy, f1, r2)</span>
+<span class="sd">            attributes: List of semantic attributes to include (default: all)</span>
+<span class="sd">            models: List of model names to include (default: all)</span>
+<span class="sd">            data_types: List of data types to include (default: all)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            pd.DataFrame: A table with attributes as rows and models as columns</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">relevant_metrics</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Metric &#39;</span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s2">&#39; not found in the data&quot;</span><span class="p">)</span>
+
+        <span class="n">filtered_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_data</span><span class="p">(</span><span class="n">attributes</span><span class="p">,</span> <span class="n">models</span><span class="p">,</span> <span class="n">data_types</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">filtered_data</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+
+        <span class="c1"># Pivot the data to create a table with attributes as rows and models as columns</span>
+        <span class="n">pivot_table</span> <span class="o">=</span> <span class="n">filtered_data</span><span class="o">.</span><span class="n">pivot_table</span><span class="p">(</span>
+            <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">attribute_column</span><span class="p">],</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model_type_column</span><span class="p">],</span>
+            <span class="n">values</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
+            <span class="n">aggfunc</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Calculate row averages (average for each attribute across models)</span>
+        <span class="n">pivot_table</span><span class="p">[</span><span class="s2">&quot;Average&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pivot_table</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Sort by the average (descending)</span>
+        <span class="n">pivot_table</span> <span class="o">=</span> <span class="n">pivot_table</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">&quot;Average&quot;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># Reset index with ranking</span>
+        <span class="n">pivot_table</span> <span class="o">=</span> <span class="n">pivot_table</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format_table</span><span class="p">(</span><span class="n">pivot_table</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ModelPerformanceAnalyzer.generate_attribute_modelability_table">
+<a class="viewcode-back" href="../../module_docs/mood/model_analysis.html#mood.model_analysis.ModelPerformanceAnalyzer.generate_attribute_modelability_table">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_attribute_modelability_table</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">primary_metric</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">secondary_metrics</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">models</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">data_types</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate a table showing which semantic attributes are most modelable.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            primary_metric: The main metric to sort by (e.g., accuracy, r2)</span>
+<span class="sd">            secondary_metrics: Additional metrics to include in the table</span>
+<span class="sd">            models: List of model names to include (default: all)</span>
+<span class="sd">            data_types: List of data types to include (default: all)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            pd.DataFrame: A table with attributes as rows and metrics as columns</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">primary_metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">relevant_metrics</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Metric &#39;</span><span class="si">{</span><span class="n">primary_metric</span><span class="si">}</span><span class="s2">&#39; not found in the data&quot;</span><span class="p">)</span>
+
+        <span class="n">metrics_to_include</span> <span class="o">=</span> <span class="p">[</span><span class="n">primary_metric</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">secondary_metrics</span><span class="p">:</span>
+            <span class="n">invalid_metrics</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">secondary_metrics</span> <span class="k">if</span> <span class="n">m</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">relevant_metrics</span>
+            <span class="p">]</span>
+            <span class="k">if</span> <span class="n">invalid_metrics</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Metrics not found: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">invalid_metrics</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">metrics_to_include</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">secondary_metrics</span><span class="p">)</span>
+
+        <span class="n">filtered_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_data</span><span class="p">(</span><span class="n">models</span><span class="o">=</span><span class="n">models</span><span class="p">,</span> <span class="n">data_types</span><span class="o">=</span><span class="n">data_types</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">filtered_data</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+
+        <span class="c1"># For each attribute, calculate the average of each metric across all models</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="n">filtered_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">attribute_column</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">():</span>
+            <span class="n">attribute_data</span> <span class="o">=</span> <span class="n">filtered_data</span><span class="p">[</span>
+                <span class="n">filtered_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">attribute_column</span><span class="p">]</span> <span class="o">==</span> <span class="n">attribute</span>
+            <span class="p">]</span>
+
+            <span class="n">row</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;semantic_attribute&quot;</span><span class="p">:</span> <span class="n">attribute</span><span class="p">}</span>
+
+            <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">metrics_to_include</span><span class="p">:</span>
+                <span class="n">row</span><span class="p">[</span><span class="n">metric</span><span class="p">]</span> <span class="o">=</span> <span class="n">attribute_data</span><span class="p">[</span><span class="n">metric</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+        <span class="c1"># Convert to DataFrame and sort by primary metric (descending)</span>
+        <span class="n">result_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="n">result_df</span> <span class="o">=</span> <span class="n">result_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">primary_metric</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># Reset index to show ranking</span>
+        <span class="n">result_df</span> <span class="o">=</span> <span class="n">result_df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format_table</span><span class="p">(</span><span class="n">result_df</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ModelPerformanceAnalyzer.visualize_model_comparison">
+<a class="viewcode-back" href="../../module_docs/mood/model_analysis.html#mood.model_analysis.ModelPerformanceAnalyzer.visualize_model_comparison">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">visualize_model_comparison</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">metric</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">attributes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">models</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">data_types</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">figsize</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+        <span class="n">palette</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;viridis&quot;</span><span class="p">,</span>
+        <span class="n">tight_ylim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">plt</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a grouped bar chart comparing model performance across semantic attributes.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            metric: The metric to visualize</span>
+<span class="sd">            attributes: List of semantic attributes to include (default: all)</span>
+<span class="sd">            models: List of model names to include (default: all)</span>
+<span class="sd">            data_types: List of data types to include (default: all)</span>
+<span class="sd">            figsize: Figure size (width, height)</span>
+<span class="sd">            palette: Color palette for the plot</span>
+<span class="sd">            tight_ylim: Whether to use tight y-axis limits (default: True)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            plt.Figure: The matplotlib figure object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">relevant_metrics</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Metric &#39;</span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s2">&#39; not found in the data&quot;</span><span class="p">)</span>
+
+        <span class="n">filtered_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_data</span><span class="p">(</span><span class="n">attributes</span><span class="p">,</span> <span class="n">models</span><span class="p">,</span> <span class="n">data_types</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">filtered_data</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+            <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+                <span class="mf">0.5</span><span class="p">,</span>
+                <span class="mf">0.5</span><span class="p">,</span>
+                <span class="s2">&quot;No data available with the specified filters&quot;</span><span class="p">,</span>
+                <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+                <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">fig</span>
+
+        <span class="c1"># Create figure</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+
+        <span class="c1"># Create grouped bar chart</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">barplot</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">filtered_data</span><span class="p">,</span>
+            <span class="n">x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">attribute_column</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
+            <span class="n">hue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_type_column</span><span class="p">,</span>
+            <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">,</span>
+            <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Set tight y limits if specified</span>
+        <span class="k">if</span> <span class="n">tight_ylim</span><span class="p">:</span>
+            <span class="n">min_val</span> <span class="o">=</span> <span class="n">filtered_data</span><span class="p">[</span><span class="n">metric</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+            <span class="n">max_val</span> <span class="o">=</span> <span class="n">filtered_data</span><span class="p">[</span><span class="n">metric</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+            <span class="c1"># Add a small padding (5% of range)</span>
+            <span class="n">padding</span> <span class="o">=</span> <span class="mf">0.05</span> <span class="o">*</span> <span class="p">(</span><span class="n">max_val</span> <span class="o">-</span> <span class="n">min_val</span><span class="p">)</span>
+            <span class="n">y_min</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">min_val</span> <span class="o">-</span> <span class="n">padding</span><span class="p">)</span>  <span class="c1"># Ensure non-negative for most metrics</span>
+            <span class="n">y_max</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_val</span> <span class="o">+</span> <span class="n">padding</span><span class="p">)</span>  <span class="c1"># Keep under 1 for normalized metrics</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">)</span>
+
+        <span class="c1"># Customize the plot</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Model Comparison: </span><span class="si">{</span><span class="n">metric</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">title</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Semantic Attribute&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">metric</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">title</span><span class="p">())</span>
+
+        <span class="c1"># Rotate x-axis labels if there are many attributes</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">filtered_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">attribute_column</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">fig</span></div>
+
+
+<div class="viewcode-block" id="ModelPerformanceAnalyzer.visualize_attribute_modelability">
+<a class="viewcode-back" href="../../module_docs/mood/model_analysis.html#mood.model_analysis.ModelPerformanceAnalyzer.visualize_attribute_modelability">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">visualize_attribute_modelability</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">metric</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">subset_idx</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">models</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">data_types</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">figsize</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+        <span class="n">palette</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;viridis&quot;</span><span class="p">,</span>
+        <span class="n">tight_xlim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">plt</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a horizontal bar chart showing which attributes are most/least modelable.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            metric: The metric to visualize</span>
+<span class="sd">            subset_idx: When positive, show first N attributes; when negative, show last N attributes</span>
+<span class="sd">                        (None = show all attributes)</span>
+<span class="sd">            models: List of model names to include (default: all)</span>
+<span class="sd">            data_types: List of data types to include (default: all)</span>
+<span class="sd">            figsize: Figure size (width, height)</span>
+<span class="sd">            palette: Color palette for the plot</span>
+<span class="sd">            tight_xlim: Whether to use tight x-axis limits (default: True)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            plt.Figure: The matplotlib figure object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">relevant_metrics</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Metric &#39;</span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s2">&#39; not found in the data&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Get attribute modelability table</span>
+        <span class="n">modelability_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_attribute_modelability_table</span><span class="p">(</span>
+            <span class="n">primary_metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span> <span class="n">models</span><span class="o">=</span><span class="n">models</span><span class="p">,</span> <span class="n">data_types</span><span class="o">=</span><span class="n">data_types</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">modelability_table</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+            <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+                <span class="mf">0.5</span><span class="p">,</span>
+                <span class="mf">0.5</span><span class="p">,</span>
+                <span class="s2">&quot;No data available with the specified filters&quot;</span><span class="p">,</span>
+                <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+                <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">fig</span>
+
+        <span class="c1"># Subset the data based on subset_idx</span>
+        <span class="k">if</span> <span class="n">subset_idx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">subset_idx</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># Take first N attributes (top performers)</span>
+                <span class="n">display_data</span> <span class="o">=</span> <span class="n">modelability_table</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="n">subset_idx</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">title_prefix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Top </span><span class="si">{</span><span class="n">subset_idx</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">elif</span> <span class="n">subset_idx</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># Take last N attributes (bottom performers)</span>
+                <span class="n">display_data</span> <span class="o">=</span> <span class="n">modelability_table</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">subset_idx</span><span class="p">:]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">title_prefix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Bottom </span><span class="si">{</span><span class="nb">abs</span><span class="p">(</span><span class="n">subset_idx</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># subset_idx is 0, show all data</span>
+                <span class="n">display_data</span> <span class="o">=</span> <span class="n">modelability_table</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">title_prefix</span> <span class="o">=</span> <span class="s2">&quot;All&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># No subsetting, show all data</span>
+            <span class="n">display_data</span> <span class="o">=</span> <span class="n">modelability_table</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">title_prefix</span> <span class="o">=</span> <span class="s2">&quot;All&quot;</span>
+
+        <span class="c1"># Create figure</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+
+        <span class="c1"># Create horizontal bar chart</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">barplot</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">display_data</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="s2">&quot;semantic_attribute&quot;</span><span class="p">,</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
+            <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">,</span>
+            <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Set tight x limits if specified</span>
+        <span class="k">if</span> <span class="n">tight_xlim</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">display_data</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+            <span class="n">min_val</span> <span class="o">=</span> <span class="n">display_data</span><span class="p">[</span><span class="n">metric</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+            <span class="n">max_val</span> <span class="o">=</span> <span class="n">display_data</span><span class="p">[</span><span class="n">metric</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+            <span class="c1"># Add a small padding (5% of range)</span>
+            <span class="n">padding</span> <span class="o">=</span> <span class="mf">0.05</span> <span class="o">*</span> <span class="p">(</span><span class="n">max_val</span> <span class="o">-</span> <span class="n">min_val</span><span class="p">)</span>
+            <span class="n">x_min</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">min_val</span> <span class="o">-</span> <span class="n">padding</span><span class="p">)</span>  <span class="c1"># Ensure non-negative for most metrics</span>
+            <span class="n">x_max</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_val</span> <span class="o">+</span> <span class="n">padding</span><span class="p">)</span>  <span class="c1"># Keep under 1 for normalized metrics</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">)</span>
+
+        <span class="c1"># Customize the plot</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">title_prefix</span><span class="si">}</span><span class="s1"> Attribute Modelability: </span><span class="si">{</span><span class="n">metric</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">title</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">metric</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">title</span><span class="p">())</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Semantic Attribute&quot;</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">fig</span></div>
+
+
+<div class="viewcode-block" id="ModelPerformanceAnalyzer.visualize_metric_distributions">
+<a class="viewcode-back" href="../../module_docs/mood/model_analysis.html#mood.model_analysis.ModelPerformanceAnalyzer.visualize_metric_distributions">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">visualize_metric_distributions</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">metrics</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">models</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">data_types</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">figsize</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">plt</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create box plots showing the distribution of metrics across semantic attributes.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            metrics: List of metrics to visualize</span>
+<span class="sd">            models: List of model names to include (default: all)</span>
+<span class="sd">            data_types: List of data types to include (default: all)</span>
+<span class="sd">            figsize: Figure size (width, height)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            plt.Figure: The matplotlib figure object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">invalid_metrics</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">metrics</span> <span class="k">if</span> <span class="n">m</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">relevant_metrics</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">invalid_metrics</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Metrics not found: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">invalid_metrics</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">filtered_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_data</span><span class="p">(</span><span class="n">models</span><span class="o">=</span><span class="n">models</span><span class="p">,</span> <span class="n">data_types</span><span class="o">=</span><span class="n">data_types</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">filtered_data</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+            <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+                <span class="mf">0.5</span><span class="p">,</span>
+                <span class="mf">0.5</span><span class="p">,</span>
+                <span class="s2">&quot;No data available with the specified filters&quot;</span><span class="p">,</span>
+                <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+                <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">fig</span>
+
+        <span class="c1"># Create figure with subplots (one for each metric)</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">metrics</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">axes</span> <span class="o">=</span> <span class="p">[</span><span class="n">axes</span><span class="p">]</span>  <span class="c1"># Make axes iterable when there&#39;s only one metric</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">metric</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">metrics</span><span class="p">):</span>
+            <span class="c1"># Create box plot for this metric</span>
+            <span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">filtered_data</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">attribute_column</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Customize this subplot</span>
+            <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">metric</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">title</span><span class="p">()</span><span class="si">}</span><span class="s1"> Distribution&#39;</span><span class="p">)</span>
+            <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>  <span class="c1"># Remove x-label (except for the last subplot)</span>
+            <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">metric</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">title</span><span class="p">())</span>
+
+        <span class="c1"># Set the x-label only for the last subplot</span>
+        <span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Semantic Attribute&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Rotate x-axis labels if there are many attributes</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">filtered_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">attribute_column</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">setp</span><span class="p">(</span><span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">(),</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">fig</span></div>
+
+
+<div class="viewcode-block" id="ModelPerformanceAnalyzer.visualize_correlation_matrix">
+<a class="viewcode-back" href="../../module_docs/mood/model_analysis.html#mood.model_analysis.ModelPerformanceAnalyzer.visualize_correlation_matrix">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">visualize_correlation_matrix</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">figsize</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">plt</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a heatmap showing the correlation between different metrics.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            metrics: List of metrics to include in the correlation matrix (default: all)</span>
+<span class="sd">            figsize: Figure size (width, height)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            plt.Figure: The matplotlib figure object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">metrics_to_include</span> <span class="o">=</span> <span class="n">metrics</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">relevant_metrics</span>
+        <span class="n">invalid_metrics</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">metrics_to_include</span> <span class="k">if</span> <span class="n">m</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">relevant_metrics</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="n">invalid_metrics</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Metrics not found: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">invalid_metrics</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Calculate correlation matrix for the selected metrics</span>
+        <span class="n">correlation_matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">metrics_to_include</span><span class="p">]</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
+
+        <span class="c1"># Create figure</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+
+        <span class="c1"># Create heatmap</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span>
+            <span class="n">correlation_matrix</span><span class="p">,</span>
+            <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;coolwarm&quot;</span><span class="p">,</span>
+            <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;.2f&quot;</span><span class="p">,</span>
+            <span class="n">linewidths</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+            <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Customize the plot</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Correlation Matrix of Performance Metrics&quot;</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">fig</span></div>
+
+
+<div class="viewcode-block" id="ModelPerformanceAnalyzer.visualize_performance_radar">
+<a class="viewcode-back" href="../../module_docs/mood/model_analysis.html#mood.model_analysis.ModelPerformanceAnalyzer.visualize_performance_radar">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">visualize_performance_radar</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">metrics</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">models</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">attribute</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">data_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">figsize</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">plt</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a radar chart comparing models across multiple metrics for a specific attribute.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            metrics: List of metrics to include in the radar chart</span>
+<span class="sd">            models: List of model names to include</span>
+<span class="sd">            attribute: The semantic attribute to analyze</span>
+<span class="sd">            data_type: Data type to filter by (default: None)</span>
+<span class="sd">            figsize: Figure size (width, height)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            plt.Figure: The matplotlib figure object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">invalid_metrics</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">metrics</span> <span class="k">if</span> <span class="n">m</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">relevant_metrics</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">invalid_metrics</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Metrics not found: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">invalid_metrics</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Filter data for the specified attribute and models</span>
+        <span class="n">data_types_filter</span> <span class="o">=</span> <span class="p">[</span><span class="n">data_type</span><span class="p">]</span> <span class="k">if</span> <span class="n">data_type</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">filtered_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_data</span><span class="p">(</span>
+            <span class="n">attributes</span><span class="o">=</span><span class="p">[</span><span class="n">attribute</span><span class="p">],</span> <span class="n">models</span><span class="o">=</span><span class="n">models</span><span class="p">,</span> <span class="n">data_types</span><span class="o">=</span><span class="n">data_types_filter</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">filtered_data</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+            <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+                <span class="mf">0.5</span><span class="p">,</span>
+                <span class="mf">0.5</span><span class="p">,</span>
+                <span class="s2">&quot;No data available with the specified filters&quot;</span><span class="p">,</span>
+                <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+                <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">fig</span>
+
+        <span class="c1"># Extract metric values for each model</span>
+        <span class="n">model_metrics</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">models</span><span class="p">:</span>
+            <span class="n">model_data</span> <span class="o">=</span> <span class="n">filtered_data</span><span class="p">[</span><span class="n">filtered_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model_type_column</span><span class="p">]</span> <span class="o">==</span> <span class="n">model</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">model_data</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+                <span class="n">model_metrics</span><span class="p">[</span><span class="n">model</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">model_data</span><span class="p">[</span><span class="n">metric</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">metrics</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">model_metrics</span><span class="p">:</span>
+            <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+                <span class="mf">0.5</span><span class="p">,</span>
+                <span class="mf">0.5</span><span class="p">,</span>
+                <span class="s2">&quot;No data available for the specified models&quot;</span><span class="p">,</span>
+                <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+                <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">fig</span>
+
+        <span class="c1"># Create radar chart</span>
+        <span class="c1"># Number of variables</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span>
+
+        <span class="c1"># Create figure</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span> <span class="n">subplot_kw</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">polar</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+
+        <span class="c1"># Set the angle for each metric (evenly spaced)</span>
+        <span class="n">angles</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">N</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)]</span>
+        <span class="n">angles</span> <span class="o">+=</span> <span class="n">angles</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># Close the loop</span>
+
+        <span class="c1"># Set the labels for each metric</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">angles</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([</span><span class="n">m</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">title</span><span class="p">()</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">metrics</span><span class="p">])</span>
+
+        <span class="c1"># Draw the chart for each model</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">viridis</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">model_metrics</span><span class="p">)))</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">model_metrics</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="n">values</span> <span class="o">+=</span> <span class="n">values</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># Close the loop</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">angles</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">angles</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="c1"># Add legend and title</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper right&quot;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model Comparison for </span><span class="si">{</span><span class="n">attribute</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">fig</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="compare_models_across_datasets">
+<a class="viewcode-back" href="../../module_docs/mood/model_analysis.html#mood.model_analysis.compare_models_across_datasets">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compare_models_across_datasets</span><span class="p">(</span>
+    <span class="n">classifier_data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">regression_data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">common_models</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">common_attributes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compare model performance across classifier and regression datasets.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        classifier_data: Dataframe with classifier metrics</span>
+<span class="sd">        regression_data: Dataframe with regression metrics</span>
+<span class="sd">        common_models: List of model names to compare (must exist in both datasets)</span>
+<span class="sd">        common_attributes: List of attributes to compare (must exist in both datasets)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Dict[str, pd.DataFrame]: Dictionary with comparison tables</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Create analyzers for both datasets</span>
+    <span class="n">classifier_analyzer</span> <span class="o">=</span> <span class="n">ModelPerformanceAnalyzer</span><span class="p">(</span><span class="n">classifier_data</span><span class="p">)</span>
+    <span class="n">regression_analyzer</span> <span class="o">=</span> <span class="n">ModelPerformanceAnalyzer</span><span class="p">(</span><span class="n">regression_data</span><span class="p">)</span>
+
+    <span class="c1"># Identify common models and attributes if not provided</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">common_models</span><span class="p">:</span>
+        <span class="n">classifier_models</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">classifier_analyzer</span><span class="o">.</span><span class="n">get_models</span><span class="p">())</span>
+        <span class="n">regression_models</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">regression_analyzer</span><span class="o">.</span><span class="n">get_models</span><span class="p">())</span>
+        <span class="n">common_models</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">classifier_models</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">regression_models</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">common_attributes</span><span class="p">:</span>
+        <span class="n">classifier_attrs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">classifier_analyzer</span><span class="o">.</span><span class="n">get_attributes</span><span class="p">())</span>
+        <span class="n">regression_attrs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">regression_analyzer</span><span class="o">.</span><span class="n">get_attributes</span><span class="p">())</span>
+        <span class="n">common_attributes</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">classifier_attrs</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">regression_attrs</span><span class="p">))</span>
+
+    <span class="c1"># Identify key metrics for each dataset</span>
+    <span class="n">classifier_key_metrics</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">,</span> <span class="s2">&quot;f1&quot;</span><span class="p">,</span> <span class="s2">&quot;roc_auc&quot;</span><span class="p">]</span>
+    <span class="n">classifier_key_metrics</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">classifier_key_metrics</span> <span class="k">if</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">classifier_analyzer</span><span class="o">.</span><span class="n">get_metrics</span><span class="p">()</span>
+    <span class="p">]</span>
+
+    <span class="n">regression_key_metrics</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;r2&quot;</span><span class="p">,</span> <span class="s2">&quot;mean_squared_error&quot;</span><span class="p">,</span> <span class="s2">&quot;mean_absolute_error&quot;</span><span class="p">]</span>
+    <span class="n">regression_key_metrics</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">regression_key_metrics</span> <span class="k">if</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">regression_analyzer</span><span class="o">.</span><span class="n">get_metrics</span><span class="p">()</span>
+    <span class="p">]</span>
+
+    <span class="c1"># Generate comparison tables</span>
+    <span class="n">comparison</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># Best classifiers per attribute</span>
+    <span class="k">if</span> <span class="n">classifier_key_metrics</span><span class="p">:</span>
+        <span class="n">comparison</span><span class="p">[</span><span class="s2">&quot;best_classifiers&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">classifier_analyzer</span><span class="o">.</span><span class="n">generate_model_comparison_table</span><span class="p">(</span>
+                <span class="n">metric</span><span class="o">=</span><span class="n">classifier_key_metrics</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">attributes</span><span class="o">=</span><span class="n">common_attributes</span><span class="p">,</span>
+                <span class="n">models</span><span class="o">=</span><span class="n">common_models</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Best regression models per attribute</span>
+    <span class="k">if</span> <span class="n">regression_key_metrics</span><span class="p">:</span>
+        <span class="n">comparison</span><span class="p">[</span><span class="s2">&quot;best_regression_models&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">regression_analyzer</span><span class="o">.</span><span class="n">generate_model_comparison_table</span><span class="p">(</span>
+                <span class="n">metric</span><span class="o">=</span><span class="n">regression_key_metrics</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">attributes</span><span class="o">=</span><span class="n">common_attributes</span><span class="p">,</span>
+                <span class="n">models</span><span class="o">=</span><span class="n">common_models</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Most modelable attributes for classification</span>
+    <span class="k">if</span> <span class="n">classifier_key_metrics</span><span class="p">:</span>
+        <span class="n">comparison</span><span class="p">[</span><span class="s2">&quot;modelable_attributes_classification&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">classifier_analyzer</span><span class="o">.</span><span class="n">generate_attribute_modelability_table</span><span class="p">(</span>
+                <span class="n">primary_metric</span><span class="o">=</span><span class="n">classifier_key_metrics</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">secondary_metrics</span><span class="o">=</span><span class="n">classifier_key_metrics</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+                <span class="n">models</span><span class="o">=</span><span class="n">common_models</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Most modelable attributes for regression</span>
+    <span class="k">if</span> <span class="n">regression_key_metrics</span><span class="p">:</span>
+        <span class="n">comparison</span><span class="p">[</span><span class="s2">&quot;modelable_attributes_regression&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">regression_analyzer</span><span class="o">.</span><span class="n">generate_attribute_modelability_table</span><span class="p">(</span>
+                <span class="n">primary_metric</span><span class="o">=</span><span class="n">regression_key_metrics</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">secondary_metrics</span><span class="o">=</span><span class="n">regression_key_metrics</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+                <span class="n">models</span><span class="o">=</span><span class="n">common_models</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">comparison</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_print_markdown_heading</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Print a markdown heading with the specified level.&quot;&quot;&quot;</span>
+    <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;#&quot;</span> <span class="o">*</span> <span class="n">level</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">text</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_print_markdown_subheading</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Print a markdown subheading (level 3).&quot;&quot;&quot;</span>
+    <span class="n">_print_markdown_heading</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_print_dataframe_as_markdown</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Print a dataframe as a markdown table with an optional description.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">description</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;*</span><span class="si">{</span><span class="n">description</span><span class="si">}</span><span class="s2">*</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">()</span>
+
+
+<span class="c1"># Example 1: Basic usage with classifier data</span>
+<div class="viewcode-block" id="analyze_classifiers">
+<a class="viewcode-back" href="../../module_docs/mood/model_analysis.html#mood.model_analysis.analyze_classifiers">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">analyze_classifiers</span><span class="p">(</span><span class="n">classifier_stats</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Example analysis of classifier models.&quot;&quot;&quot;</span>
+    <span class="n">_print_markdown_heading</span><span class="p">(</span><span class="s2">&quot;Classification Model Analysis&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;This analysis compares different classification models across semantic attributes to identify which models perform best overall and which semantic attributes are most effectively modeled by classification approaches.&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Initialize the analyzer</span>
+    <span class="n">classifier_analyzer</span> <span class="o">=</span> <span class="n">ModelPerformanceAnalyzer</span><span class="p">(</span><span class="n">classifier_stats</span><span class="p">)</span>
+
+    <span class="c1"># Get available metrics, attributes, and models</span>
+    <span class="n">metrics</span> <span class="o">=</span> <span class="n">classifier_analyzer</span><span class="o">.</span><span class="n">get_metrics</span><span class="p">()</span>
+    <span class="n">attributes</span> <span class="o">=</span> <span class="n">classifier_analyzer</span><span class="o">.</span><span class="n">get_attributes</span><span class="p">()</span>
+    <span class="n">models</span> <span class="o">=</span> <span class="n">classifier_analyzer</span><span class="o">.</span><span class="n">get_models</span><span class="p">()</span>
+
+    <span class="n">_print_markdown_subheading</span><span class="p">(</span><span class="s2">&quot;Dataset Overview&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;* **Available metrics:** </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;* **Semantic attributes:** </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;* **Models evaluated:** </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">models</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Generate a table comparing models across attributes for accuracy</span>
+    <span class="n">model_comparison</span> <span class="o">=</span> <span class="n">classifier_analyzer</span><span class="o">.</span><span class="n">generate_model_comparison_table</span><span class="p">(</span>
+        <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;accuracy&quot;</span><span class="p">,</span>
+        <span class="c1"># Optional filters:</span>
+        <span class="c1"># attributes=[&quot;irony_humor&quot;, &quot;moral_outrage&quot;],</span>
+        <span class="c1"># models=[&quot;logistic_high_vs_low&quot;, &quot;svm_high_vs_low&quot;]</span>
+    <span class="p">)</span>
+
+    <span class="n">_print_markdown_subheading</span><span class="p">(</span><span class="s2">&quot;Model Comparison by Accuracy&quot;</span><span class="p">)</span>
+    <span class="n">_print_dataframe_as_markdown</span><span class="p">(</span>
+        <span class="n">model_comparison</span><span class="p">,</span>
+        <span class="s2">&quot;This table shows how different classification models perform across semantic attributes, with rows sorted by average accuracy. Higher values indicate better performance.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Generate a table showing which attributes are most modelable</span>
+    <span class="n">modelability_table</span> <span class="o">=</span> <span class="n">classifier_analyzer</span><span class="o">.</span><span class="n">generate_attribute_modelability_table</span><span class="p">(</span>
+        <span class="n">primary_metric</span><span class="o">=</span><span class="s2">&quot;accuracy&quot;</span><span class="p">,</span> <span class="n">secondary_metrics</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;precision&quot;</span><span class="p">,</span> <span class="s2">&quot;recall&quot;</span><span class="p">,</span> <span class="s2">&quot;f1&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="n">_print_markdown_subheading</span><span class="p">(</span><span class="s2">&quot;Semantic Attribute Modelability&quot;</span><span class="p">)</span>
+    <span class="n">_print_dataframe_as_markdown</span><span class="p">(</span>
+        <span class="n">modelability_table</span><span class="p">,</span>
+        <span class="s2">&quot;This table ranks semantic attributes by how accurately they can be modeled, with additional performance metrics for comprehensive evaluation. Higher values indicate attributes that are easier to model.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Visualize model comparison</span>
+    <span class="n">_print_markdown_subheading</span><span class="p">(</span><span class="s2">&quot;Visualizations&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The following visualizations have been generated and saved:&quot;</span><span class="p">)</span>
+
+    <span class="n">fig1</span> <span class="o">=</span> <span class="n">classifier_analyzer</span><span class="o">.</span><span class="n">visualize_model_comparison</span><span class="p">(</span>
+        <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;accuracy&quot;</span><span class="p">,</span>
+        <span class="n">attributes</span><span class="o">=</span><span class="n">attributes</span><span class="p">,</span>
+        <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+        <span class="n">tight_ylim</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">fig1</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;model_comparison.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;* **Figure 1:** Model comparison across semantic attributes (saved as `model_comparison.png`)&quot;</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  * Shows how different models perform on each semantic attribute&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Visualize top 5 most modelable attributes</span>
+    <span class="n">fig2a</span> <span class="o">=</span> <span class="n">classifier_analyzer</span><span class="o">.</span><span class="n">visualize_attribute_modelability</span><span class="p">(</span>
+        <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;accuracy&quot;</span><span class="p">,</span> <span class="n">subset_idx</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">tight_xlim</span><span class="o">=</span><span class="kc">True</span>  <span class="c1"># Top 5</span>
+    <span class="p">)</span>
+    <span class="n">fig2a</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;top_modelable_attributes.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;* **Figure 2a:** Most modelable attributes (saved as `top_modelable_attributes.png`)&quot;</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  * Shows the 5 semantic attributes that are most accurately modeled&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Visualize bottom 5 least modelable attributes</span>
+    <span class="n">fig2b</span> <span class="o">=</span> <span class="n">classifier_analyzer</span><span class="o">.</span><span class="n">visualize_attribute_modelability</span><span class="p">(</span>
+        <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;accuracy&quot;</span><span class="p">,</span> <span class="n">subset_idx</span><span class="o">=-</span><span class="mi">5</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">tight_xlim</span><span class="o">=</span><span class="kc">True</span>  <span class="c1"># Bottom 5</span>
+    <span class="p">)</span>
+    <span class="n">fig2b</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;bottom_modelable_attributes.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;* **Figure 2b:** Least modelable attributes (saved as `bottom_modelable_attributes.png`)&quot;</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;  * Shows the 5 semantic attributes that are most difficult to model accurately&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Visualize metric distributions</span>
+    <span class="n">fig3</span> <span class="o">=</span> <span class="n">classifier_analyzer</span><span class="o">.</span><span class="n">visualize_metric_distributions</span><span class="p">(</span>
+        <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">,</span> <span class="s2">&quot;precision&quot;</span><span class="p">,</span> <span class="s2">&quot;recall&quot;</span><span class="p">],</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">fig3</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;metric_distributions.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;* **Figure 3:** Distribution of metrics across attributes (saved as `metric_distributions.png`)&quot;</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;  * Shows the variability of performance metrics across different semantic attributes&quot;</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">classifier_analyzer</span></div>
+
+
+
+<span class="c1"># Example 2: Basic usage with regression data</span>
+<div class="viewcode-block" id="analyze_regression_models">
+<a class="viewcode-back" href="../../module_docs/mood/model_analysis.html#mood.model_analysis.analyze_regression_models">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">analyze_regression_models</span><span class="p">(</span><span class="n">regression_stats</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Example analysis of regression models.&quot;&quot;&quot;</span>
+    <span class="n">_print_markdown_heading</span><span class="p">(</span><span class="s2">&quot;Regression Model Analysis&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;This analysis evaluates different regression models across semantic attributes to determine which regression approaches are most effective and which semantic attributes can be modeled with greater precision using regression techniques.&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Initialize the analyzer</span>
+    <span class="n">regression_analyzer</span> <span class="o">=</span> <span class="n">ModelPerformanceAnalyzer</span><span class="p">(</span><span class="n">regression_stats</span><span class="p">)</span>
+
+    <span class="c1"># Generate a table comparing models across attributes for R²</span>
+    <span class="n">model_comparison</span> <span class="o">=</span> <span class="n">regression_analyzer</span><span class="o">.</span><span class="n">generate_model_comparison_table</span><span class="p">(</span><span class="n">metric</span><span class="o">=</span><span class="s2">&quot;r2&quot;</span><span class="p">)</span>
+
+    <span class="n">_print_markdown_subheading</span><span class="p">(</span><span class="s2">&quot;Regression Model Comparison (R²)&quot;</span><span class="p">)</span>
+    <span class="n">_print_dataframe_as_markdown</span><span class="p">(</span>
+        <span class="n">model_comparison</span><span class="p">,</span>
+        <span class="s2">&quot;This table compares regression models across semantic attributes using R² (coefficient of determination). Higher values indicate models that explain more variance in the data.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Generate a table showing which attributes are most modelable with regression</span>
+    <span class="n">modelability_table</span> <span class="o">=</span> <span class="n">regression_analyzer</span><span class="o">.</span><span class="n">generate_attribute_modelability_table</span><span class="p">(</span>
+        <span class="n">primary_metric</span><span class="o">=</span><span class="s2">&quot;r2&quot;</span><span class="p">,</span>
+        <span class="n">secondary_metrics</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;mean_squared_error&quot;</span><span class="p">,</span> <span class="s2">&quot;mean_absolute_error&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="n">_print_markdown_subheading</span><span class="p">(</span><span class="s2">&quot;Regression Modelability by Attribute&quot;</span><span class="p">)</span>
+    <span class="n">_print_dataframe_as_markdown</span><span class="p">(</span>
+        <span class="n">modelability_table</span><span class="p">,</span>
+        <span class="s2">&quot;This table ranks semantic attributes by how well they can be modeled using regression techniques. Higher R² and lower error metrics indicate attributes that are more effectively modeled.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Visualize model comparison for regression</span>
+    <span class="n">_print_markdown_subheading</span><span class="p">(</span><span class="s2">&quot;Visualizations&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The following visualizations have been generated and saved:&quot;</span><span class="p">)</span>
+
+    <span class="n">fig1</span> <span class="o">=</span> <span class="n">regression_analyzer</span><span class="o">.</span><span class="n">visualize_model_comparison</span><span class="p">(</span>
+        <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;r2&quot;</span><span class="p">,</span>
+        <span class="n">data_types</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;numerical&quot;</span><span class="p">],</span>  <span class="c1"># Filter to only numerical data</span>
+        <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+        <span class="n">tight_ylim</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">fig1</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;regression_model_comparison.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;* **Figure 1:** Regression model comparison (saved as `regression_model_comparison.png`)&quot;</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;  * Compares R² values across models and semantic attributes for numerical data&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Visualize top 5 most modelable attributes for regression</span>
+    <span class="n">fig2a</span> <span class="o">=</span> <span class="n">regression_analyzer</span><span class="o">.</span><span class="n">visualize_attribute_modelability</span><span class="p">(</span>
+        <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;r2&quot;</span><span class="p">,</span>
+        <span class="n">subset_idx</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>  <span class="c1"># Top 5</span>
+        <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+        <span class="n">tight_xlim</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">fig2a</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span>
+        <span class="s2">&quot;top_regression_modelable_attributes.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;* **Figure 2a:** Most modelable attributes for regression (saved as `top_regression_modelable_attributes.png`)&quot;</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;  * Shows the 5 semantic attributes that are most effectively modeled with regression&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Visualize bottom 5 least modelable attributes for regression</span>
+    <span class="n">fig2b</span> <span class="o">=</span> <span class="n">regression_analyzer</span><span class="o">.</span><span class="n">visualize_attribute_modelability</span><span class="p">(</span>
+        <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;r2&quot;</span><span class="p">,</span>
+        <span class="n">subset_idx</span><span class="o">=-</span><span class="mi">5</span><span class="p">,</span>  <span class="c1"># Bottom 5</span>
+        <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+        <span class="n">tight_xlim</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">fig2b</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span>
+        <span class="s2">&quot;bottom_regression_modelable_attributes.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;* **Figure 2b:** Least modelable attributes for regression (saved as `bottom_regression_modelable_attributes.png`)&quot;</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;  * Shows the 5 semantic attributes that are most difficult to model with regression&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Visualize correlation matrix of metrics</span>
+    <span class="n">fig3</span> <span class="o">=</span> <span class="n">regression_analyzer</span><span class="o">.</span><span class="n">visualize_correlation_matrix</span><span class="p">(</span>
+        <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;r2&quot;</span><span class="p">,</span> <span class="s2">&quot;mean_squared_error&quot;</span><span class="p">,</span> <span class="s2">&quot;mean_absolute_error&quot;</span><span class="p">],</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">fig3</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;metric_correlation.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;* **Figure 3:** Correlation matrix of regression metrics (saved as `metric_correlation.png`)&quot;</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  * Shows relationships between different performance metrics&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">regression_analyzer</span></div>
+
+
+
+<span class="c1"># Example 3: Advanced analysis across both datasets</span>
+<div class="viewcode-block" id="compare_datasets">
+<a class="viewcode-back" href="../../module_docs/mood/model_analysis.html#mood.model_analysis.compare_datasets">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compare_datasets</span><span class="p">(</span><span class="n">classifier_stats</span><span class="p">,</span> <span class="n">regression_stats</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compare model performance across classifier and regression datasets.&quot;&quot;&quot;</span>
+    <span class="n">_print_markdown_heading</span><span class="p">(</span><span class="s2">&quot;Cross-Dataset Comparison Analysis&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;This analysis compares classification and regression approaches to identify which modeling paradigm is more effective for each semantic attribute and to determine if certain attributes are better suited to one approach over the other.&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Get common attributes (those that appear in both datasets)</span>
+    <span class="n">classifier_attrs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">ModelPerformanceAnalyzer</span><span class="p">(</span><span class="n">classifier_stats</span><span class="p">)</span><span class="o">.</span><span class="n">get_attributes</span><span class="p">())</span>
+    <span class="n">regression_attrs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">ModelPerformanceAnalyzer</span><span class="p">(</span><span class="n">regression_stats</span><span class="p">)</span><span class="o">.</span><span class="n">get_attributes</span><span class="p">())</span>
+    <span class="n">common_attributes</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">classifier_attrs</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">regression_attrs</span><span class="p">))</span>
+
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Analyzing </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">common_attributes</span><span class="p">)</span><span class="si">}</span><span class="s2"> semantic attributes that appear in both datasets.&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Run the comparison</span>
+    <span class="n">comparison_results</span> <span class="o">=</span> <span class="n">compare_models_across_datasets</span><span class="p">(</span>
+        <span class="n">classifier_data</span><span class="o">=</span><span class="n">classifier_stats</span><span class="p">,</span>
+        <span class="n">regression_data</span><span class="o">=</span><span class="n">regression_stats</span><span class="p">,</span>
+        <span class="n">common_attributes</span><span class="o">=</span><span class="n">common_attributes</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="s2">&quot;best_classifiers&quot;</span> <span class="ow">in</span> <span class="n">comparison_results</span><span class="p">:</span>
+        <span class="n">_print_markdown_subheading</span><span class="p">(</span><span class="s2">&quot;Best Classifiers per Attribute&quot;</span><span class="p">)</span>
+        <span class="n">_print_dataframe_as_markdown</span><span class="p">(</span>
+            <span class="n">comparison_results</span><span class="p">[</span><span class="s2">&quot;best_classifiers&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;This table shows which classification models perform best for each semantic attribute.&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="s2">&quot;best_regression_models&quot;</span> <span class="ow">in</span> <span class="n">comparison_results</span><span class="p">:</span>
+        <span class="n">_print_markdown_subheading</span><span class="p">(</span><span class="s2">&quot;Best Regression Models per Attribute&quot;</span><span class="p">)</span>
+        <span class="n">_print_dataframe_as_markdown</span><span class="p">(</span>
+            <span class="n">comparison_results</span><span class="p">[</span><span class="s2">&quot;best_regression_models&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;This table shows which regression models perform best for each semantic attribute.&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="s2">&quot;modelable_attributes_classification&quot;</span> <span class="ow">in</span> <span class="n">comparison_results</span><span class="p">:</span>
+        <span class="n">_print_markdown_subheading</span><span class="p">(</span><span class="s2">&quot;Most Modelable Attributes (Classification)&quot;</span><span class="p">)</span>
+        <span class="n">_print_dataframe_as_markdown</span><span class="p">(</span>
+            <span class="n">comparison_results</span><span class="p">[</span><span class="s2">&quot;modelable_attributes_classification&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;This table ranks semantic attributes by how well they can be modeled using classification approaches.&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="s2">&quot;modelable_attributes_regression&quot;</span> <span class="ow">in</span> <span class="n">comparison_results</span><span class="p">:</span>
+        <span class="n">_print_markdown_subheading</span><span class="p">(</span><span class="s2">&quot;Most Modelable Attributes (Regression)&quot;</span><span class="p">)</span>
+        <span class="n">_print_dataframe_as_markdown</span><span class="p">(</span>
+            <span class="n">comparison_results</span><span class="p">[</span><span class="s2">&quot;modelable_attributes_regression&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;This table ranks semantic attributes by how well they can be modeled using regression approaches.&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">comparison_results</span></div>
+
+
+
+<span class="c1"># Example 4: Focused analysis on a specific attribute</span>
+<div class="viewcode-block" id="analyze_specific_attribute">
+<a class="viewcode-back" href="../../module_docs/mood/model_analysis.html#mood.model_analysis.analyze_specific_attribute">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">analyze_specific_attribute</span><span class="p">(</span>
+    <span class="n">classifier_stats</span><span class="p">,</span> <span class="n">regression_stats</span><span class="p">,</span> <span class="n">attribute</span><span class="o">=</span><span class="s2">&quot;irony_humor&quot;</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Focused analysis on a specific semantic attribute.&quot;&quot;&quot;</span>
+    <span class="n">_print_markdown_heading</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Detailed Analysis of &#39;</span><span class="si">{</span><span class="n">attribute</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;This analysis focuses specifically on the &#39;</span><span class="si">{</span><span class="n">attribute</span><span class="si">}</span><span class="s2">&#39; semantic attribute, comparing how different classification and regression models perform when modeling this particular attribute.&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Initialize analyzers</span>
+    <span class="n">classifier_analyzer</span> <span class="o">=</span> <span class="n">ModelPerformanceAnalyzer</span><span class="p">(</span><span class="n">classifier_stats</span><span class="p">)</span>
+    <span class="n">regression_analyzer</span> <span class="o">=</span> <span class="n">ModelPerformanceAnalyzer</span><span class="p">(</span><span class="n">regression_stats</span><span class="p">)</span>
+
+    <span class="c1"># Filter data for the specific attribute</span>
+    <span class="n">classifier_data</span> <span class="o">=</span> <span class="n">classifier_analyzer</span><span class="o">.</span><span class="n">filter_data</span><span class="p">(</span><span class="n">attributes</span><span class="o">=</span><span class="p">[</span><span class="n">attribute</span><span class="p">])</span>
+    <span class="n">regression_data</span> <span class="o">=</span> <span class="n">regression_analyzer</span><span class="o">.</span><span class="n">filter_data</span><span class="p">(</span><span class="n">attributes</span><span class="o">=</span><span class="p">[</span><span class="n">attribute</span><span class="p">])</span>
+
+    <span class="c1"># Create new analyzers with the filtered data</span>
+    <span class="n">attr_classifier_analyzer</span> <span class="o">=</span> <span class="n">ModelPerformanceAnalyzer</span><span class="p">(</span><span class="n">classifier_data</span><span class="p">)</span>
+    <span class="n">attr_regression_analyzer</span> <span class="o">=</span> <span class="n">ModelPerformanceAnalyzer</span><span class="p">(</span><span class="n">regression_data</span><span class="p">)</span>
+
+    <span class="c1"># Get model performance for this attribute</span>
+    <span class="n">classifier_models</span> <span class="o">=</span> <span class="n">attr_classifier_analyzer</span><span class="o">.</span><span class="n">get_models</span><span class="p">()</span>
+    <span class="n">regression_models</span> <span class="o">=</span> <span class="n">attr_regression_analyzer</span><span class="o">.</span><span class="n">get_models</span><span class="p">()</span>
+
+    <span class="n">_print_markdown_subheading</span><span class="p">(</span><span class="s2">&quot;Classification Models&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">classifier_data</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No classification data available for attribute &#39;</span><span class="si">{</span><span class="n">attribute</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">classifier_comparison</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">attr_classifier_analyzer</span><span class="o">.</span><span class="n">generate_model_comparison_table</span><span class="p">(</span><span class="n">metric</span><span class="o">=</span><span class="s2">&quot;accuracy&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">_print_dataframe_as_markdown</span><span class="p">(</span>
+            <span class="n">classifier_comparison</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;Classification model performance for &#39;</span><span class="si">{</span><span class="n">attribute</span><span class="si">}</span><span class="s2">&#39; (sorted by accuracy)&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">_print_markdown_subheading</span><span class="p">(</span><span class="s2">&quot;Regression Models&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">regression_data</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No regression data available for attribute &#39;</span><span class="si">{</span><span class="n">attribute</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">regression_comparison</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">attr_regression_analyzer</span><span class="o">.</span><span class="n">generate_model_comparison_table</span><span class="p">(</span><span class="n">metric</span><span class="o">=</span><span class="s2">&quot;r2&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">_print_dataframe_as_markdown</span><span class="p">(</span>
+            <span class="n">regression_comparison</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;Regression model performance for &#39;</span><span class="si">{</span><span class="n">attribute</span><span class="si">}</span><span class="s2">&#39; (sorted by R²)&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Compare models for this attribute using radar chart</span>
+    <span class="n">_print_markdown_subheading</span><span class="p">(</span><span class="s2">&quot;Visualizations&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;The following radar charts have been generated to compare models across multiple metrics:&quot;</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">classifier_data</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+        <span class="n">classifier_metrics</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">,</span> <span class="s2">&quot;precision&quot;</span><span class="p">,</span> <span class="s2">&quot;recall&quot;</span><span class="p">,</span> <span class="s2">&quot;f1&quot;</span><span class="p">,</span> <span class="s2">&quot;roc_auc&quot;</span><span class="p">]</span>
+        <span class="n">available_metrics</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">classifier_metrics</span> <span class="k">if</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">attr_classifier_analyzer</span><span class="o">.</span><span class="n">get_metrics</span><span class="p">()</span>
+        <span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">available_metrics</span><span class="p">:</span>
+            <span class="n">fig1</span> <span class="o">=</span> <span class="n">attr_classifier_analyzer</span><span class="o">.</span><span class="n">visualize_performance_radar</span><span class="p">(</span>
+                <span class="n">metrics</span><span class="o">=</span><span class="n">available_metrics</span><span class="p">,</span>
+                <span class="n">models</span><span class="o">=</span><span class="n">classifier_models</span><span class="p">,</span>
+                <span class="n">attribute</span><span class="o">=</span><span class="n">attribute</span><span class="p">,</span>
+                <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="n">fig1</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">attribute</span><span class="si">}</span><span class="s2">_classifier_radar.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span>
+            <span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;* **Figure 1:** Classification model comparison for &#39;</span><span class="si">{</span><span class="n">attribute</span><span class="si">}</span><span class="s2">&#39; (saved as `</span><span class="si">{</span><span class="n">attribute</span><span class="si">}</span><span class="s2">_classifier_radar.png`)&quot;</span>
+            <span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  * Compares models across </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">available_metrics</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">regression_data</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+        <span class="n">regression_metrics</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;r2&quot;</span><span class="p">,</span> <span class="s2">&quot;mean_absolute_error&quot;</span><span class="p">]</span>
+        <span class="n">available_metrics</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">regression_metrics</span> <span class="k">if</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">attr_regression_analyzer</span><span class="o">.</span><span class="n">get_metrics</span><span class="p">()</span>
+        <span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">available_metrics</span><span class="p">:</span>
+            <span class="n">fig2</span> <span class="o">=</span> <span class="n">attr_regression_analyzer</span><span class="o">.</span><span class="n">visualize_performance_radar</span><span class="p">(</span>
+                <span class="n">metrics</span><span class="o">=</span><span class="n">available_metrics</span><span class="p">,</span>
+                <span class="n">models</span><span class="o">=</span><span class="n">regression_models</span><span class="p">,</span>
+                <span class="n">attribute</span><span class="o">=</span><span class="n">attribute</span><span class="p">,</span>
+                <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="n">fig2</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">attribute</span><span class="si">}</span><span class="s2">_regression_radar.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span>
+            <span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;* **Figure 2:** Regression model comparison for &#39;</span><span class="si">{</span><span class="n">attribute</span><span class="si">}</span><span class="s2">&#39; (saved as `</span><span class="si">{</span><span class="n">attribute</span><span class="si">}</span><span class="s2">_regression_radar.png`)&quot;</span>
+            <span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  * Compares models across </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">available_metrics</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">attr_classifier_analyzer</span><span class="p">,</span> <span class="n">attr_regression_analyzer</span></div>
+
+
+
+<span class="c1"># Example 5: Data-type specific analysis</span>
+<div class="viewcode-block" id="analyze_by_data_type">
+<a class="viewcode-back" href="../../module_docs/mood/model_analysis.html#mood.model_analysis.analyze_by_data_type">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">analyze_by_data_type</span><span class="p">(</span><span class="n">classifier_stats</span><span class="p">,</span> <span class="n">regression_stats</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Analyze performance by data type.&quot;&quot;&quot;</span>
+    <span class="n">_print_markdown_heading</span><span class="p">(</span><span class="s2">&quot;Data Type Analysis&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;This analysis examines how model performance varies across different data types (binary, numerical, ordinal), providing insights into which modeling approaches are most effective for each data representation.&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Initialize analyzers</span>
+    <span class="n">classifier_analyzer</span> <span class="o">=</span> <span class="n">ModelPerformanceAnalyzer</span><span class="p">(</span><span class="n">classifier_stats</span><span class="p">)</span>
+    <span class="n">regression_analyzer</span> <span class="o">=</span> <span class="n">ModelPerformanceAnalyzer</span><span class="p">(</span><span class="n">regression_stats</span><span class="p">)</span>
+
+    <span class="c1"># Get available data types</span>
+    <span class="n">classifier_data_types</span> <span class="o">=</span> <span class="n">classifier_analyzer</span><span class="o">.</span><span class="n">get_data_types</span><span class="p">()</span>
+    <span class="n">regression_data_types</span> <span class="o">=</span> <span class="n">regression_analyzer</span><span class="o">.</span><span class="n">get_data_types</span><span class="p">()</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;* **Classifier data types:** </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">classifier_data_types</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;* **Regression data types:** </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">regression_data_types</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Analyze binary classification performance</span>
+    <span class="k">if</span> <span class="s2">&quot;binary&quot;</span> <span class="ow">in</span> <span class="n">classifier_data_types</span><span class="p">:</span>
+        <span class="n">_print_markdown_subheading</span><span class="p">(</span><span class="s2">&quot;Binary Classification Analysis&quot;</span><span class="p">)</span>
+        <span class="n">binary_results</span> <span class="o">=</span> <span class="n">classifier_analyzer</span><span class="o">.</span><span class="n">generate_model_comparison_table</span><span class="p">(</span>
+            <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;accuracy&quot;</span><span class="p">,</span> <span class="n">data_types</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;binary&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">_print_dataframe_as_markdown</span><span class="p">(</span>
+            <span class="n">binary_results</span><span class="p">,</span>
+            <span class="s2">&quot;Model performance comparison for binary classification tasks (sorted by average accuracy)&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">fig1</span> <span class="o">=</span> <span class="n">classifier_analyzer</span><span class="o">.</span><span class="n">visualize_model_comparison</span><span class="p">(</span>
+            <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;accuracy&quot;</span><span class="p">,</span> <span class="n">data_types</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;binary&quot;</span><span class="p">],</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">tight_ylim</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="n">fig1</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;binary_model_comparison.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s2">&quot;* **Figure:** Binary classification model comparison (saved as `binary_model_comparison.png`)&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Analyze numerical regression performance</span>
+    <span class="k">if</span> <span class="s2">&quot;numerical&quot;</span> <span class="ow">in</span> <span class="n">regression_data_types</span><span class="p">:</span>
+        <span class="n">_print_markdown_subheading</span><span class="p">(</span><span class="s2">&quot;Numerical Regression Analysis&quot;</span><span class="p">)</span>
+        <span class="n">numerical_results</span> <span class="o">=</span> <span class="n">regression_analyzer</span><span class="o">.</span><span class="n">generate_model_comparison_table</span><span class="p">(</span>
+            <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;r2&quot;</span><span class="p">,</span> <span class="n">data_types</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;numerical&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">_print_dataframe_as_markdown</span><span class="p">(</span>
+            <span class="n">numerical_results</span><span class="p">,</span>
+            <span class="s2">&quot;Model performance comparison for numerical regression tasks (sorted by average R²)&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">fig2</span> <span class="o">=</span> <span class="n">regression_analyzer</span><span class="o">.</span><span class="n">visualize_model_comparison</span><span class="p">(</span>
+            <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;r2&quot;</span><span class="p">,</span> <span class="n">data_types</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;numerical&quot;</span><span class="p">],</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">tight_ylim</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="n">fig2</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;numerical_model_comparison.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s2">&quot;* **Figure:** Numerical regression model comparison (saved as `numerical_model_comparison.png`)&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Analyze ordinal regression performance</span>
+    <span class="k">if</span> <span class="s2">&quot;ordinal&quot;</span> <span class="ow">in</span> <span class="n">regression_data_types</span><span class="p">:</span>
+        <span class="n">_print_markdown_subheading</span><span class="p">(</span><span class="s2">&quot;Ordinal Regression Analysis&quot;</span><span class="p">)</span>
+        <span class="n">ordinal_results</span> <span class="o">=</span> <span class="n">regression_analyzer</span><span class="o">.</span><span class="n">generate_model_comparison_table</span><span class="p">(</span>
+            <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;r2&quot;</span><span class="p">,</span> <span class="n">data_types</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ordinal&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">_print_dataframe_as_markdown</span><span class="p">(</span>
+            <span class="n">ordinal_results</span><span class="p">,</span>
+            <span class="s2">&quot;Model performance comparison for ordinal regression tasks (sorted by average R²)&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">fig3</span> <span class="o">=</span> <span class="n">regression_analyzer</span><span class="o">.</span><span class="n">visualize_model_comparison</span><span class="p">(</span>
+            <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;r2&quot;</span><span class="p">,</span> <span class="n">data_types</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ordinal&quot;</span><span class="p">],</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">tight_ylim</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="n">fig3</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;ordinal_model_comparison.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s2">&quot;* **Figure:** Ordinal regression model comparison (saved as `ordinal_model_comparison.png`)&quot;</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="analyze_all">
+<a class="viewcode-back" href="../../module_docs/mood/model_analysis.html#mood.model_analysis.analyze_all">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">analyze_all</span><span class="p">(</span><span class="n">classifier_stats</span><span class="p">,</span> <span class="n">regression_stats</span><span class="p">,</span> <span class="n">attribute</span><span class="o">=</span><span class="s2">&quot;irony_humor&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run all analyses and generate a complete report.&quot;&quot;&quot;</span>
+    <span class="n">_print_markdown_heading</span><span class="p">(</span><span class="s2">&quot;Complete Model Performance Analysis&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;This report provides a comprehensive analysis of model performance across different semantic attributes, comparing various classification and regression approaches to determine which models perform best and which semantic attributes are most effectively modeled.&quot;</span>
+    <span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running classifier analysis...&quot;</span><span class="p">)</span>
+    <span class="n">classifier_analyzer</span> <span class="o">=</span> <span class="n">analyze_classifiers</span><span class="p">(</span><span class="n">classifier_stats</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Running regression analysis...&quot;</span><span class="p">)</span>
+    <span class="n">regression_analyzer</span> <span class="o">=</span> <span class="n">analyze_regression_models</span><span class="p">(</span><span class="n">regression_stats</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Comparing datasets...&quot;</span><span class="p">)</span>
+    <span class="n">comparison_results</span> <span class="o">=</span> <span class="n">compare_datasets</span><span class="p">(</span><span class="n">classifier_stats</span><span class="p">,</span> <span class="n">regression_stats</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Analyzing specific attribute...&quot;</span><span class="p">)</span>
+    <span class="n">attr_classifier</span><span class="p">,</span> <span class="n">attr_regression</span> <span class="o">=</span> <span class="n">analyze_specific_attribute</span><span class="p">(</span>
+        <span class="n">classifier_stats</span><span class="p">,</span> <span class="n">regression_stats</span><span class="p">,</span> <span class="n">attribute</span>
+    <span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Analyzing by data type...&quot;</span><span class="p">)</span>
+    <span class="n">analyze_by_data_type</span><span class="p">(</span><span class="n">classifier_stats</span><span class="p">,</span> <span class="n">regression_stats</span><span class="p">)</span>
+
+    <span class="n">_print_markdown_heading</span><span class="p">(</span><span class="s2">&quot;Analysis Summary&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;All analyses have been completed and the results have been saved to various output files. This report provides insights into which models perform best for different semantic attributes and which attributes are most effectively modeled using different approaches.&quot;</span>
+    <span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright NO COPYRIGHT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -6,18 +6,18 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>mood.model_analysis &mdash; mood 0.0.14 documentation</title>
+  <title>mood.model_analysis &mdash; mood 0.0.15 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
 
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=544df88d"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/documentation_options.js?v=f0357c94"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../_static/copybutton.js?v=f281be69"></script>
@@ -53,7 +53,31 @@
 <li class="toctree-l1"><a class="reference internal" href="dataset_makers.html">mood.dataset_makers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">mood.examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="learn_sentiments.html">mood.learn_sentiments</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">mood.model_analysis</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">mood.model_analysis</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#mood.model_analysis.ModelPerformanceAnalyzer"><code class="docutils literal notranslate"><span class="pre">ModelPerformanceAnalyzer</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#mood.model_analysis.ModelPerformanceAnalyzer.filter_data"><code class="docutils literal notranslate"><span class="pre">ModelPerformanceAnalyzer.filter_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mood.model_analysis.ModelPerformanceAnalyzer.generate_attribute_modelability_table"><code class="docutils literal notranslate"><span class="pre">ModelPerformanceAnalyzer.generate_attribute_modelability_table()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mood.model_analysis.ModelPerformanceAnalyzer.generate_model_comparison_table"><code class="docutils literal notranslate"><span class="pre">ModelPerformanceAnalyzer.generate_model_comparison_table()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mood.model_analysis.ModelPerformanceAnalyzer.get_attributes"><code class="docutils literal notranslate"><span class="pre">ModelPerformanceAnalyzer.get_attributes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mood.model_analysis.ModelPerformanceAnalyzer.get_data_types"><code class="docutils literal notranslate"><span class="pre">ModelPerformanceAnalyzer.get_data_types()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mood.model_analysis.ModelPerformanceAnalyzer.get_metrics"><code class="docutils literal notranslate"><span class="pre">ModelPerformanceAnalyzer.get_metrics()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mood.model_analysis.ModelPerformanceAnalyzer.get_models"><code class="docutils literal notranslate"><span class="pre">ModelPerformanceAnalyzer.get_models()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mood.model_analysis.ModelPerformanceAnalyzer.visualize_attribute_modelability"><code class="docutils literal notranslate"><span class="pre">ModelPerformanceAnalyzer.visualize_attribute_modelability()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mood.model_analysis.ModelPerformanceAnalyzer.visualize_correlation_matrix"><code class="docutils literal notranslate"><span class="pre">ModelPerformanceAnalyzer.visualize_correlation_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mood.model_analysis.ModelPerformanceAnalyzer.visualize_metric_distributions"><code class="docutils literal notranslate"><span class="pre">ModelPerformanceAnalyzer.visualize_metric_distributions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mood.model_analysis.ModelPerformanceAnalyzer.visualize_model_comparison"><code class="docutils literal notranslate"><span class="pre">ModelPerformanceAnalyzer.visualize_model_comparison()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mood.model_analysis.ModelPerformanceAnalyzer.visualize_performance_radar"><code class="docutils literal notranslate"><span class="pre">ModelPerformanceAnalyzer.visualize_performance_radar()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#mood.model_analysis.analyze_all"><code class="docutils literal notranslate"><span class="pre">analyze_all()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mood.model_analysis.analyze_by_data_type"><code class="docutils literal notranslate"><span class="pre">analyze_by_data_type()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mood.model_analysis.analyze_classifiers"><code class="docutils literal notranslate"><span class="pre">analyze_classifiers()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mood.model_analysis.analyze_regression_models"><code class="docutils literal notranslate"><span class="pre">analyze_regression_models()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mood.model_analysis.analyze_specific_attribute"><code class="docutils literal notranslate"><span class="pre">analyze_specific_attribute()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mood.model_analysis.compare_datasets"><code class="docutils literal notranslate"><span class="pre">compare_datasets()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mood.model_analysis.compare_models_across_datasets"><code class="docutils literal notranslate"><span class="pre">compare_models_across_datasets()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="mood_modeling.html">mood.mood_modeling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="scripts.html">mood.scripts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="scripts/financial_news_searches.html">mood.scripts.financial_news_searches</a></li>
@@ -86,8 +110,324 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="mood-model-analysis">
-<h1>mood.model_analysis<a class="headerlink" href="#mood-model-analysis" title="Link to this heading"></a></h1>
+  <section id="module-mood.model_analysis">
+<span id="mood-model-analysis"></span><h1>mood.model_analysis<a class="headerlink" href="#module-mood.model_analysis" title="Link to this heading"></a></h1>
+<p>Tools for model analysis</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="mood.model_analysis.ModelPerformanceAnalyzer">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">mood.model_analysis.</span></span><span class="sig-name descname"><span class="pre">ModelPerformanceAnalyzer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relevant_metrics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_type_column</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'model_name'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute_column</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'semantic_attribute'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type_column</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'data_type'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mood/model_analysis.html#ModelPerformanceAnalyzer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.model_analysis.ModelPerformanceAnalyzer" title="Link to this definition"></a></dt>
+<dd><p>Analyze model performance metrics across different semantic attributes and model types.</p>
+<p>This class provides methods to generate statistical summaries and visualizations
+for comparing model performance across different metrics and semantic attributes.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Sample data</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+<span class="gp">... </span>    <span class="s1">&#39;semantic_attribute&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;irony&#39;</span><span class="p">,</span> <span class="s1">&#39;irony&#39;</span><span class="p">,</span> <span class="s1">&#39;moral&#39;</span><span class="p">,</span> <span class="s1">&#39;moral&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="s1">&#39;model_name&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;svm&#39;</span><span class="p">,</span> <span class="s1">&#39;log_reg&#39;</span><span class="p">,</span> <span class="s1">&#39;svm&#39;</span><span class="p">,</span> <span class="s1">&#39;log_reg&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="s1">&#39;accuracy&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">]</span>
+<span class="gp">... </span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">analyzer</span> <span class="o">=</span> <span class="n">ModelPerformanceAnalyzer</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">analyzer</span><span class="o">.</span><span class="n">get_metrics</span><span class="p">()</span>
+<span class="go">[&#39;accuracy&#39;]</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.model_analysis.ModelPerformanceAnalyzer.filter_data">
+<span class="sig-name descname"><span class="pre">filter_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attributes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_types</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="../../_modules/mood/model_analysis.html#ModelPerformanceAnalyzer.filter_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.model_analysis.ModelPerformanceAnalyzer.filter_data" title="Link to this definition"></a></dt>
+<dd><p>Filter the dataframe based on specified attributes, models, and data types.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>attributes</strong> – List of semantic attributes to include</p></li>
+<li><p><strong>models</strong> – List of model names to include</p></li>
+<li><p><strong>data_types</strong> – List of data types to include</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Filtered dataframe</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.model_analysis.ModelPerformanceAnalyzer.generate_attribute_modelability_table">
+<span class="sig-name descname"><span class="pre">generate_attribute_modelability_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">primary_metric</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secondary_metrics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_types</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="../../_modules/mood/model_analysis.html#ModelPerformanceAnalyzer.generate_attribute_modelability_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.model_analysis.ModelPerformanceAnalyzer.generate_attribute_modelability_table" title="Link to this definition"></a></dt>
+<dd><p>Generate a table showing which semantic attributes are most modelable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>primary_metric</strong> – The main metric to sort by (e.g., accuracy, r2)</p></li>
+<li><p><strong>secondary_metrics</strong> – Additional metrics to include in the table</p></li>
+<li><p><strong>models</strong> – List of model names to include (default: all)</p></li>
+<li><p><strong>data_types</strong> – List of data types to include (default: all)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A table with attributes as rows and metrics as columns</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.model_analysis.ModelPerformanceAnalyzer.generate_model_comparison_table">
+<span class="sig-name descname"><span class="pre">generate_model_comparison_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_types</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="../../_modules/mood/model_analysis.html#ModelPerformanceAnalyzer.generate_model_comparison_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.model_analysis.ModelPerformanceAnalyzer.generate_model_comparison_table" title="Link to this definition"></a></dt>
+<dd><p>Generate a comparison table of models across different semantic attributes for a given metric.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metric</strong> – The metric to compare (e.g., accuracy, f1, r2)</p></li>
+<li><p><strong>attributes</strong> – List of semantic attributes to include (default: all)</p></li>
+<li><p><strong>models</strong> – List of model names to include (default: all)</p></li>
+<li><p><strong>data_types</strong> – List of data types to include (default: all)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A table with attributes as rows and models as columns</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.model_analysis.ModelPerformanceAnalyzer.get_attributes">
+<span class="sig-name descname"><span class="pre">get_attributes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/mood/model_analysis.html#ModelPerformanceAnalyzer.get_attributes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.model_analysis.ModelPerformanceAnalyzer.get_attributes" title="Link to this definition"></a></dt>
+<dd><p>Get the list of unique semantic attributes in the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of semantic attribute names</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.model_analysis.ModelPerformanceAnalyzer.get_data_types">
+<span class="sig-name descname"><span class="pre">get_data_types</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/mood/model_analysis.html#ModelPerformanceAnalyzer.get_data_types"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.model_analysis.ModelPerformanceAnalyzer.get_data_types" title="Link to this definition"></a></dt>
+<dd><p>Get the list of unique data types in the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of data types (e.g., binary, numerical, ordinal)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.model_analysis.ModelPerformanceAnalyzer.get_metrics">
+<span class="sig-name descname"><span class="pre">get_metrics</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/mood/model_analysis.html#ModelPerformanceAnalyzer.get_metrics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.model_analysis.ModelPerformanceAnalyzer.get_metrics" title="Link to this definition"></a></dt>
+<dd><p>Get the list of available metrics in the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of metric names</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.model_analysis.ModelPerformanceAnalyzer.get_models">
+<span class="sig-name descname"><span class="pre">get_models</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/mood/model_analysis.html#ModelPerformanceAnalyzer.get_models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.model_analysis.ModelPerformanceAnalyzer.get_models" title="Link to this definition"></a></dt>
+<dd><p>Get the list of unique model names in the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of model names</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.model_analysis.ModelPerformanceAnalyzer.visualize_attribute_modelability">
+<span class="sig-name descname"><span class="pre">visualize_attribute_modelability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_types</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(10,</span> <span class="pre">6)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">palette</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'viridis'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tight_xlim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Figure</span></span></span><a class="reference internal" href="../../_modules/mood/model_analysis.html#ModelPerformanceAnalyzer.visualize_attribute_modelability"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.model_analysis.ModelPerformanceAnalyzer.visualize_attribute_modelability" title="Link to this definition"></a></dt>
+<dd><p>Create a horizontal bar chart showing which attributes are most/least modelable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metric</strong> – The metric to visualize</p></li>
+<li><p><strong>subset_idx</strong> – When positive, show first N attributes; when negative, show last N attributes
+(None = show all attributes)</p></li>
+<li><p><strong>models</strong> – List of model names to include (default: all)</p></li>
+<li><p><strong>data_types</strong> – List of data types to include (default: all)</p></li>
+<li><p><strong>figsize</strong> – Figure size (width, height)</p></li>
+<li><p><strong>palette</strong> – Color palette for the plot</p></li>
+<li><p><strong>tight_xlim</strong> – Whether to use tight x-axis limits (default: True)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The matplotlib figure object</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>plt.Figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.model_analysis.ModelPerformanceAnalyzer.visualize_correlation_matrix">
+<span class="sig-name descname"><span class="pre">visualize_correlation_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metrics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(10,</span> <span class="pre">8)</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Figure</span></span></span><a class="reference internal" href="../../_modules/mood/model_analysis.html#ModelPerformanceAnalyzer.visualize_correlation_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.model_analysis.ModelPerformanceAnalyzer.visualize_correlation_matrix" title="Link to this definition"></a></dt>
+<dd><p>Create a heatmap showing the correlation between different metrics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metrics</strong> – List of metrics to include in the correlation matrix (default: all)</p></li>
+<li><p><strong>figsize</strong> – Figure size (width, height)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The matplotlib figure object</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>plt.Figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.model_analysis.ModelPerformanceAnalyzer.visualize_metric_distributions">
+<span class="sig-name descname"><span class="pre">visualize_metric_distributions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metrics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_types</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(12,</span> <span class="pre">8)</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Figure</span></span></span><a class="reference internal" href="../../_modules/mood/model_analysis.html#ModelPerformanceAnalyzer.visualize_metric_distributions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.model_analysis.ModelPerformanceAnalyzer.visualize_metric_distributions" title="Link to this definition"></a></dt>
+<dd><p>Create box plots showing the distribution of metrics across semantic attributes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metrics</strong> – List of metrics to visualize</p></li>
+<li><p><strong>models</strong> – List of model names to include (default: all)</p></li>
+<li><p><strong>data_types</strong> – List of data types to include (default: all)</p></li>
+<li><p><strong>figsize</strong> – Figure size (width, height)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The matplotlib figure object</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>plt.Figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.model_analysis.ModelPerformanceAnalyzer.visualize_model_comparison">
+<span class="sig-name descname"><span class="pre">visualize_model_comparison</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_types</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(10,</span> <span class="pre">6)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">palette</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'viridis'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tight_ylim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Figure</span></span></span><a class="reference internal" href="../../_modules/mood/model_analysis.html#ModelPerformanceAnalyzer.visualize_model_comparison"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.model_analysis.ModelPerformanceAnalyzer.visualize_model_comparison" title="Link to this definition"></a></dt>
+<dd><p>Create a grouped bar chart comparing model performance across semantic attributes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metric</strong> – The metric to visualize</p></li>
+<li><p><strong>attributes</strong> – List of semantic attributes to include (default: all)</p></li>
+<li><p><strong>models</strong> – List of model names to include (default: all)</p></li>
+<li><p><strong>data_types</strong> – List of data types to include (default: all)</p></li>
+<li><p><strong>figsize</strong> – Figure size (width, height)</p></li>
+<li><p><strong>palette</strong> – Color palette for the plot</p></li>
+<li><p><strong>tight_ylim</strong> – Whether to use tight y-axis limits (default: True)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The matplotlib figure object</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>plt.Figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.model_analysis.ModelPerformanceAnalyzer.visualize_performance_radar">
+<span class="sig-name descname"><span class="pre">visualize_performance_radar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metrics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(10,</span> <span class="pre">8)</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Figure</span></span></span><a class="reference internal" href="../../_modules/mood/model_analysis.html#ModelPerformanceAnalyzer.visualize_performance_radar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.model_analysis.ModelPerformanceAnalyzer.visualize_performance_radar" title="Link to this definition"></a></dt>
+<dd><p>Create a radar chart comparing models across multiple metrics for a specific attribute.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metrics</strong> – List of metrics to include in the radar chart</p></li>
+<li><p><strong>models</strong> – List of model names to include</p></li>
+<li><p><strong>attribute</strong> – The semantic attribute to analyze</p></li>
+<li><p><strong>data_type</strong> – Data type to filter by (default: None)</p></li>
+<li><p><strong>figsize</strong> – Figure size (width, height)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The matplotlib figure object</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>plt.Figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mood.model_analysis.analyze_all">
+<span class="sig-prename descclassname"><span class="pre">mood.model_analysis.</span></span><span class="sig-name descname"><span class="pre">analyze_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">classifier_stats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regression_stats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'irony_humor'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mood/model_analysis.html#analyze_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.model_analysis.analyze_all" title="Link to this definition"></a></dt>
+<dd><p>Run all analyses and generate a complete report.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mood.model_analysis.analyze_by_data_type">
+<span class="sig-prename descclassname"><span class="pre">mood.model_analysis.</span></span><span class="sig-name descname"><span class="pre">analyze_by_data_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">classifier_stats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regression_stats</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mood/model_analysis.html#analyze_by_data_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.model_analysis.analyze_by_data_type" title="Link to this definition"></a></dt>
+<dd><p>Analyze performance by data type.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mood.model_analysis.analyze_classifiers">
+<span class="sig-prename descclassname"><span class="pre">mood.model_analysis.</span></span><span class="sig-name descname"><span class="pre">analyze_classifiers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">classifier_stats</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mood/model_analysis.html#analyze_classifiers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.model_analysis.analyze_classifiers" title="Link to this definition"></a></dt>
+<dd><p>Example analysis of classifier models.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mood.model_analysis.analyze_regression_models">
+<span class="sig-prename descclassname"><span class="pre">mood.model_analysis.</span></span><span class="sig-name descname"><span class="pre">analyze_regression_models</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">regression_stats</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mood/model_analysis.html#analyze_regression_models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.model_analysis.analyze_regression_models" title="Link to this definition"></a></dt>
+<dd><p>Example analysis of regression models.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mood.model_analysis.analyze_specific_attribute">
+<span class="sig-prename descclassname"><span class="pre">mood.model_analysis.</span></span><span class="sig-name descname"><span class="pre">analyze_specific_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">classifier_stats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regression_stats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'irony_humor'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mood/model_analysis.html#analyze_specific_attribute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.model_analysis.analyze_specific_attribute" title="Link to this definition"></a></dt>
+<dd><p>Focused analysis on a specific semantic attribute.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mood.model_analysis.compare_datasets">
+<span class="sig-prename descclassname"><span class="pre">mood.model_analysis.</span></span><span class="sig-name descname"><span class="pre">compare_datasets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">classifier_stats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regression_stats</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mood/model_analysis.html#compare_datasets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.model_analysis.compare_datasets" title="Link to this definition"></a></dt>
+<dd><p>Compare model performance across classifier and regression datasets.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mood.model_analysis.compare_models_across_datasets">
+<span class="sig-prename descclassname"><span class="pre">mood.model_analysis.</span></span><span class="sig-name descname"><span class="pre">compare_models_across_datasets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">classifier_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regression_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">common_models</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">common_attributes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/mood/model_analysis.html#compare_models_across_datasets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.model_analysis.compare_models_across_datasets" title="Link to this definition"></a></dt>
+<dd><p>Compare model performance across classifier and regression datasets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>classifier_data</strong> – Dataframe with classifier metrics</p></li>
+<li><p><strong>regression_data</strong> – Dataframe with regression metrics</p></li>
+<li><p><strong>common_models</strong> – List of model names to compare (must exist in both datasets)</p></li>
+<li><p><strong>common_attributes</strong> – List of attributes to compare (must exist in both datasets)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary with comparison tables</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict[str, pd.DataFrame]</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 
 

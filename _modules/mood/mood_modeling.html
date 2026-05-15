@@ -1,0 +1,1639 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>mood.mood_modeling &mdash; mood 0.0.15 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=f0357c94"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            mood
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/mood.html">mood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/mood/dataset_makers.html">mood.dataset_makers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/mood/examples.html">mood.examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/mood/learn_sentiments.html">mood.learn_sentiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/mood/model_analysis.html">mood.model_analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/mood/mood_modeling.html">mood.mood_modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/mood/scripts.html">mood.scripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/mood/scripts/financial_news_searches.html">mood.scripts.financial_news_searches</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/mood/sentiment.html">mood.sentiment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/mood/tools.html">mood.tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/mood/util.html">mood.util</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">mood</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">mood.mood_modeling</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for mood.mood_modeling</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Mood Modeling Module</span>
+
+<span class="sd">This module provides tools for modeling semantic attributes (or &quot;moods&quot;) based on text embeddings.</span>
+<span class="sd">It allows for different modeling approaches: numerical regression, ordinal regression, and binary classification.</span>
+
+<span class="sd">The main class, MoodModelingManager, handles the entire process:</span>
+<span class="sd">- Preparing different (X, y) pairs from input dataframes</span>
+<span class="sd">- Training and evaluating multiple modeling pipelines</span>
+<span class="sd">- Gathering comprehensive validation statistics</span>
+<span class="sd">- Providing a final model that outputs mood scores in the [0, 1] range</span>
+
+<span class="sd">These mood scores are ordinally aligned with training scores, where higher values indicate</span>
+<span class="sd">stronger presence of the target semantic attribute.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.base</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">BaseEstimator</span><span class="p">,</span>
+    <span class="n">TransformerMixin</span><span class="p">,</span>
+    <span class="n">ClassifierMixin</span><span class="p">,</span>
+    <span class="n">RegressorMixin</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span><span class="p">,</span> <span class="n">KFold</span><span class="p">,</span> <span class="n">cross_validate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">mean_squared_error</span><span class="p">,</span>
+    <span class="n">mean_absolute_error</span><span class="p">,</span>
+    <span class="n">r2_score</span><span class="p">,</span>
+    <span class="n">accuracy_score</span><span class="p">,</span>
+    <span class="n">precision_score</span><span class="p">,</span>
+    <span class="n">recall_score</span><span class="p">,</span>
+    <span class="n">f1_score</span><span class="p">,</span>
+    <span class="n">roc_auc_score</span><span class="p">,</span>
+    <span class="n">confusion_matrix</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">MinMaxScaler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ridge</span><span class="p">,</span> <span class="n">LogisticRegression</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.svm</span><span class="w"> </span><span class="kn">import</span> <span class="n">SVR</span><span class="p">,</span> <span class="n">SVC</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.ensemble</span><span class="w"> </span><span class="kn">import</span> <span class="n">RandomForestRegressor</span><span class="p">,</span> <span class="n">RandomForestClassifier</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Set</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.special</span><span class="w"> </span><span class="kn">import</span> <span class="n">expit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">spearmanr</span><span class="p">,</span> <span class="n">kendalltau</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">suppress</span>
+
+
+<div class="viewcode-block" id="class_to_path">
+<a class="viewcode-back" href="../../module_docs/mood/mood_modeling.html#mood.mood_modeling.class_to_path">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">class_to_path</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert an object to a string path.</span>
+<span class="sd">    This is useful for serialization and deserialization of objects.</span>
+
+<span class="sd">    &gt;&gt;&gt; from sklearn.linear_model import LogisticRegression</span>
+<span class="sd">    &gt;&gt;&gt; path = class_to_path(LogisticRegression)</span>
+<span class="sd">    &gt;&gt;&gt; path</span>
+<span class="sd">    &#39;sklearn.linear_model._logistic.LogisticRegression&#39;</span>
+<span class="sd">    &gt;&gt;&gt; path_to_class(path) == LogisticRegression</span>
+<span class="sd">    True</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">obj</span><span class="o">.</span><span class="vm">__module__</span><span class="p">,</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__qualname__</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="path_to_class">
+<a class="viewcode-back" href="../../module_docs/mood/mood_modeling.html#mood.mood_modeling.path_to_class">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">path_to_class</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a string path to an object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">importlib</span>
+
+    <span class="n">module_name</span><span class="p">,</span> <span class="n">class_name</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">module_name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">class_name</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_replace_class_values_with_path</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_transformed</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">k</span><span class="p">,</span> <span class="n">class_to_path</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span>
+
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">_transformed</span><span class="p">())</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_sigmoid_transform</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Transform values using sigmoid function to range [0, 1].</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        x: Input array to transform</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Array with values transformed to [0, 1] range</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">expit</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_minmax_transform</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Scale values to [0, 1] range using min-max scaling.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        x: Input array to transform</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Array with values scaled to [0, 1] range</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">x</span>
+
+    <span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">x_min</span> <span class="o">==</span> <span class="n">x_max</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">x_max</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_tanh_transform</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Transform values using hyperbolic tangent function to range [0, 1].</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        x: Input array to transform</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Array with values transformed to [0, 1] range</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="x_and_y_with_boolean_y">
+<a class="viewcode-back" href="../../module_docs/mood/mood_modeling.html#mood.mood_modeling.x_and_y_with_boolean_y">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">x_and_y_with_boolean_y</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">x_col</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">y_col</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">y_is_true_vals</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">y_is_false_vals</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the x and y values from a dataframe, converting y to binary values.</span>
+<span class="sd">    The output y elements will be 1 if and only if the y_col value is in y_is_true_vals.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data: The dataframe to get the x and y values from</span>
+<span class="sd">        x_col: The name of the column to use as x</span>
+<span class="sd">        y_col: The name of the column to use as y</span>
+<span class="sd">        y_is_true_vals: The values in y_col that are considered 1</span>
+<span class="sd">        y_is_false_vals: The values in y_col that are considered 0 (optional)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple of (X, y) where X contains features and y contains binary labels</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Extract feature column X as numpy array</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">x_col</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+
+    <span class="c1"># Convert y_is_true_vals to set if it&#39;s a string</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y_is_true_vals</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">y_is_true_vals</span> <span class="o">=</span> <span class="p">{</span><span class="n">y_is_true_vals</span><span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">y_is_true_vals</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">y_is_true_vals</span><span class="p">)</span>
+
+    <span class="c1"># Get y values from dataframe</span>
+    <span class="n">y_values</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">y_col</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+
+    <span class="c1"># Initialize y</span>
+    <span class="k">if</span> <span class="n">y_is_false_vals</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># If no false values specified, all non-true values are 0</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">y_values</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">y_is_true_vals</span><span class="p">:</span>
+                <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># If false values specified, values not in either set are NaN</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y_is_false_vals</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">y_is_false_vals</span> <span class="o">=</span> <span class="p">{</span><span class="n">y_is_false_vals</span><span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">y_is_false_vals</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">y_is_false_vals</span><span class="p">)</span>
+
+        <span class="c1"># Initialize with NaN</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+
+        <span class="c1"># Set values</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">y_values</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">y_is_true_vals</span><span class="p">:</span>
+                <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">elif</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">y_is_false_vals</span><span class="p">:</span>
+                <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># Drop NaN values</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="DimensionReducer">
+<a class="viewcode-back" href="../../module_docs/mood/mood_modeling.html#mood.mood_modeling.DimensionReducer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DimensionReducer</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">TransformerMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Transformer to reduce dimensionality by selecting first n dimensions.</span>
+
+<span class="sd">    This is useful for embedding vectors where the first dimensions typically</span>
+<span class="sd">    contain the most important information.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_dims</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the dimension reducer.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            max_dims: Maximum number of dimensions to keep (None keeps all)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_dims</span> <span class="o">=</span> <span class="n">max_dims</span>
+
+<div class="viewcode-block" id="DimensionReducer.fit">
+<a class="viewcode-back" href="../../module_docs/mood/mood_modeling.html#mood.mood_modeling.DimensionReducer.fit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;DimensionReducer&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fit method (no-op as this is a simple feature selector).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            X: Input features</span>
+<span class="sd">            y: Target values (not used)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Self</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
+<div class="viewcode-block" id="DimensionReducer.transform">
+<a class="viewcode-back" href="../../module_docs/mood/mood_modeling.html#mood.mood_modeling.DimensionReducer.transform">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Transform X by selecting first max_dims dimensions.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            X: Input features</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Reduced feature matrix</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_dims</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_dims</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">X</span>
+        <span class="k">return</span> <span class="n">X</span><span class="p">[:,</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_dims</span><span class="p">]</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="MoodEstimator">
+<a class="viewcode-back" href="../../module_docs/mood/mood_modeling.html#mood.mood_modeling.MoodEstimator">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MoodEstimator</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">TransformerMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Custom estimator that wraps an underlying model and provides methods to transform</span>
+<span class="sd">    predictions to mood scores in the [0, 1] range.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">model</span><span class="p">:</span> <span class="n">BaseEstimator</span><span class="p">,</span>
+        <span class="n">max_dims</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">output_transform</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;sigmoid&quot;</span><span class="p">,</span>
+        <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">data_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;numerical&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the mood estimator.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            model: The underlying scikit-learn model</span>
+<span class="sd">            max_dims: Maximum dimensions to use from input features</span>
+<span class="sd">            output_transform: Method to transform output to [0, 1] (&#39;sigmoid&#39;, &#39;minmax&#39;, or &#39;tanh&#39;)</span>
+<span class="sd">            threshold: Classification threshold for binary predictions (if applicable)</span>
+<span class="sd">            data_type: Type of data this model handles (&#39;numerical&#39;, &#39;ordinal&#39;, or &#39;binary&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_dims</span> <span class="o">=</span> <span class="n">max_dims</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_transform</span> <span class="o">=</span> <span class="n">output_transform</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span> <span class="o">=</span> <span class="n">threshold</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">=</span> <span class="n">data_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dimension_reducer</span> <span class="o">=</span> <span class="n">DimensionReducer</span><span class="p">(</span><span class="n">max_dims</span><span class="o">=</span><span class="n">max_dims</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_transform_functions</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;sigmoid&quot;</span><span class="p">:</span> <span class="n">_sigmoid_transform</span><span class="p">,</span>
+            <span class="s2">&quot;minmax&quot;</span><span class="p">:</span> <span class="n">_minmax_transform</span><span class="p">,</span>
+            <span class="s2">&quot;tanh&quot;</span><span class="p">:</span> <span class="n">_tanh_transform</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Detect if model is a classifier or regressor for sklearn compatibility</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_classifier</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">data_type</span> <span class="o">==</span> <span class="s2">&quot;binary&quot;</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;predict_proba&quot;</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span>
+                <span class="n">model</span><span class="p">,</span>
+                <span class="p">(</span><span class="n">LogisticRegression</span><span class="p">,</span> <span class="n">SVC</span><span class="p">,</span> <span class="n">RandomForestClassifier</span><span class="p">,</span> <span class="n">ClassifierMixin</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="MoodEstimator.fit">
+<a class="viewcode-back" href="../../module_docs/mood/mood_modeling.html#mood.mood_modeling.MoodEstimator.fit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MoodEstimator&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fit the model to the data.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            X: Input features</span>
+<span class="sd">            y: Target values</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Self</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">X_reduced</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension_reducer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_reduced</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
+<div class="viewcode-block" id="MoodEstimator.predict">
+<a class="viewcode-back" href="../../module_docs/mood/mood_modeling.html#mood.mood_modeling.MoodEstimator.predict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Make predictions using the underlying model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            X: Input features</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Raw model predictions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">X_reduced</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension_reducer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_reduced</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MoodEstimator.transform">
+<a class="viewcode-back" href="../../module_docs/mood/mood_modeling.html#mood.mood_modeling.MoodEstimator.transform">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Transform input features to mood scores in [0, 1] range.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            X: Input features</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Mood scores in [0, 1] range</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">X_reduced</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension_reducer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+        <span class="c1"># Get raw predictions</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_is_classifier</span>
+            <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;predict_proba&quot;</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span> <span class="ow">is</span> <span class="kc">None</span>
+        <span class="p">):</span>
+            <span class="c1"># For models with predict_proba, use probability of positive class</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">y_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_reduced</span><span class="p">)[:,</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="k">return</span> <span class="n">y_pred</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">IndexError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
+                <span class="k">pass</span>
+
+        <span class="c1"># Use regular predictions</span>
+        <span class="n">y_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_reduced</span><span class="p">)</span>
+
+        <span class="c1"># Apply the selected transform function</span>
+        <span class="n">transform_func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transform_functions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output_transform</span><span class="p">,</span> <span class="n">_sigmoid_transform</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">transform_func</span><span class="p">(</span><span class="n">y_pred</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MoodEstimator.predict_proba">
+<a class="viewcode-back" href="../../module_docs/mood/mood_modeling.html#mood.mood_modeling.MoodEstimator.predict_proba">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict_proba</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Predict class probabilities if the underlying model supports it.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            X: Input features</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Class probabilities if available, otherwise transformed predictions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_classifier</span><span class="p">:</span>
+            <span class="c1"># Explicitly raise an error for non-classifiers to avoid sklearn confusion</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                <span class="s2">&quot;predict_proba is not available when the base model is not a classifier&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">X_reduced</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension_reducer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;predict_proba&quot;</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_reduced</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">NotImplementedError</span><span class="p">):</span>
+                <span class="k">pass</span>
+
+        <span class="c1"># Fall back to transform</span>
+        <span class="n">scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">scores</span><span class="p">,</span> <span class="n">scores</span><span class="p">))</span></div>
+
+
+    <span class="c1"># Add explicit sklearn compatibility methods</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_more_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Provide additional tags to help sklearn correctly identify estimator type.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;_skip_test&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>  <span class="c1"># Skip sklearn&#39;s estimator tests</span>
+            <span class="s2">&quot;requires_y&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>  <span class="c1"># Model requires target for fitting</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Override the get_tags method for better sklearn compatibility.&quot;&quot;&quot;</span>
+        <span class="n">tags</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_get_tags</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_classifier</span><span class="p">:</span>
+            <span class="n">tags</span><span class="p">[</span><span class="s2">&quot;binary_only&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="kc">True</span>  <span class="c1"># Indicate this is a binary classifier when in classifier mode</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">tags</span>
+
+    <span class="c1"># This is what sklearn uses for duck-typing</span>
+    <span class="c1"># Make this look like a classifier when intended to be used as one</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_is_classifier</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="s2">&quot;binary&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__sklearn_tags__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">__sklearn_tags__</span>
+
+    <span class="c1"># make it so that any other attribute will be looked up on self</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Delegate attribute access to the underlying model.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&#39; object has no attribute &#39;</span><span class="si">{</span><span class="n">attr</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="MoodModelingManager">
+<a class="viewcode-back" href="../../module_docs/mood/mood_modeling.html#mood.mood_modeling.MoodModelingManager">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MoodModelingManager</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Manager class for building and evaluating mood models.</span>
+
+<span class="sd">    This class handles:</span>
+<span class="sd">    - Data preparation for different model types</span>
+<span class="sd">    - Training and evaluation of multiple modeling pipelines</span>
+<span class="sd">    - Collection of validation statistics</span>
+<span class="sd">    - Final model selection and fitting</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+        <span class="n">embedding_col</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;embedding&quot;</span><span class="p">,</span>
+        <span class="n">score_col</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;score&quot;</span><span class="p">,</span>
+        <span class="n">test_size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span>
+        <span class="n">random_state</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">42</span><span class="p">,</span>
+        <span class="n">models</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the mood modeling manager.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            df: DataFrame containing embeddings and scores</span>
+<span class="sd">            embedding_col: Name of the column containing embeddings</span>
+<span class="sd">            score_col: Name of the column containing scores</span>
+<span class="sd">            test_size: Proportion of data to use for testing</span>
+<span class="sd">            random_state: Random seed for reproducibility</span>
+<span class="sd">            models: Dictionary of modeling pipelines (uses default_models if None)</span>
+<span class="sd">            verbose: Level of verbosity (0: no output, 1: warnings, 2: info, 3: detailed)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">df</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">embedding_col</span> <span class="o">=</span> <span class="n">embedding_col</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">score_col</span> <span class="o">=</span> <span class="n">score_col</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_size</span> <span class="o">=</span> <span class="n">test_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">models</span> <span class="o">=</span> <span class="n">models</span> <span class="k">if</span> <span class="n">models</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">default_models</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+
+        <span class="c1"># Storage for results</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">final_models</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trained_models</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cv_results</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Process the data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_data</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_prepare_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Process the input dataframe to extract embeddings and scores.&quot;&quot;&quot;</span>
+        <span class="c1"># Ensure embeddings are proper numpy arrays</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">embedding_col</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">embedding_col</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">embedding_col</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
+
+        <span class="c1"># Stack embeddings to create the feature matrix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">embedding_col</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">score_col</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+
+        <span class="c1"># Store original ranges for reference</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_min</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unique_scores</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">score_col</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+
+        <span class="c1"># Check dimensions and warn if potentially problematic</span>
+        <span class="n">n_samples</span><span class="p">,</span> <span class="n">n_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">n_samples</span> <span class="o">&lt;</span> <span class="mi">20</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;WARNING: Small sample size (</span><span class="si">{</span><span class="n">n_samples</span><span class="si">}</span><span class="s2"> samples) may lead to unstable models&quot;</span>
+                <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">config</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">max_dims</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_dims&quot;</span><span class="p">,</span> <span class="n">MAX_DIMS</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">max_dims</span> <span class="o">&gt;</span> <span class="n">n_samples</span> <span class="o">/</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;WARNING: Model &#39;</span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2">&#39; uses </span><span class="si">{</span><span class="n">max_dims</span><span class="si">}</span><span class="s2"> dimensions with only </span><span class="si">{</span><span class="n">n_samples</span><span class="si">}</span><span class="s2"> samples. Consider reducing max_dims to avoid overfitting.&quot;</span>
+                    <span class="p">)</span>
+
+    <span class="c1"># TODO: REALLY silly. We make a dataframe from X and y to make X and y in _prepare_data</span>
+<div class="viewcode-block" id="MoodModelingManager.from_arrays">
+<a class="viewcode-back" href="../../module_docs/mood/mood_modeling.html#mood.mood_modeling.MoodModelingManager.from_arrays">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_arrays</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">test_size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span>
+        <span class="n">random_state</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">42</span><span class="p">,</span>
+        <span class="n">models</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MoodModelingManager&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a MoodModelingManager directly from numpy arrays.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            X: Array of embeddings, shape (n_samples, n_features)</span>
+<span class="sd">            y: Array of scores, shape (n_samples,)</span>
+<span class="sd">            test_size: Proportion of data to use for testing</span>
+<span class="sd">            random_state: Random seed for reproducibility</span>
+<span class="sd">            models: Dictionary of modeling pipelines (uses default_models if None)</span>
+<span class="sd">            verbose: Level of verbosity</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            MoodModelingManager instance</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            &gt;&gt;&gt; manager = MoodModelingManager.from_arrays(X, y, verbose=2)  # doctest: +SKIP</span>
+<span class="sd">            &gt;&gt;&gt; results = manager.train_and_evaluate()  # doctest: +SKIP</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Create a minimal DataFrame just for initialization</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;embedding&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span>
+                    <span class="n">X</span>
+                <span class="p">),</span>  <span class="c1"># Convert rows to lists for DataFrame compatibility</span>
+                <span class="s1">&#39;score&#39;</span><span class="p">:</span> <span class="n">y</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+            <span class="n">embedding_col</span><span class="o">=</span><span class="s1">&#39;embedding&#39;</span><span class="p">,</span>
+            <span class="n">score_col</span><span class="o">=</span><span class="s1">&#39;score&#39;</span><span class="p">,</span>
+            <span class="n">test_size</span><span class="o">=</span><span class="n">test_size</span><span class="p">,</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">,</span>
+            <span class="n">models</span><span class="o">=</span><span class="n">models</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MoodModelingManager.prepare_numerical_data">
+<a class="viewcode-back" href="../../module_docs/mood/mood_modeling.html#mood.mood_modeling.MoodModelingManager.prepare_numerical_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prepare_numerical_data</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prepare numerical data from the dataframe.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            normalize: Whether to normalize scores to [0, 1]</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple of (X, y) for numerical regression</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">normalize</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_min</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_max</span><span class="p">:</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_min</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_max</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_min</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span></div>
+
+
+<div class="viewcode-block" id="MoodModelingManager.prepare_ordinal_data">
+<a class="viewcode-back" href="../../module_docs/mood/mood_modeling.html#mood.mood_modeling.MoodModelingManager.prepare_ordinal_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prepare_ordinal_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prepare ordinal data from the dataframe.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple of (X, y) for ordinal regression</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Convert scores to ordinal ranks (0 to n-1)</span>
+        <span class="n">score_to_rank</span> <span class="o">=</span> <span class="p">{</span><span class="n">score</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">score</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unique_scores</span><span class="p">)}</span>
+        <span class="n">y_ordinal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">score_to_rank</span><span class="p">[</span><span class="n">score</span><span class="p">]</span> <span class="k">for</span> <span class="n">score</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">y_ordinal</span></div>
+
+
+<div class="viewcode-block" id="MoodModelingManager.prepare_binary_data">
+<a class="viewcode-back" href="../../module_docs/mood/mood_modeling.html#mood.mood_modeling.MoodModelingManager.prepare_binary_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prepare_binary_data</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">positive_labels</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">negative_labels</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prepare binary data from the dataframe.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            threshold: Score threshold above which is considered positive</span>
+<span class="sd">            positive_labels: List of scores considered positive</span>
+<span class="sd">            negative_labels: List of scores considered negative</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple of (X, y) for binary classification</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">positive_labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">negative_labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">negative_labels</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">score</span>
+                    <span class="k">for</span> <span class="n">score</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">unique_scores</span>
+                    <span class="k">if</span> <span class="n">score</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">positive_labels</span>
+                <span class="p">]</span>
+            <span class="k">return</span> <span class="n">x_and_y_with_boolean_y</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">embedding_col</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">score_col</span><span class="p">,</span>
+                <span class="n">positive_labels</span><span class="p">,</span>
+                <span class="n">negative_labels</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Use threshold if no specific labels provided</span>
+        <span class="k">if</span> <span class="n">threshold</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Default to median if no threshold specified</span>
+            <span class="n">threshold</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+
+        <span class="n">y_binary</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">&gt;</span> <span class="n">threshold</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">y_binary</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_model_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the appropriate (X, y) data for a given model configuration.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            model_config: Dictionary with model configuration</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple of (X, y) for the model</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data_type</span> <span class="o">=</span> <span class="n">model_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data_type&quot;</span><span class="p">,</span> <span class="s2">&quot;numerical&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">data_type</span> <span class="o">==</span> <span class="s2">&quot;numerical&quot;</span><span class="p">:</span>
+            <span class="n">normalize</span> <span class="o">=</span> <span class="n">model_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;normalize&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_numerical_data</span><span class="p">(</span><span class="n">normalize</span><span class="o">=</span><span class="n">normalize</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">data_type</span> <span class="o">==</span> <span class="s2">&quot;ordinal&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_ordinal_data</span><span class="p">()</span>
+
+        <span class="k">elif</span> <span class="n">data_type</span> <span class="o">==</span> <span class="s2">&quot;binary&quot;</span><span class="p">:</span>
+            <span class="n">threshold</span> <span class="o">=</span> <span class="n">model_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;threshold&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">positive_labels</span> <span class="o">=</span> <span class="n">model_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;positive_labels&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">negative_labels</span> <span class="o">=</span> <span class="n">model_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;negative_labels&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_binary_data</span><span class="p">(</span>
+                <span class="n">threshold</span><span class="o">=</span><span class="n">threshold</span><span class="p">,</span>
+                <span class="n">positive_labels</span><span class="o">=</span><span class="n">positive_labels</span><span class="p">,</span>
+                <span class="n">negative_labels</span><span class="o">=</span><span class="n">negative_labels</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown data type: </span><span class="si">{</span><span class="n">data_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MoodEstimator</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a model based on the provided configuration.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            model_config: Dictionary with model configuration</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Configured MoodEstimator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">model_class</span> <span class="o">=</span> <span class="n">model_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;model_class&quot;</span><span class="p">)</span>
+        <span class="n">model_params</span> <span class="o">=</span> <span class="n">model_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;model_params&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">max_dims</span> <span class="o">=</span> <span class="n">model_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_dims&quot;</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">output_transform</span> <span class="o">=</span> <span class="n">model_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;output_transform&quot;</span><span class="p">,</span> <span class="s2">&quot;sigmoid&quot;</span><span class="p">)</span>
+        <span class="n">threshold</span> <span class="o">=</span> <span class="n">model_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;threshold&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">data_type</span> <span class="o">=</span> <span class="n">model_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data_type&quot;</span><span class="p">,</span> <span class="s2">&quot;numerical&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Create the base model</span>
+        <span class="n">base_model</span> <span class="o">=</span> <span class="n">model_class</span><span class="p">(</span><span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+
+        <span class="c1"># Create the mood estimator</span>
+        <span class="k">return</span> <span class="n">MoodEstimator</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">base_model</span><span class="p">,</span>
+            <span class="n">max_dims</span><span class="o">=</span><span class="n">max_dims</span><span class="p">,</span>
+            <span class="n">output_transform</span><span class="o">=</span><span class="n">output_transform</span><span class="p">,</span>
+            <span class="n">threshold</span><span class="o">=</span><span class="n">threshold</span><span class="p">,</span>
+            <span class="n">data_type</span><span class="o">=</span><span class="n">data_type</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_evaluate_numerical</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">y_true</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">y_mood</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluate numerical regression predictions.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            y_true: True target values</span>
+<span class="sd">            y_pred: Raw model predictions</span>
+<span class="sd">            y_mood: Transformed mood scores</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dictionary of evaluation metrics</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;mse&quot;</span><span class="p">:</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">),</span>
+            <span class="s2">&quot;rmse&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">mean_squared_error</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)),</span>
+            <span class="s2">&quot;mae&quot;</span><span class="p">:</span> <span class="n">mean_absolute_error</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">),</span>
+            <span class="s2">&quot;r2&quot;</span><span class="p">:</span> <span class="n">r2_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">),</span>
+            <span class="s2">&quot;spearman&quot;</span><span class="p">:</span> <span class="n">spearmanr</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_mood</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="s2">&quot;kendall_tau&quot;</span><span class="p">:</span> <span class="n">kendalltau</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_mood</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="s2">&quot;min_pred&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">y_pred</span><span class="p">),</span>
+            <span class="s2">&quot;max_pred&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">y_pred</span><span class="p">),</span>
+            <span class="s2">&quot;min_mood&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">y_mood</span><span class="p">),</span>
+            <span class="s2">&quot;max_mood&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">y_mood</span><span class="p">),</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_evaluate_ordinal</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">y_true</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">y_mood</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluate ordinal regression predictions.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            y_true: True ordinal values</span>
+<span class="sd">            y_pred: Predicted ordinal values</span>
+<span class="sd">            y_mood: Transformed mood scores</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dictionary of evaluation metrics</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;accuracy&quot;</span><span class="p">:</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">y_pred</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)),</span>
+            <span class="s2">&quot;mae&quot;</span><span class="p">:</span> <span class="n">mean_absolute_error</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">),</span>
+            <span class="s2">&quot;mse&quot;</span><span class="p">:</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">),</span>
+            <span class="s2">&quot;spearman&quot;</span><span class="p">:</span> <span class="n">spearmanr</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_mood</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="s2">&quot;kendall_tau&quot;</span><span class="p">:</span> <span class="n">kendalltau</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_mood</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_evaluate_binary</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">y_true</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">y_mood</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluate binary classification predictions.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            y_true: True binary labels</span>
+<span class="sd">            y_pred: Predicted binary labels</span>
+<span class="sd">            y_mood: Probability scores</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dictionary of evaluation metrics</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">y_pred_binary</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_pred</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">auc</span> <span class="o">=</span> <span class="n">roc_auc_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_mood</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">auc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+        <span class="n">metrics</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;accuracy&quot;</span><span class="p">:</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred_binary</span><span class="p">),</span>
+            <span class="s2">&quot;precision&quot;</span><span class="p">:</span> <span class="n">precision_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred_binary</span><span class="p">,</span> <span class="n">zero_division</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+            <span class="s2">&quot;recall&quot;</span><span class="p">:</span> <span class="n">recall_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred_binary</span><span class="p">,</span> <span class="n">zero_division</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+            <span class="s2">&quot;f1&quot;</span><span class="p">:</span> <span class="n">f1_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred_binary</span><span class="p">,</span> <span class="n">zero_division</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+            <span class="s2">&quot;auc&quot;</span><span class="p">:</span> <span class="n">auc</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Add confusion matrix elements</span>
+        <span class="n">cm</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred_binary</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cm</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;tn&quot;</span><span class="p">],</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;fp&quot;</span><span class="p">],</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;fn&quot;</span><span class="p">],</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;tp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">metrics</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_evaluate_model</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">MoodEstimator</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">data_type</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluate a model on the given data.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            model: Model to evaluate</span>
+<span class="sd">            X: Input features</span>
+<span class="sd">            y: Target values</span>
+<span class="sd">            data_type: Type of data (&quot;numerical&quot;, &quot;ordinal&quot;, or &quot;binary&quot;)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dictionary of evaluation metrics</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Get raw predictions</span>
+        <span class="n">y_pred</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+        <span class="c1"># Get mood scores (transformed to [0, 1])</span>
+        <span class="n">y_mood</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+        <span class="c1"># Evaluate based on data type</span>
+        <span class="k">if</span> <span class="n">data_type</span> <span class="o">==</span> <span class="s2">&quot;numerical&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate_numerical</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">y_mood</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">data_type</span> <span class="o">==</span> <span class="s2">&quot;ordinal&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate_ordinal</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">y_mood</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">data_type</span> <span class="o">==</span> <span class="s2">&quot;binary&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate_binary</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">y_mood</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown data type: </span><span class="si">{</span><span class="n">data_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MoodModelingManager.train_and_evaluate">
+<a class="viewcode-back" href="../../module_docs/mood/mood_modeling.html#mood.mood_modeling.MoodModelingManager.train_and_evaluate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">train_and_evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Train and evaluate all models using a single train/test split, collecting performance metrics.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dictionary of results for all models</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">model_config</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Training and evaluating model: </span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Get data for this model</span>
+            <span class="n">data_type</span> <span class="o">=</span> <span class="n">model_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data_type&quot;</span><span class="p">,</span> <span class="s2">&quot;numerical&quot;</span><span class="p">)</span>
+            <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_model_data</span><span class="p">(</span><span class="n">model_config</span><span class="p">)</span>
+
+            <span class="c1"># Train-test split</span>
+            <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+                <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_size</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Create and train model</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_model</span><span class="p">(</span><span class="n">model_config</span><span class="p">)</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+            <span class="c1"># Evaluate on test set</span>
+            <span class="n">test_metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">data_type</span><span class="p">)</span>
+
+            <span class="c1"># Evaluate on train set (for debugging and comparison)</span>
+            <span class="n">train_metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">data_type</span><span class="p">)</span>
+
+            <span class="c1"># Store results</span>
+            <span class="n">results</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;test_metrics&quot;</span><span class="p">:</span> <span class="n">test_metrics</span><span class="p">,</span>
+                <span class="s2">&quot;train_metrics&quot;</span><span class="p">:</span> <span class="n">train_metrics</span><span class="p">,</span>
+                <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="n">data_type</span><span class="p">,</span>
+                <span class="s2">&quot;config&quot;</span><span class="p">:</span> <span class="n">model_config</span><span class="p">,</span>
+            <span class="p">}</span>
+
+            <span class="c1"># Store the trained model</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trained_models</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;  Test metrics: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">=</span><span class="si">{</span><span class="n">v</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">&#39;</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">test_metrics</span><span class="o">.</span><span class="n">items</span><span class="p">()</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nb">int</span><span class="p">,</span><span class="w"> </span><span class="nb">float</span><span class="p">))])</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="n">results</span>
+        <span class="k">return</span> <span class="n">results</span></div>
+
+
+    <span class="c1"># Update the cross_validate_models method to use appropriate scoring</span>
+<div class="viewcode-block" id="MoodModelingManager.cross_validate_models">
+<a class="viewcode-back" href="../../module_docs/mood/mood_modeling.html#mood.mood_modeling.MoodModelingManager.cross_validate_models">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cross_validate_models</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">n_splits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">metrics</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform cross-validation on all models to get more stable performance metrics.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            n_splits: Number of cross-validation folds</span>
+<span class="sd">            metrics: Set of metric names to compute (defaults to model-appropriate metrics)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dictionary of cross-validation results for all models</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cv_results</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">model_config</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cross-validating model: </span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Get data for this model</span>
+            <span class="n">data_type</span> <span class="o">=</span> <span class="n">model_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data_type&quot;</span><span class="p">,</span> <span class="s2">&quot;numerical&quot;</span><span class="p">)</span>
+            <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_model_data</span><span class="p">(</span><span class="n">model_config</span><span class="p">)</span>
+
+            <span class="c1"># Apply dimension reduction before cross-validation</span>
+            <span class="n">max_dims</span> <span class="o">=</span> <span class="n">model_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_dims&quot;</span><span class="p">,</span> <span class="n">MAX_DIMS</span><span class="p">)</span>
+            <span class="n">dimension_reducer</span> <span class="o">=</span> <span class="n">DimensionReducer</span><span class="p">(</span><span class="n">max_dims</span><span class="o">=</span><span class="n">max_dims</span><span class="p">)</span>
+            <span class="n">X_reduced</span> <span class="o">=</span> <span class="n">dimension_reducer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+            <span class="c1"># Define scoring metrics based on data type if not specified</span>
+            <span class="k">if</span> <span class="n">metrics</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">data_type</span> <span class="o">==</span> <span class="s2">&quot;numerical&quot;</span> <span class="ow">or</span> <span class="n">data_type</span> <span class="o">==</span> <span class="s2">&quot;ordinal&quot;</span><span class="p">:</span>
+                    <span class="n">scoring</span> <span class="o">=</span> <span class="p">[</span>
+                        <span class="s2">&quot;neg_mean_squared_error&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;neg_mean_absolute_error&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;r2&quot;</span><span class="p">,</span>
+                    <span class="p">]</span>
+                <span class="k">elif</span> <span class="n">data_type</span> <span class="o">==</span> <span class="s2">&quot;binary&quot;</span><span class="p">:</span>
+                    <span class="c1"># Only use classification metrics for binary classification</span>
+                    <span class="k">if</span> <span class="n">model_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;model_class&quot;</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span>
+                        <span class="n">LogisticRegression</span><span class="p">,</span>
+                        <span class="n">SVC</span><span class="p">,</span>
+                        <span class="n">RandomForestClassifier</span><span class="p">,</span>
+                    <span class="p">]:</span>
+                        <span class="n">scoring</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">,</span> <span class="s2">&quot;precision&quot;</span><span class="p">,</span> <span class="s2">&quot;recall&quot;</span><span class="p">,</span> <span class="s2">&quot;f1&quot;</span><span class="p">,</span> <span class="s2">&quot;roc_auc&quot;</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># For other models converted to binary, use regression metrics</span>
+                        <span class="n">scoring</span> <span class="o">=</span> <span class="p">[</span>
+                            <span class="s2">&quot;neg_mean_squared_error&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;neg_mean_absolute_error&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;r2&quot;</span><span class="p">,</span>
+                        <span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">scoring</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;neg_mean_squared_error&quot;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">scoring</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span>
+
+            <span class="c1"># Create the base model (without MoodEstimator wrapper for cross_validate)</span>
+            <span class="n">model_class</span> <span class="o">=</span> <span class="n">model_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;model_class&quot;</span><span class="p">)</span>
+            <span class="n">model_params</span> <span class="o">=</span> <span class="n">model_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;model_params&quot;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="n">base_model</span> <span class="o">=</span> <span class="n">model_class</span><span class="p">(</span><span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+
+            <span class="c1"># Perform cross-validation</span>
+            <span class="n">cv</span> <span class="o">=</span> <span class="n">KFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="n">n_splits</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># Use a custom scoring function for each model type to avoid sklearn errors</span>
+                <span class="n">custom_scoring</span> <span class="o">=</span> <span class="p">{}</span>
+
+                <span class="c1"># For binary classifiers, use standard classification metrics</span>
+                <span class="k">if</span> <span class="n">data_type</span> <span class="o">==</span> <span class="s2">&quot;binary&quot;</span> <span class="ow">and</span> <span class="p">(</span>
+                    <span class="nb">isinstance</span><span class="p">(</span>
+                        <span class="n">base_model</span><span class="p">,</span>
+                        <span class="p">(</span>
+                            <span class="n">LogisticRegression</span><span class="p">,</span>
+                            <span class="n">SVC</span><span class="p">,</span>
+                            <span class="n">RandomForestClassifier</span><span class="p">,</span>
+                            <span class="n">ClassifierMixin</span><span class="p">,</span>
+                        <span class="p">),</span>
+                    <span class="p">)</span>
+                <span class="p">):</span>
+                    <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">scoring</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">metric</span> <span class="ow">in</span> <span class="p">[</span>
+                            <span class="s2">&quot;accuracy&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;precision&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;recall&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;f1&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;roc_auc&quot;</span><span class="p">,</span>
+                        <span class="p">]:</span>
+                            <span class="n">custom_scoring</span><span class="p">[</span><span class="n">metric</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                                <span class="n">metric</span>  <span class="c1"># Use standard sklearn metrics</span>
+                            <span class="p">)</span>
+
+                <span class="c1"># For regression models, use regression metrics</span>
+                <span class="k">elif</span> <span class="n">data_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;numerical&quot;</span><span class="p">,</span> <span class="s2">&quot;ordinal&quot;</span><span class="p">]</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
+                    <span class="n">base_model</span><span class="p">,</span>
+                    <span class="p">(</span><span class="n">LogisticRegression</span><span class="p">,</span> <span class="n">SVC</span><span class="p">,</span> <span class="n">RandomForestClassifier</span><span class="p">,</span> <span class="n">ClassifierMixin</span><span class="p">),</span>
+                <span class="p">):</span>
+                    <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">scoring</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">metric</span> <span class="ow">in</span> <span class="p">[</span>
+                            <span class="s2">&quot;neg_mean_squared_error&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;neg_mean_absolute_error&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;r2&quot;</span><span class="p">,</span>
+                        <span class="p">]:</span>
+                            <span class="n">custom_scoring</span><span class="p">[</span><span class="n">metric</span><span class="p">]</span> <span class="o">=</span> <span class="n">metric</span>
+
+                <span class="c1"># If no appropriate metrics, fall back to a simple one</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">custom_scoring</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span>
+                        <span class="n">base_model</span><span class="p">,</span>
+                        <span class="p">(</span>
+                            <span class="n">LogisticRegression</span><span class="p">,</span>
+                            <span class="n">SVC</span><span class="p">,</span>
+                            <span class="n">RandomForestClassifier</span><span class="p">,</span>
+                            <span class="n">ClassifierMixin</span><span class="p">,</span>
+                        <span class="p">),</span>
+                    <span class="p">):</span>
+                        <span class="n">custom_scoring</span><span class="p">[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;accuracy&quot;</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">custom_scoring</span><span class="p">[</span><span class="s2">&quot;neg_mse&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;neg_mean_squared_error&quot;</span>
+
+                <span class="c1"># Catch warnings to suppress them in verbose mode</span>
+                <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">(</span><span class="n">record</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">caught_warnings</span><span class="p">:</span>
+                    <span class="c1"># Use custom scoring on the reduced data</span>
+                    <span class="n">cv_scores</span> <span class="o">=</span> <span class="n">cross_validate</span><span class="p">(</span>
+                        <span class="n">base_model</span><span class="p">,</span>
+                        <span class="n">X_reduced</span><span class="p">,</span>  <span class="c1"># Use the reduced dimensions data</span>
+                        <span class="n">y</span><span class="p">,</span>
+                        <span class="n">cv</span><span class="o">=</span><span class="n">cv</span><span class="p">,</span>
+                        <span class="n">scoring</span><span class="o">=</span><span class="n">custom_scoring</span><span class="p">,</span>
+                        <span class="n">return_train_score</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">error_score</span><span class="o">=</span><span class="s2">&quot;raise&quot;</span><span class="p">,</span>  <span class="c1"># Better to fail visibly than silently</span>
+                    <span class="p">)</span>
+
+                    <span class="c1"># Show warnings if in high verbose mode</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">caught_warnings</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">warning</span> <span class="ow">in</span> <span class="n">caught_warnings</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span>
+                                <span class="sa">f</span><span class="s2">&quot;WARNING during cross-validation of </span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">warning</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span>
+                            <span class="p">)</span>
+
+                <span class="c1"># Format results</span>
+                <span class="n">metrics_results</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">metric_name</span><span class="p">,</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">custom_scoring</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="c1"># Convert sklearn metric names to our convention</span>
+                    <span class="n">display_name</span> <span class="o">=</span> <span class="n">metric_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;neg_&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">metric_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;neg_&quot;</span><span class="p">):</span>
+                        <span class="c1"># Negate negative metrics back to positive</span>
+                        <span class="n">metrics_results</span><span class="p">[</span><span class="n">display_name</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">cv_scores</span><span class="p">[</span>
+                            <span class="sa">f</span><span class="s2">&quot;test_</span><span class="si">{</span><span class="n">metric_name</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+                        <span class="n">metrics_results</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;train_</span><span class="si">{</span><span class="n">display_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">cv_scores</span><span class="p">[</span>
+                            <span class="sa">f</span><span class="s2">&quot;train_</span><span class="si">{</span><span class="n">metric_name</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">metrics_results</span><span class="p">[</span><span class="n">display_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">cv_scores</span><span class="p">[</span>
+                            <span class="sa">f</span><span class="s2">&quot;test_</span><span class="si">{</span><span class="n">metric_name</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+                        <span class="n">metrics_results</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;train_</span><span class="si">{</span><span class="n">display_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cv_scores</span><span class="p">[</span>
+                            <span class="sa">f</span><span class="s2">&quot;train_</span><span class="si">{</span><span class="n">metric_name</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+                    <span class="c1"># Add standard deviation</span>
+                    <span class="k">if</span> <span class="n">metric_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;neg_&quot;</span><span class="p">):</span>
+                        <span class="n">metrics_results</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">display_name</span><span class="si">}</span><span class="s2">_std&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cv_scores</span><span class="p">[</span>
+                            <span class="sa">f</span><span class="s2">&quot;test_</span><span class="si">{</span><span class="n">metric_name</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="p">]</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">metrics_results</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">display_name</span><span class="si">}</span><span class="s2">_std&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cv_scores</span><span class="p">[</span>
+                            <span class="sa">f</span><span class="s2">&quot;test_</span><span class="si">{</span><span class="n">metric_name</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="p">]</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+
+                <span class="c1"># Add additional metrics not supported directly by sklearn cross_validate</span>
+                <span class="c1"># For example, spearman correlation for every model type</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="nb">isinstance</span><span class="p">(</span>
+                        <span class="n">base_model</span><span class="p">,</span>
+                        <span class="p">(</span>
+                            <span class="n">LogisticRegression</span><span class="p">,</span>
+                            <span class="n">SVC</span><span class="p">,</span>
+                            <span class="n">RandomForestClassifier</span><span class="p">,</span>
+                            <span class="n">ClassifierMixin</span><span class="p">,</span>
+                        <span class="p">),</span>
+                    <span class="p">)</span>
+                    <span class="ow">and</span> <span class="s2">&quot;accuracy&quot;</span> <span class="ow">in</span> <span class="n">metrics_results</span>
+                <span class="p">):</span>
+                    <span class="c1"># Add a placeholder for ordinal metrics if needed</span>
+                    <span class="n">metrics_results</span><span class="p">[</span><span class="s2">&quot;spearman&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="n">metrics_results</span><span class="p">[</span><span class="s2">&quot;kendall_tau&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+                <span class="n">cv_results</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;metrics&quot;</span><span class="p">:</span> <span class="n">metrics_results</span><span class="p">,</span>
+                    <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="n">data_type</span><span class="p">,</span>
+                    <span class="s2">&quot;config&quot;</span><span class="p">:</span> <span class="n">_replace_class_values_with_path</span><span class="p">(</span><span class="n">model_config</span><span class="p">),</span>
+                    <span class="s2">&quot;n_splits&quot;</span><span class="p">:</span> <span class="n">n_splits</span><span class="p">,</span>
+                <span class="p">}</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;  CV metrics: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">=</span><span class="si">{</span><span class="n">v</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">&#39;</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">metrics_results</span><span class="o">.</span><span class="n">items</span><span class="p">()</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nb">int</span><span class="p">,</span><span class="w"> </span><span class="nb">float</span><span class="p">))</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;train_&#39;</span><span class="p">)</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="n">k</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;_std&#39;</span><span class="p">)</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="ow">is</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="kc">None</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;WARNING: Cross-validation failed for model &#39;</span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
+                        <span class="kn">import</span><span class="w"> </span><span class="nn">traceback</span>
+
+                        <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
+
+                <span class="n">cv_results</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span>
+                    <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="n">data_type</span><span class="p">,</span>
+                    <span class="s2">&quot;config&quot;</span><span class="p">:</span> <span class="n">_replace_class_values_with_path</span><span class="p">(</span><span class="n">model_config</span><span class="p">),</span>
+                <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cv_results</span> <span class="o">=</span> <span class="n">cv_results</span>
+        <span class="k">return</span> <span class="n">cv_results</span></div>
+
+
+<div class="viewcode-block" id="MoodModelingManager.fit_final_models">
+<a class="viewcode-back" href="../../module_docs/mood/mood_modeling.html#mood.mood_modeling.MoodModelingManager.fit_final_models">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit_final_models</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fit final models on the entire dataset.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dictionary of fitted models</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">final_models</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">model_config</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Fitting final model: </span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Get data for this model</span>
+            <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_model_data</span><span class="p">(</span><span class="n">model_config</span><span class="p">)</span>
+
+            <span class="c1"># Check dimensions again</span>
+            <span class="n">n_samples</span><span class="p">,</span> <span class="n">n_features</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+            <span class="n">max_dims</span> <span class="o">=</span> <span class="n">model_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_dims&quot;</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">max_dims</span> <span class="o">&gt;</span> <span class="n">n_samples</span> <span class="o">/</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;WARNING: Final model &#39;</span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2">&#39; may be overfitting with </span><span class="si">{</span><span class="n">max_dims</span><span class="si">}</span><span class="s2"> dimensions and only </span><span class="si">{</span><span class="n">n_samples</span><span class="si">}</span><span class="s2"> samples&quot;</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Create and train model on all data</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_model</span><span class="p">(</span><span class="n">model_config</span><span class="p">)</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+            <span class="c1"># Evaluate on all data (train=test evaluation)</span>
+            <span class="n">data_type</span> <span class="o">=</span> <span class="n">model_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data_type&quot;</span><span class="p">,</span> <span class="s2">&quot;numerical&quot;</span><span class="p">)</span>
+            <span class="n">metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">data_type</span><span class="p">)</span>
+
+            <span class="c1"># Store results</span>
+            <span class="n">final_models</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span> <span class="s2">&quot;full_data_metrics&quot;</span><span class="p">:</span> <span class="n">metrics</span><span class="p">}</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;  Full data metrics: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">=</span><span class="si">{</span><span class="n">v</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">&#39;</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">metrics</span><span class="o">.</span><span class="n">items</span><span class="p">()</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nb">int</span><span class="p">,</span><span class="w"> </span><span class="nb">float</span><span class="p">))])</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">final_models</span> <span class="o">=</span> <span class="n">final_models</span>
+        <span class="k">return</span> <span class="n">final_models</span></div>
+
+
+<div class="viewcode-block" id="MoodModelingManager.get_best_model">
+<a class="viewcode-back" href="../../module_docs/mood/mood_modeling.html#mood.mood_modeling.MoodModelingManager.get_best_model">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_best_model</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">metric</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;spearman&quot;</span><span class="p">,</span>
+        <span class="n">data_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">use_cv</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">MoodEstimator</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the best model based on a specific metric.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            metric: Metric to use for comparison</span>
+<span class="sd">            data_type: Filter by data type (optional)</span>
+<span class="sd">            use_cv: Whether to use cross-validation results for comparison (if available)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple of (model_name, model)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">use_cv</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">cv_results</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Selecting best model based on cross-validation </span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s2"> score&quot;</span><span class="p">)</span>
+
+            <span class="n">best_score</span> <span class="o">=</span> <span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>
+            <span class="n">best_model_name</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="k">for</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cv_results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="s2">&quot;error&quot;</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="k">if</span> <span class="n">data_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;data_type&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">data_type</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="n">score</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;metrics&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">metric</span><span class="p">,</span> <span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="n">score</span> <span class="o">&gt;</span> <span class="n">best_score</span><span class="p">:</span>
+                    <span class="n">best_score</span> <span class="o">=</span> <span class="n">score</span>
+                    <span class="n">best_model_name</span> <span class="o">=</span> <span class="n">model_name</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No results found, running train_and_evaluate&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">train_and_evaluate</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Selecting best model based on single split </span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s2"> score&quot;</span><span class="p">)</span>
+
+            <span class="n">best_score</span> <span class="o">=</span> <span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>
+            <span class="n">best_model_name</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="k">for</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">data_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;data_type&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">data_type</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="n">score</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;test_metrics&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">metric</span><span class="p">,</span> <span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="n">score</span> <span class="o">&gt;</span> <span class="n">best_score</span><span class="p">:</span>
+                    <span class="n">best_score</span> <span class="o">=</span> <span class="n">score</span>
+                    <span class="n">best_model_name</span> <span class="o">=</span> <span class="n">model_name</span>
+
+        <span class="k">if</span> <span class="n">best_model_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;No models found matching criteria: metric=</span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s2">, data_type=</span><span class="si">{</span><span class="n">data_type</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_models</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Fitting final models&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fit_final_models</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Selected model &#39;</span><span class="si">{</span><span class="n">best_model_name</span><span class="si">}</span><span class="s2">&#39; with </span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">best_score</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">best_model_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_models</span><span class="p">[</span><span class="n">best_model_name</span><span class="p">][</span><span class="s2">&quot;model&quot;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="MoodModelingManager.predict_mood">
+<a class="viewcode-back" href="../../module_docs/mood/mood_modeling.html#mood.mood_modeling.MoodModelingManager.predict_mood">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict_mood</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Predict mood scores for new data.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            X: Input features</span>
+<span class="sd">            model_name: Name of model to use (uses best model if None)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Array of mood scores in [0, 1] range</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_models</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fit_final_models</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">model_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">model_name</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_best_model</span><span class="p">()</span>
+
+        <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_models</span><span class="p">[</span><span class="n">model_name</span><span class="p">][</span><span class="s2">&quot;model&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MoodModelingManager.get_model_summary">
+<a class="viewcode-back" href="../../module_docs/mood/mood_modeling.html#mood.mood_modeling.MoodModelingManager.get_model_summary">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_model_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">use_cv</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">egress</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a summary of all models and their performance.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            use_cv: Whether to use cross-validation results (if available)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            DataFrame summarizing model performance</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">use_cv</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cv_results</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cross_validate_models</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Generating summary from cross-validation results&quot;</span><span class="p">)</span>
+
+            <span class="n">summary</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">for</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cv_results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="s2">&quot;error&quot;</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="n">row</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;model_name&quot;</span><span class="p">:</span> <span class="n">model_name</span><span class="p">,</span>
+                    <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;data_type&quot;</span><span class="p">],</span>
+                    <span class="s2">&quot;n_splits&quot;</span><span class="p">:</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;n_splits&quot;</span><span class="p">],</span>
+                <span class="p">}</span>
+
+                <span class="c1"># Add metrics</span>
+                <span class="k">for</span> <span class="n">metric</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;metrics&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">row</span><span class="p">[</span><span class="n">metric</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+                <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No results found, running train_and_evaluate&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">train_and_evaluate</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Generating summary from single split results&quot;</span><span class="p">)</span>
+
+            <span class="n">summary</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">for</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">row</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;model_name&quot;</span><span class="p">:</span> <span class="n">model_name</span><span class="p">,</span> <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;data_type&quot;</span><span class="p">]}</span>
+
+                <span class="c1"># Add test metrics</span>
+                <span class="k">for</span> <span class="n">metric</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;test_metrics&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">row</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;test_</span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+                <span class="c1"># Add selected train metrics for comparison</span>
+                <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;mse&quot;</span><span class="p">,</span> <span class="s2">&quot;accuracy&quot;</span><span class="p">,</span> <span class="s2">&quot;f1&quot;</span><span class="p">,</span> <span class="s2">&quot;spearman&quot;</span><span class="p">,</span> <span class="s2">&quot;kendall_tau&quot;</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;train_metrics&quot;</span><span class="p">]:</span>
+                        <span class="n">row</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;train_</span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;train_metrics&quot;</span><span class="p">][</span><span class="n">metric</span><span class="p">]</span>
+
+                <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">egress</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">egress</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span>
+
+        <span class="k">return</span> <span class="n">egress</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="n">MAX_DIMS</span> <span class="o">=</span> <span class="mi">300</span>
+
+<span class="c1"># Default model configurations</span>
+<span class="n">default_models</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;linear_regression&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="s2">&quot;numerical&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;model_class&quot;</span><span class="p">:</span> <span class="n">Ridge</span><span class="p">,</span>
+        <span class="s2">&quot;model_params&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">},</span>
+        <span class="s2">&quot;max_dims&quot;</span><span class="p">:</span> <span class="n">MAX_DIMS</span><span class="p">,</span>
+        <span class="s2">&quot;output_transform&quot;</span><span class="p">:</span> <span class="s2">&quot;sigmoid&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;normalize&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;svr&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="s2">&quot;numerical&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;model_class&quot;</span><span class="p">:</span> <span class="n">SVR</span><span class="p">,</span>
+        <span class="s2">&quot;model_params&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s2">&quot;kernel&quot;</span><span class="p">:</span> <span class="s2">&quot;linear&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;max_dims&quot;</span><span class="p">:</span> <span class="n">MAX_DIMS</span><span class="p">,</span>
+        <span class="s2">&quot;output_transform&quot;</span><span class="p">:</span> <span class="s2">&quot;minmax&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;normalize&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;logistic_high_vs_low&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="s2">&quot;binary&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;model_class&quot;</span><span class="p">:</span> <span class="n">LogisticRegression</span><span class="p">,</span>
+        <span class="s2">&quot;model_params&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s2">&quot;class_weight&quot;</span><span class="p">:</span> <span class="s2">&quot;balanced&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;max_dims&quot;</span><span class="p">:</span> <span class="n">MAX_DIMS</span><span class="p">,</span>
+        <span class="s2">&quot;threshold&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># Will be set to median</span>
+        <span class="s2">&quot;output_transform&quot;</span><span class="p">:</span> <span class="s2">&quot;sigmoid&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;svm_high_vs_low&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="s2">&quot;binary&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;model_class&quot;</span><span class="p">:</span> <span class="n">SVC</span><span class="p">,</span>
+        <span class="s2">&quot;model_params&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s2">&quot;kernel&quot;</span><span class="p">:</span> <span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="s2">&quot;probability&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+        <span class="s2">&quot;max_dims&quot;</span><span class="p">:</span> <span class="n">MAX_DIMS</span><span class="p">,</span>
+        <span class="s2">&quot;threshold&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># Will be set to median</span>
+        <span class="s2">&quot;output_transform&quot;</span><span class="p">:</span> <span class="s2">&quot;sigmoid&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+
+<span class="c1"># Add ordinal regression models</span>
+<span class="k">with</span> <span class="n">suppress</span><span class="p">(</span><span class="ne">ImportError</span><span class="p">,</span> <span class="ne">ModuleNotFoundError</span><span class="p">):</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">mord</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogisticIT</span><span class="p">,</span> <span class="n">LogisticAT</span>
+
+    <span class="n">default_models</span><span class="p">[</span><span class="s2">&quot;ordered_logistic_it&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="s2">&quot;ordinal&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;model_class&quot;</span><span class="p">:</span> <span class="n">LogisticIT</span><span class="p">,</span>
+        <span class="s2">&quot;model_params&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">},</span>
+        <span class="s2">&quot;max_dims&quot;</span><span class="p">:</span> <span class="n">MAX_DIMS</span><span class="p">,</span>
+        <span class="s2">&quot;output_transform&quot;</span><span class="p">:</span> <span class="s2">&quot;minmax&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="n">default_models</span><span class="p">[</span><span class="s2">&quot;ordered_logistic_at&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="s2">&quot;ordinal&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;model_class&quot;</span><span class="p">:</span> <span class="n">LogisticAT</span><span class="p">,</span>
+        <span class="s2">&quot;model_params&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">},</span>
+        <span class="s2">&quot;max_dims&quot;</span><span class="p">:</span> <span class="n">MAX_DIMS</span><span class="p">,</span>
+        <span class="s2">&quot;output_transform&quot;</span><span class="p">:</span> <span class="s2">&quot;minmax&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+<span class="k">with</span> <span class="n">suppress</span><span class="p">(</span><span class="ne">ImportError</span><span class="p">,</span> <span class="ne">ModuleNotFoundError</span><span class="p">):</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">mord</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrdinalRidge</span>
+
+    <span class="n">default_models</span><span class="p">[</span><span class="s2">&quot;ordinal_ridge&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="s2">&quot;ordinal&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;model_class&quot;</span><span class="p">:</span> <span class="n">OrdinalRidge</span><span class="p">,</span>
+        <span class="s2">&quot;model_params&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">},</span>
+        <span class="s2">&quot;max_dims&quot;</span><span class="p">:</span> <span class="n">MAX_DIMS</span><span class="p">,</span>
+        <span class="s2">&quot;output_transform&quot;</span><span class="p">:</span> <span class="s2">&quot;minmax&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+<span class="k">with</span> <span class="n">suppress</span><span class="p">(</span><span class="ne">ImportError</span><span class="p">,</span> <span class="ne">ModuleNotFoundError</span><span class="p">):</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">ogb</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ogb</span><span class="w"> </span><span class="kn">import</span> <span class="n">OGBClassifier</span>
+
+    <span class="n">default_models</span><span class="p">[</span><span class="s2">&quot;ogboost&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="s2">&quot;ordinal&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;model_class&quot;</span><span class="p">:</span> <span class="n">OGBClassifier</span><span class="p">,</span>
+        <span class="s2">&quot;model_params&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;n_estimators&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">&quot;learning_rate&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">},</span>
+        <span class="s2">&quot;max_dims&quot;</span><span class="p">:</span> <span class="n">MAX_DIMS</span><span class="p">,</span>
+        <span class="s2">&quot;output_transform&quot;</span><span class="p">:</span> <span class="s2">&quot;minmax&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+<span class="c1"># Ordered SVM approach - using scikit-learn&#39;s SVC with a specific configuration</span>
+<span class="n">default_models</span><span class="p">[</span><span class="s2">&quot;ordinal_svm&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="s2">&quot;ordinal&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;model_class&quot;</span><span class="p">:</span> <span class="n">SVC</span><span class="p">,</span>
+    <span class="s2">&quot;model_params&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="s2">&quot;kernel&quot;</span><span class="p">:</span> <span class="s2">&quot;linear&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;decision_function_shape&quot;</span><span class="p">:</span> <span class="s2">&quot;ovo&quot;</span><span class="p">,</span>  <span class="c1"># One-vs-One approach works better for ordinal data</span>
+        <span class="s2">&quot;probability&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;max_dims&quot;</span><span class="p">:</span> <span class="n">MAX_DIMS</span><span class="p">,</span>
+    <span class="s2">&quot;output_transform&quot;</span><span class="p">:</span> <span class="s2">&quot;minmax&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<span class="c1"># Using Random Forest for ordinal regression</span>
+<div class="viewcode-block" id="OrdinalRandomForest">
+<a class="viewcode-back" href="../../module_docs/mood/mood_modeling.html#mood.mood_modeling.OrdinalRandomForest">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OrdinalRandomForest</span><span class="p">(</span><span class="n">RandomForestRegressor</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Random Forest customized for ordinal regression.</span>
+
+<span class="sd">    Predicts continuous values first, then maps them to the closest ordinal class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ordinal_classes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ordinal_classes</span> <span class="o">=</span> <span class="n">ordinal_classes</span>
+
+<div class="viewcode-block" id="OrdinalRandomForest.fit">
+<a class="viewcode-back" href="../../module_docs/mood/mood_modeling.html#mood.mood_modeling.OrdinalRandomForest.fit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="c1"># Store unique ordinal classes if not provided</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ordinal_classes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ordinal_classes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="OrdinalRandomForest.predict">
+<a class="viewcode-back" href="../../module_docs/mood/mood_modeling.html#mood.mood_modeling.OrdinalRandomForest.predict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="c1"># Get continuous predictions from the forest</span>
+        <span class="n">continuous_pred</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+        <span class="c1"># Map to closest ordinal class</span>
+        <span class="c1"># For each prediction, find the closest value in ordinal_classes</span>
+        <span class="n">mapped_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">continuous_pred</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">pred</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">continuous_pred</span><span class="p">):</span>
+            <span class="c1"># Find index of closest ordinal class</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ordinal_classes</span> <span class="o">-</span> <span class="n">pred</span><span class="p">)</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span>
+            <span class="n">mapped_pred</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ordinal_classes</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">mapped_pred</span></div>
+</div>
+
+
+
+<span class="n">default_models</span><span class="p">[</span><span class="s2">&quot;ordinal_forest&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="s2">&quot;ordinal&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;model_class&quot;</span><span class="p">:</span> <span class="n">OrdinalRandomForest</span><span class="p">,</span>
+    <span class="s2">&quot;model_params&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;n_estimators&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">&quot;max_depth&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;min_samples_split&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">},</span>
+    <span class="s2">&quot;max_dims&quot;</span><span class="p">:</span> <span class="n">MAX_DIMS</span><span class="p">,</span>
+    <span class="s2">&quot;output_transform&quot;</span><span class="p">:</span> <span class="s2">&quot;minmax&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<span class="c1"># Example usage:</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd"># Create a MoodModelingManager with your data</span>
+<span class="sd">manager = MoodModelingManager(</span>
+<span class="sd">    df=your_dataframe,</span>
+<span class="sd">    embedding_col=&#39;embedding&#39;,</span>
+<span class="sd">    score_col=&#39;score&#39;,</span>
+<span class="sd">    verbose=2  # Show information messages</span>
+<span class="sd">)</span>
+
+<span class="sd"># Initial evaluation with single train/test split</span>
+<span class="sd">results = manager.train_and_evaluate()</span>
+
+<span class="sd"># Get a summary of model performance</span>
+<span class="sd">summary = manager.get_model_summary()</span>
+<span class="sd">print(summary)</span>
+
+<span class="sd"># For more stable metrics, run cross-validation</span>
+<span class="sd">cv_results = manager.cross_validate_models(n_splits=5)</span>
+
+<span class="sd"># Get CV-based summary</span>
+<span class="sd">cv_summary = manager.get_model_summary(use_cv=True)</span>
+<span class="sd">print(cv_summary)</span>
+
+<span class="sd"># Fit final models on all data</span>
+<span class="sd">manager.fit_final_models()</span>
+
+<span class="sd"># Get the best model based on Spearman correlation from CV results</span>
+<span class="sd">best_model_name, best_model = manager.get_best_model(</span>
+<span class="sd">    metric=&#39;spearman&#39;, </span>
+<span class="sd">    use_cv=True</span>
+<span class="sd">)</span>
+
+<span class="sd"># Use the best model to predict mood scores for new data</span>
+<span class="sd">new_embeddings = np.array([...])  # Your new embeddings</span>
+<span class="sd">mood_scores = manager.predict_mood(new_embeddings)</span>
+
+<span class="sd">print(f&quot;Best model: {best_model_name}&quot;)</span>
+<span class="sd">print(f&quot;Mood scores: {mood_scores}&quot;)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright NO COPYRIGHT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

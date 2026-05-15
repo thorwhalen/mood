@@ -6,18 +6,18 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>&lt;no title&gt; &mdash; mood 0.0.14 documentation</title>
+  <title>&lt;no title&gt; &mdash; mood 0.0.15 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=544df88d"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/documentation_options.js?v=f0357c94"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/toggleprompt.js?v=d7ede5d2"></script>
       <script src="_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="_static/copybutton.js?v=f281be69"></script>
@@ -88,11 +88,39 @@
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/mood.html">mood</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/mood/dataset_makers.html">mood.dataset_makers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/mood/dataset_makers.html">mood.dataset_makers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/mood/dataset_makers.html#mood.dataset_makers.make_semantic_attributes_dataset"><code class="docutils literal notranslate"><span class="pre">make_semantic_attributes_dataset()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/mood/examples.html">mood.examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/mood/learn_sentiments.html">mood.learn_sentiments</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/mood/model_analysis.html">mood.model_analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/mood/mood_modeling.html">mood.mood_modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/mood/learn_sentiments.html">mood.learn_sentiments</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/mood/learn_sentiments.html#mood.learn_sentiments.ModelStatistics"><code class="docutils literal notranslate"><span class="pre">ModelStatistics</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/mood/learn_sentiments.html#mood.learn_sentiments.fit_logistic_classifier"><code class="docutils literal notranslate"><span class="pre">fit_logistic_classifier()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/mood/learn_sentiments.html#mood.learn_sentiments.get_binary_y"><code class="docutils literal notranslate"><span class="pre">get_binary_y()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/mood/learn_sentiments.html#mood.learn_sentiments.predict_with_model"><code class="docutils literal notranslate"><span class="pre">predict_with_model()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/mood/model_analysis.html">mood.model_analysis</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/mood/model_analysis.html#mood.model_analysis.ModelPerformanceAnalyzer"><code class="docutils literal notranslate"><span class="pre">ModelPerformanceAnalyzer</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/mood/model_analysis.html#mood.model_analysis.analyze_all"><code class="docutils literal notranslate"><span class="pre">analyze_all()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/mood/model_analysis.html#mood.model_analysis.analyze_by_data_type"><code class="docutils literal notranslate"><span class="pre">analyze_by_data_type()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/mood/model_analysis.html#mood.model_analysis.analyze_classifiers"><code class="docutils literal notranslate"><span class="pre">analyze_classifiers()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/mood/model_analysis.html#mood.model_analysis.analyze_regression_models"><code class="docutils literal notranslate"><span class="pre">analyze_regression_models()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/mood/model_analysis.html#mood.model_analysis.analyze_specific_attribute"><code class="docutils literal notranslate"><span class="pre">analyze_specific_attribute()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/mood/model_analysis.html#mood.model_analysis.compare_datasets"><code class="docutils literal notranslate"><span class="pre">compare_datasets()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/mood/model_analysis.html#mood.model_analysis.compare_models_across_datasets"><code class="docutils literal notranslate"><span class="pre">compare_models_across_datasets()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/mood/mood_modeling.html">mood.mood_modeling</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/mood/mood_modeling.html#mood.mood_modeling.DimensionReducer"><code class="docutils literal notranslate"><span class="pre">DimensionReducer</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/mood/mood_modeling.html#mood.mood_modeling.MoodEstimator"><code class="docutils literal notranslate"><span class="pre">MoodEstimator</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/mood/mood_modeling.html#mood.mood_modeling.MoodModelingManager"><code class="docutils literal notranslate"><span class="pre">MoodModelingManager</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/mood/mood_modeling.html#mood.mood_modeling.OrdinalRandomForest"><code class="docutils literal notranslate"><span class="pre">OrdinalRandomForest</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/mood/mood_modeling.html#mood.mood_modeling.class_to_path"><code class="docutils literal notranslate"><span class="pre">class_to_path()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/mood/mood_modeling.html#mood.mood_modeling.path_to_class"><code class="docutils literal notranslate"><span class="pre">path_to_class()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/mood/mood_modeling.html#mood.mood_modeling.x_and_y_with_boolean_y"><code class="docutils literal notranslate"><span class="pre">x_and_y_with_boolean_y()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/mood/scripts.html">mood.scripts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/mood/scripts/financial_news_searches.html">mood.scripts.financial_news_searches</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/mood/sentiment.html">mood.sentiment</a><ul>

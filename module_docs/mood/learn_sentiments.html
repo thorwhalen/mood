@@ -6,18 +6,18 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>mood.learn_sentiments &mdash; mood 0.0.14 documentation</title>
+  <title>mood.learn_sentiments &mdash; mood 0.0.15 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
 
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=544df88d"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/documentation_options.js?v=f0357c94"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../_static/copybutton.js?v=f281be69"></script>
@@ -52,7 +52,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../mood.html">mood</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dataset_makers.html">mood.dataset_makers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">mood.examples</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">mood.learn_sentiments</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">mood.learn_sentiments</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#mood.learn_sentiments.ModelStatistics"><code class="docutils literal notranslate"><span class="pre">ModelStatistics</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mood.learn_sentiments.fit_logistic_classifier"><code class="docutils literal notranslate"><span class="pre">fit_logistic_classifier()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mood.learn_sentiments.get_binary_y"><code class="docutils literal notranslate"><span class="pre">get_binary_y()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mood.learn_sentiments.predict_with_model"><code class="docutils literal notranslate"><span class="pre">predict_with_model()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="model_analysis.html">mood.model_analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mood_modeling.html">mood.mood_modeling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="scripts.html">mood.scripts</a></li>
@@ -86,8 +92,89 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="mood-learn-sentiments">
-<h1>mood.learn_sentiments<a class="headerlink" href="#mood-learn-sentiments" title="Link to this heading"></a></h1>
+  <section id="module-mood.learn_sentiments">
+<span id="mood-learn-sentiments"></span><h1>mood.learn_sentiments<a class="headerlink" href="#module-mood.learn_sentiments" title="Link to this heading"></a></h1>
+<p>Learning sentiments from data.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="mood.learn_sentiments.ModelStatistics">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">mood.learn_sentiments.</span></span><span class="sig-name descname"><span class="pre">ModelStatistics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">accuracy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precision</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recall</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roc_auc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">confusion_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classification_report</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_test_performed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">training_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mood/learn_sentiments.html#ModelStatistics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.learn_sentiments.ModelStatistics" title="Link to this definition"></a></dt>
+<dd><p>Container for model performance statistics</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mood.learn_sentiments.fit_logistic_classifier">
+<span class="sig-prename descclassname"><span class="pre">mood.learn_sentiments.</span></span><span class="sig-name descname"><span class="pre">fit_logistic_classifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">42</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'lbfgs'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">penalty</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'l2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">class_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_intercept</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_validation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">LogisticRegression</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#mood.learn_sentiments.ModelStatistics" title="mood.learn_sentiments.ModelStatistics"><span class="pre">ModelStatistics</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/mood/learn_sentiments.html#fit_logistic_classifier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.learn_sentiments.fit_logistic_classifier" title="Link to this definition"></a></dt>
+<dd><p>Fits a logistic regression model on embedding data for binary classification without feature scaling.</p>
+<section id="parameters">
+<h2>Parameters:<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>X<span class="classifier">array-like, shape (n_samples, n_features)</span></dt><dd><p>The embedding vectors.</p>
+</dd>
+<dt>y<span class="classifier">array-like, shape (n_samples,)</span></dt><dd><p>Binary target values (0/1 or True/False).</p>
+</dd>
+<dt>test_size<span class="classifier">float, default=0.2</span></dt><dd><p>Proportion of the dataset to include in the test split.</p>
+</dd>
+<dt>random_state<span class="classifier">int, default=42</span></dt><dd><p>Controls the shuffling applied to the data before applying the split.</p>
+</dd>
+<dt>c_value<span class="classifier">float, default=1.0</span></dt><dd><p>Inverse of regularization strength; smaller values specify stronger regularization.</p>
+</dd>
+<dt>max_iter<span class="classifier">int, default=1000</span></dt><dd><p>Maximum number of iterations taken for the solvers to converge.</p>
+</dd>
+<dt>solver<span class="classifier">str, default=’lbfgs’</span></dt><dd><p>Algorithm to use in the optimization problem (‘newton-cg’, ‘lbfgs’, ‘liblinear’, ‘sag’, ‘saga’).</p>
+</dd>
+<dt>penalty<span class="classifier">str, default=’l2’</span></dt><dd><p>Specify the norm used in the penalization (‘l1’, ‘l2’, ‘elasticnet’, None).</p>
+</dd>
+<dt>class_weight<span class="classifier">dict or ‘balanced’, default=None</span></dt><dd><p>Weights associated with classes. If ‘balanced’, uses class frequencies.</p>
+</dd>
+<dt>fit_intercept<span class="classifier">bool, default=True</span></dt><dd><p>Whether to fit an intercept term in the model.</p>
+</dd>
+<dt>skip_validation<span class="classifier">bool, default=False</span></dt><dd><p>If True, skips train/test validation and fits model on all data.</p>
+</dd>
+<dt>verbose<span class="classifier">bool, default=True</span></dt><dd><p>If True, prints progress and results.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h2>Returns:<a class="headerlink" href="#returns" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>model<span class="classifier">LogisticRegression</span></dt><dd><p>Trained logistic regression model.</p>
+</dd>
+<dt>stats<span class="classifier">ModelStatistics</span></dt><dd><p>Object containing performance statistics.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mood.learn_sentiments.get_binary_y">
+<span class="sig-prename descclassname"><span class="pre">mood.learn_sentiments.</span></span><span class="sig-name descname"><span class="pre">get_binary_y</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mood/learn_sentiments.html#get_binary_y"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.learn_sentiments.get_binary_y" title="Link to this definition"></a></dt>
+<dd><p>Convert a multi-class target array to a binary array for a specific target class.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mood.learn_sentiments.predict_with_model">
+<span class="sig-prename descclassname"><span class="pre">mood.learn_sentiments.</span></span><span class="sig-name descname"><span class="pre">predict_with_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mood/learn_sentiments.html#predict_with_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.learn_sentiments.predict_with_model" title="Link to this definition"></a></dt>
+<dd><p>Helper function to make predictions with a fitted model.</p>
+<section id="id1">
+<h2>Parameters:<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>model<span class="classifier">LogisticRegression</span></dt><dd><p>Trained logistic regression model.</p>
+</dd>
+<dt>X<span class="classifier">array-like</span></dt><dd><p>Feature vectors to predict on.</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h2>Returns:<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>y_pred<span class="classifier">array-like</span></dt><dd><p>Class predictions (0 or 1).</p>
+</dd>
+<dt>y_prob<span class="classifier">array-like</span></dt><dd><p>Probability estimates for class 1.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
 </section>
 
 
