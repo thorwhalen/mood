@@ -5,7 +5,6 @@ Tools to make datasets for training and testing models (for semantic attribute e
 import os
 from typing import Union, Optional
 from collections.abc import MutableMapping, Mapping, Callable
-from functools import partial
 
 from dol import TextFiles, mk_dirs_if_missing
 
@@ -168,36 +167,55 @@ Again, the target attribute is: {attribute}
 """
 )
 
-# TODO: Change to more general aix prompt_function when available
-import oa
+# LLM generation is routed through ``aix`` (the multi-provider facade) rather than a
+# provider-specific client, so the model/provider is switchable from a single seam.
+# ``aix`` is imported lazily (inside the factory below) and the generator is an
+# injectable default, so ``import mood`` stays offline.
 
 DFLT_TEMPERATURE_FOR_MOOD_DATASET_GEN = 0.7
 DFLT_MODEL_FOR_MOOD_DATASET_GEN = "gpt-4o-mini"  # cheapish model
 
-semantic_attribute_examples_for_attribute = oa.prompt_function(
-    prompt_template_for_dataset_generation,
-    prompt_func=partial(
-        oa.chat,
-        temperature=float(
+
+def _make_semantic_attribute_examples_for_attribute(
+    *, model: str = None, temperature: float = None
+):
+    """Build the dataset-generation prompt function on :mod:`aix` (lazy import).
+
+    Routes LLM generation through :mod:`aix` (the multi-provider facade) so the model
+    and provider are switchable. ``aix`` is imported here, on first use, so importing
+    :mod:`mood` does not pull a provider SDK at import time. ``aix.prompt_func``
+    understands the ``{name:default}`` template dialect this prompt uses.
+    """
+    import aix
+
+    if model is None:
+        model = os.environ.get(
+            "DFLT_MODEL_FOR_MOOD_DATASET_GEN", DFLT_MODEL_FOR_MOOD_DATASET_GEN
+        )
+    if temperature is None:
+        temperature = float(
             os.environ.get(
                 "DFLT_TEMPERATURE_FOR_MOOD_DATASET_GEN",
                 DFLT_TEMPERATURE_FOR_MOOD_DATASET_GEN,
             )
-        ),
-        model=os.environ.get(
-            "DFLT_MODEL_FOR_MOOD_DATASET_GEN", DFLT_MODEL_FOR_MOOD_DATASET_GEN
-        ),
-    ),
-)
+        )
+    return aix.prompt_func(
+        prompt_template_for_dataset_generation,
+        model=model,
+        temperature=temperature,
+        name="semantic_attribute_examples_for_attribute",
+    )
 
 
-# def _semantic_attribute_examples_for_attribute(attribute: str, n_examples: int = 100):
-#     prompt = prompt_template_for_dataset_generation.format(
-#         concept=attribute,
-#         n_examples=n_examples,
-#     )
-#     response = semantic_attribute_examples_for_attribute(prompt)
-#     return response
+def __getattr__(name):
+    # PEP 562: preserve the module-level ``semantic_attribute_examples_for_attribute``
+    # name for backward compatibility, but build it lazily so importing this module
+    # stays offline and provider-agnostic.
+    if name == "semantic_attribute_examples_for_attribute":
+        fn = _make_semantic_attribute_examples_for_attribute()
+        globals()[name] = fn  # cache for subsequent accesses
+        return fn
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
 # --------------------------------------------------------------------------------------
@@ -230,6 +248,7 @@ def make_semantic_attributes_dataset(
     start_batch_idx_at: int = 0,
     save_key: Callable = default_save_key,
     verbose: int = 0,
+    example_generator: Callable | None = None,
     **dataset_maker_kwargs,
 ):
     """
@@ -243,7 +262,9 @@ def make_semantic_attributes_dataset(
     - start_batch_idx_at: Starting index for batch numbering
     - save_key: Function to generate save keys
     - verbose: Verbosity level (0=quiet, 1=attribute progress, 2=batch progress)
-    - dataset_maker_kwargs: Additional kwargs for semantic_attribute_examples_for_attribute
+    - example_generator: Injectable ``(attribute, n_examples, ...) -> str`` callable;
+      when omitted it is built lazily on ``aix`` (so importing ``mood`` stays offline)
+    - dataset_maker_kwargs: Additional kwargs passed to the example generator
 
     WARNING: Some models aren't very good at generating the requested number of examples.
     They may generate fewer or more than requested. This is a known issue with LLM
@@ -280,6 +301,9 @@ def make_semantic_attributes_dataset(
     if isinstance(store, str):
         store = mk_dirs_if_missing(TextFiles(store))
 
+    if example_generator is None:
+        example_generator = _make_semantic_attribute_examples_for_attribute()
+
     def _get_batch_config(n_examples, batch_size, start_idx):
         """
         Generate batch configuration based on whether batch_size is None or not.
@@ -311,7 +335,7 @@ def make_semantic_attributes_dataset(
             if verbose > 1:
                 print(f"  Gathering {current_batch_size} examples for: {_save_key}")
 
-            response = semantic_attribute_examples_for_attribute(
+            response = example_generator(
                 attribute=attribute,
                 n_examples=current_batch_size,
                 **dataset_maker_kwargs,
