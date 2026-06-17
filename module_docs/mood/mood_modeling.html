@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>mood.mood_modeling &mdash; mood 0.0.15 documentation</title>
+  <title>mood.mood_modeling &mdash; mood 0.0.16 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=f0357c94"></script>
+      <script src="../../_static/documentation_options.js?v=c7cdf6fe"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -83,6 +83,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#mood.mood_modeling.OrdinalRandomForest"><code class="docutils literal notranslate"><span class="pre">OrdinalRandomForest</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#mood.mood_modeling.OrdinalRandomForest.fit"><code class="docutils literal notranslate"><span class="pre">OrdinalRandomForest.fit()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#mood.mood_modeling.OrdinalRandomForest.predict"><code class="docutils literal notranslate"><span class="pre">OrdinalRandomForest.predict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mood.mood_modeling.OrdinalRandomForest.set_fit_request"><code class="docutils literal notranslate"><span class="pre">OrdinalRandomForest.set_fit_request()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#mood.mood_modeling.OrdinalRandomForest.set_score_request"><code class="docutils literal notranslate"><span class="pre">OrdinalRandomForest.set_score_request()</span></code></a></li>
 </ul>
 </li>
@@ -462,6 +463,21 @@ converted into a sparse <code class="docutils literal notranslate"><span class="
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="mood.mood_modeling.OrdinalRandomForest.set_fit_request">
+<span class="sig-name descname"><span class="pre">set_fit_request</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#mood.mood_modeling.OrdinalRandomForest" title="mood.mood_modeling.OrdinalRandomForest"><span class="pre">OrdinalRandomForest</span></a></span></span><a class="headerlink" href="#mood.mood_modeling.OrdinalRandomForest.set_fit_request" title="Link to this definition"></a></dt>
+<dd><p>No-op.</p>
+<p>Calling this method has no effect.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>self</strong> – The updated object.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="mood.mood_modeling.OrdinalRandomForest.set_score_request">
 <span class="sig-name descname"><span class="pre">set_score_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'$UNCHANGED$'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#mood.mood_modeling.OrdinalRandomForest" title="mood.mood_modeling.OrdinalRandomForest"><span class="pre">OrdinalRandomForest</span></a></span></span><a class="headerlink" href="#mood.mood_modeling.OrdinalRandomForest.set_score_request" title="Link to this definition"></a></dt>
 <dd><p>Configure whether metadata should be requested to be passed to the <code class="docutils literal notranslate"><span class="pre">score</span></code> method.</p>
@@ -553,7 +569,7 @@ The output y elements will be 1 if and only if the y_col value is in y_is_true_v
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright NO COPYRIGHT.</p>
+    <p></p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

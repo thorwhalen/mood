@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>mood.sentiment &mdash; mood 0.0.15 documentation</title>
+  <title>mood.sentiment &mdash; mood 0.0.16 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=f0357c94"></script>
+      <script src="../../_static/documentation_options.js?v=c7cdf6fe"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -119,8 +119,12 @@ Output: 0.99 (approximately, for a strong positive sentiment)</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="mood.sentiment.sentiment_analysis">
-<span class="sig-prename descclassname"><span class="pre">mood.sentiment.</span></span><span class="sig-name descname"><span class="pre">sentiment_analysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">headlines</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mood/sentiment.html#sentiment_analysis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.sentiment.sentiment_analysis" title="Link to this definition"></a></dt>
-<dd><p>Get sentiment analysis for headlines.</p>
+<span class="sig-prename descclassname"><span class="pre">mood.sentiment.</span></span><span class="sig-name descname"><span class="pre">sentiment_analysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">headlines</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">analyze</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mood/sentiment.html#sentiment_analysis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.sentiment.sentiment_analysis" title="Link to this definition"></a></dt>
+<dd><p>Score the sentiment of financial-news headlines.</p>
+<p><code class="docutils literal notranslate"><span class="pre">headlines</span></code> is a single string or an iterable of headline strings. Returns a
+<code class="docutils literal notranslate"><span class="pre">{headline:</span> <span class="pre">score}</span></code> mapping where each score is an integer in <code class="docutils literal notranslate"><span class="pre">[-9,</span> <span class="pre">9]</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">analyze</span></code> is an injectable <code class="docutils literal notranslate"><span class="pre">headlines_str</span> <span class="pre">-&gt;</span> <span class="pre">dict</span></code> callable; when omitted it
+is built lazily on <code class="xref py py-mod docutils literal notranslate"><span class="pre">aix</span></code> (so importing this module stays offline).</p>
 </dd></dl>
 
 </section>
@@ -136,7 +140,7 @@ Output: 0.99 (approximately, for a strong positive sentiment)</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright NO COPYRIGHT.</p>
+    <p></p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

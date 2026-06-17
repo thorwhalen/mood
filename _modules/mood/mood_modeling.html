@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>mood.mood_modeling &mdash; mood 0.0.15 documentation</title>
+  <title>mood.mood_modeling &mdash; mood 0.0.16 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=f0357c94"></script>
+      <script src="../../_static/documentation_options.js?v=c7cdf6fe"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -648,17 +648,17 @@
         <span class="c1"># Create a minimal DataFrame just for initialization</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
             <span class="p">{</span>
-                <span class="s1">&#39;embedding&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span>
+                <span class="s2">&quot;embedding&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span>
                     <span class="n">X</span>
                 <span class="p">),</span>  <span class="c1"># Convert rows to lists for DataFrame compatibility</span>
-                <span class="s1">&#39;score&#39;</span><span class="p">:</span> <span class="n">y</span><span class="p">,</span>
+                <span class="s2">&quot;score&quot;</span><span class="p">:</span> <span class="n">y</span><span class="p">,</span>
             <span class="p">}</span>
         <span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
-            <span class="n">embedding_col</span><span class="o">=</span><span class="s1">&#39;embedding&#39;</span><span class="p">,</span>
-            <span class="n">score_col</span><span class="o">=</span><span class="s1">&#39;score&#39;</span><span class="p">,</span>
+            <span class="n">embedding_col</span><span class="o">=</span><span class="s2">&quot;embedding&quot;</span><span class="p">,</span>
+            <span class="n">score_col</span><span class="o">=</span><span class="s2">&quot;score&quot;</span><span class="p">,</span>
             <span class="n">test_size</span><span class="o">=</span><span class="n">test_size</span><span class="p">,</span>
             <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">,</span>
             <span class="n">models</span><span class="o">=</span><span class="n">models</span><span class="p">,</span>
@@ -1327,9 +1327,7 @@
 
 <div class="viewcode-block" id="MoodModelingManager.predict_mood">
 <a class="viewcode-back" href="../../module_docs/mood/mood_modeling.html#mood.mood_modeling.MoodModelingManager.predict_mood">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">predict_mood</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict_mood</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Predict mood scores for new data.</span>
 
@@ -1616,7 +1614,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright NO COPYRIGHT.</p>
+    <p></p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
