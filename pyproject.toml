@@ -9,6 +9,7 @@ name = "mood"
 version = "0.0.16"
 description = "Investigations in financial sentiment analysis"
 readme = "README.md"
+license = "MIT"
 requires-python = ">=3.10"
 keywords = [
     "finance",
@@ -19,6 +20,19 @@ keywords = [
     "text analysis",
 ]
 authors = []
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Text Processing :: Linguistic",
+]
 dependencies = [
     "scoopy",
     "beautifulsoup4",
@@ -26,7 +40,7 @@ dependencies = [
     "scikit-learn",
     "numpy",
     "pandas",
-    "oa",
+    "aix>=0.0.34",
     "config2py",
     "dol",
     "i2",
@@ -35,11 +49,12 @@ dependencies = [
     "matplotlib",
 ]
 
-[project.license]
-text = "MIT"
-
 [project.urls]
-Homepage = "https://github.com/infinvest/mood"
+Documentation = "https://thorwhalen.github.io/mood/"
+Homepage = "https://github.com/thorwhalen/mood"
+Repository = "https://github.com/thorwhalen/mood"
+Issues = "https://github.com/thorwhalen/mood/issues"
+Changelog = "https://github.com/thorwhalen/mood/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 dev = [
@@ -96,7 +111,7 @@ convention = "google"
 [tool.pytest.ini_options]
 minversion = "6.0"
 testpaths = [
-    "tests",
+    "mood",
 ]
 doctest_optionflags = [
     "NORMALIZE_WHITESPACE",
