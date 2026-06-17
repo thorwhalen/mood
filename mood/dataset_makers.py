@@ -29,6 +29,11 @@ from dol import store_aggregate, cache_iter, TextFiles, DirReader, Files
 
 
 def text_lines(text: str):
+    r"""Yield the non-empty, stripped lines of ``text``.
+
+    >>> list(text_lines("a\n\n  b  \nc"))
+    ['a', 'b', 'c']
+    """
     for line in text.splitlines():
         line = line.strip()
         if line:
@@ -230,6 +235,13 @@ def default_save_key(
     counter_key_format="_{:02.0f}",
     extension=".txt",
 ):
+    """Build the storage key for a dataset batch.
+
+    >>> default_save_key("color", include_subdir_prefix=False)
+    'color.txt'
+    >>> default_save_key("color", 1, include_subdir_prefix=False)
+    'color_01.txt'
+    """
     path_sep = os.path.sep
     suffix = f"{name}{path_sep}" if include_subdir_prefix else ""
     if batch_idx is None:
@@ -272,7 +284,12 @@ def make_semantic_attributes_dataset(
 
     >>> store = {}
     >>> attributes = {"color": "description of color"}
-    >>> make_semantic_attributes_dataset(attributes, store, n_examples=3, batch_size=2)
+    >>> # A deterministic generator keeps this example offline and reproducible;
+    >>> # omit ``example_generator`` to use the default aix-backed LLM generator.
+    >>> make_semantic_attributes_dataset(
+    ...     attributes, store, n_examples=3, batch_size=2,
+    ...     example_generator=lambda attribute, n_examples, **_: "0 a sample segment",
+    ... )
     >>> len(store)  # Two batches saved
     2
     >>> store  # doctest: +SKIP
