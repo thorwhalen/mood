@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "mood"
-version = "0.0.16"
+version = "0.0.17"
 description = "Investigations in financial sentiment analysis"
 readme = "README.md"
 license = "MIT"
