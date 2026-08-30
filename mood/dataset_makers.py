@@ -360,7 +360,44 @@ def make_semantic_attributes_dataset(
             store[_save_key] = response
 
 
-if __name__ == "__main__":
-    import argh
+#: CLI flags for the parameters of ``make_semantic_attributes_dataset`` that a
+#: shell can actually supply. ``save_key`` and ``example_generator`` take
+#: callables and are deliberately absent: no command-line string can produce one.
+_CLI_FLAGS = {
+    "store": ("--store",),
+    "n_examples": ("-n", "--n-examples"),
+    "batch_size": ("-b", "--batch-size"),
+    "start_batch_idx_at": ("--start-batch-idx-at",),
+    "verbose": ("-v", "--verbose"),
+}
 
-    argh.dispatch_commands([make_semantic_attributes_dataset])
+
+def _cli(argv=None):
+    """Run :func:`make_semantic_attributes_dataset` from the command line."""
+    import argparse
+    import inspect
+
+    fn = make_semantic_attributes_dataset
+    parser = argparse.ArgumentParser(prog="dataset_makers.py")
+    sub = parser.add_subparsers(dest="command", required=True)
+    sp = sub.add_parser(
+        "make-semantic-attributes-dataset",
+        help=fn.__doc__,
+        description=inspect.getdoc(fn),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    sp.add_argument("semantic_attributes", metavar="semantic-attributes", help="-")
+    params = inspect.signature(fn).parameters
+    for name, flags in _CLI_FLAGS.items():
+        default = params[name].default
+        kwargs = {"default": default, "help": repr(default)}
+        if isinstance(default, int) and not isinstance(default, bool):
+            kwargs["type"] = int
+        sp.add_argument(*flags, **kwargs)
+    kwargs = vars(parser.parse_args(argv))
+    kwargs.pop("command")
+    fn(**kwargs)
+
+
+if __name__ == "__main__":
+    _cli()
