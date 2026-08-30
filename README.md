@@ -39,8 +39,8 @@ make_semantic_attributes_dataset(
     semantic_attributes=semantic_attributes,
     store="path/to/save/datasets",  # or use a MutableMapping
     n_examples=1000,  # total examples per attribute
-    batch_size=100,   # examples per API call
-    verbose=2         # show progress
+    batch_size=100,  # examples per API call
+    verbose=2,  # show progress
 )
 ```
 
@@ -66,17 +66,13 @@ dataset = pd.DataFrame(list(parsed_lines(dataset_content)))
 
 # Compute embeddings for the text segments
 embeddings = compute_embeddings(
-    segments=dataset.segment.to_list(),
-    batch_size=1000,
-    verbosity=2
+    segments=dataset.segment.to_list(), batch_size=1000, verbosity=2
 )
 
 # Combine into final training dataset
-training_data = pd.DataFrame({
-    'score': dataset.score,
-    'segment': dataset.segment,
-    'embedding': embeddings
-})
+training_data = pd.DataFrame(
+    {"score": dataset.score, "segment": dataset.segment, "embedding": embeddings}
+)
 ```
 
 ### 4. Train Mood Models
@@ -89,9 +85,9 @@ from mood.mood_modeling import MoodModelingManager
 # Create manager with your training data
 manager = MoodModelingManager(
     df=training_data,
-    embedding_col='embedding',
-    score_col='score',
-    verbose=2  # Show detailed progress
+    embedding_col="embedding",
+    score_col="score",
+    verbose=2,  # Show detailed progress
 )
 
 # Train and evaluate models with single train/test split
@@ -113,8 +109,8 @@ manager.fit_final_models()
 
 # Get the best model based on performance metric
 best_model_name, best_model = manager.get_best_model(
-    metric='spearman',  # or 'accuracy', 'f1', etc.
-    use_cv=True
+    metric="spearman",  # or 'accuracy', 'f1', etc.
+    use_cv=True,
 )
 
 print(f"Best model: {best_model_name}")
@@ -156,7 +152,7 @@ custom_models = {
         "model_class": Ridge,
         "model_params": {"alpha": 0.5},
         "max_dims": 200,
-        "output_transform": "sigmoid"
+        "output_transform": "sigmoid",
     }
 }
 
