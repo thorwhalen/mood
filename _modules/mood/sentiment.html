@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>mood.sentiment &mdash; mood 0.0.16 documentation</title>
+  <title>mood.sentiment &mdash; mood 0.0.17 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=c7cdf6fe"></script>
+      <script src="../../_static/documentation_options.js?v=63b572e7"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -84,39 +84,39 @@
            <div itemprop="articleBody">
              
   <h1>Source code for mood.sentiment</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Sentiment analysis tools&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""Sentiment analysis tools"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">lru_cache</span>
 
 <span class="c1"># Prompt for headline sentiment scoring. LLM generation is routed through ``aix``</span>
 <span class="c1"># (the multi-provider facade) so the model/provider is switchable from one seam.</span>
 <span class="n">SENTIMENT_ANALYSIS_PROMPT</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="s2">&quot;You are an expert sentiment analysis system, specialized in financial news &quot;</span>
-    <span class="s2">&quot;and trading headlines.</span><span class="se">\n\n</span><span class="s2">&quot;</span>
-    <span class="s2">&quot;I will give you a list of headlines and you will output a json that contains &quot;</span>
-    <span class="s2">&quot;these headlines as keys,</span><span class="se">\n</span><span class="s2">&quot;</span>
-    <span class="s2">&quot;and a natural number between -9 and 9 that describes the sentiment of the &quot;</span>
-    <span class="s2">&quot;headline,</span><span class="se">\n</span><span class="s2">&quot;</span>
-    <span class="s2">&quot;where -9 represents the most negative, 0 is neutral, and 9 is the most &quot;</span>
-    <span class="s2">&quot;positive.</span><span class="se">\n\n</span><span class="s2">&quot;</span>
-    <span class="s2">&quot;HEADLINES:</span><span class="se">\n</span><span class="si">{headlines}</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="s2">"You are an expert sentiment analysis system, specialized in financial news "</span>
+    <span class="s2">"and trading headlines.</span><span class="se">\n\n</span><span class="s2">"</span>
+    <span class="s2">"I will give you a list of headlines and you will output a json that contains "</span>
+    <span class="s2">"these headlines as keys,</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"and a natural number between -9 and 9 that describes the sentiment of the "</span>
+    <span class="s2">"headline,</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"where -9 represents the most negative, 0 is neutral, and 9 is the most "</span>
+    <span class="s2">"positive.</span><span class="se">\n\n</span><span class="s2">"</span>
+    <span class="s2">"HEADLINES:</span><span class="se">\n</span><span class="si">{headlines}</span><span class="se">\n</span><span class="s2">"</span>
 <span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_make_sentiment_analyzer</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build the headline-sentiment function on :mod:`aix` (lazy import).</span>
+<span class="w">    </span><span class="sd">"""Build the headline-sentiment function on :mod:`aix` (lazy import).</span>
 
 <span class="sd">    Returns a ``headlines_str -&gt; {headline: score}`` callable. ``aix`` is imported</span>
 <span class="sd">    here, on first use, so importing :mod:`mood` stays offline. ``output_schema``</span>
 <span class="sd">    makes ``aix`` request and parse JSON robustly (tolerating fenced output), so the</span>
 <span class="sd">    result is already a parsed dict.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">aix</span>
 
     <span class="k">return</span> <span class="n">aix</span><span class="o">.</span><span class="n">prompt_func</span><span class="p">(</span>
         <span class="n">SENTIMENT_ANALYSIS_PROMPT</span><span class="p">,</span>
         <span class="n">output_schema</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;sentiment_analysis&quot;</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"sentiment_analysis"</span><span class="p">,</span>
         <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
     <span class="p">)</span>
 
@@ -124,17 +124,17 @@
 <div class="viewcode-block" id="sentiment_analysis">
 <a class="viewcode-back" href="../../module_docs/mood/sentiment.html#mood.sentiment.sentiment_analysis">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">sentiment_analysis</span><span class="p">(</span><span class="n">headlines</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">analyze</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Score the sentiment of financial-news headlines.</span>
+<span class="w">    </span><span class="sd">"""Score the sentiment of financial-news headlines.</span>
 
 <span class="sd">    ``headlines`` is a single string or an iterable of headline strings. Returns a</span>
 <span class="sd">    ``{headline: score}`` mapping where each score is an integer in ``[-9, 9]``.</span>
 
 <span class="sd">    ``analyze`` is an injectable ``headlines_str -&gt; dict`` callable; when omitted it</span>
 <span class="sd">    is built lazily on :mod:`aix` (so importing this module stays offline).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">headlines</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>  <span class="c1"># Pattern: ingress</span>
         <span class="c1"># join with two newlines to separate headlines</span>
-        <span class="n">headlines</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">headlines</span><span class="p">)</span>
+        <span class="n">headlines</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\n\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">headlines</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">analyze</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">analyze</span> <span class="o">=</span> <span class="n">_make_sentiment_analyzer</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">analyze</span><span class="p">(</span><span class="n">headlines</span><span class="o">=</span><span class="n">headlines</span><span class="p">)</span></div>
@@ -142,7 +142,7 @@
 
 
 <span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">_flair_text_classifier</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">&quot;en-sentiment&quot;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_flair_text_classifier</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">"en-sentiment"</span><span class="p">):</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">flair.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">TextClassifier</span>
 
     <span class="k">return</span> <span class="n">TextClassifier</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
@@ -150,21 +150,21 @@
 
 <div class="viewcode-block" id="flair_sentiment_score">
 <a class="viewcode-back" href="../../module_docs/mood/sentiment.html#mood.sentiment.flair_sentiment_score">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">flair_sentiment_score</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;en-sentiment&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Analyzes the sentiment of the input text using Flair&#39;s pre-trained sentiment model.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">flair_sentiment_score</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">"en-sentiment"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Analyzes the sentiment of the input text using Flair's pre-trained sentiment model.</span>
 
 <span class="sd">    This function returns a sentiment score as a float:</span>
 <span class="sd">      - Positive sentiment is returned as a positive value.</span>
 <span class="sd">      - Negative sentiment is returned as a negative value.</span>
 
 <span class="sd">    Example:</span>
-<span class="sd">      Input: &quot;I absolutely love this product!&quot;</span>
+<span class="sd">      Input: "I absolutely love this product!"</span>
 <span class="sd">      Output: 0.99 (approximately, for a strong positive sentiment)</span>
 
 <span class="sd">    :param text: The input string to analyze.</span>
 <span class="sd">    :return: Sentiment score (positive for positive sentiment, negative for negative sentiment).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">flair.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sentence</span>
 
     <span class="n">sentence</span> <span class="o">=</span> <span class="n">Sentence</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
@@ -174,9 +174,9 @@
     <span class="c1"># The classifier adds a label to the sentence; we assume the first label is the sentiment result.</span>
     <span class="n">label</span> <span class="o">=</span> <span class="n">sentence</span><span class="o">.</span><span class="n">labels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-    <span class="k">if</span> <span class="n">label</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;POSITIVE&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">label</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"POSITIVE"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">label</span><span class="o">.</span><span class="n">score</span>
-    <span class="k">elif</span> <span class="n">label</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;NEGATIVE&quot;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">label</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"NEGATIVE"</span><span class="p">:</span>
         <span class="k">return</span> <span class="o">-</span><span class="n">label</span><span class="o">.</span><span class="n">score</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># Fallback in case an unexpected label is returned.</span>

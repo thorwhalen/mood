@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>mood.dataset_makers &mdash; mood 0.0.16 documentation</title>
+  <title>mood.dataset_makers &mdash; mood 0.0.17 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=c7cdf6fe"></script>
+      <script src="../../_static/documentation_options.js?v=63b572e7"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -98,10 +98,10 @@
 <dt class="sig sig-object py" id="mood.dataset_makers.default_save_key">
 <span class="sig-prename descclassname"><span class="pre">mood.dataset_makers.</span></span><span class="sig-name descname"><span class="pre">default_save_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_subdir_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counter_key_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'_{:02.0f}'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extension</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.txt'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mood/dataset_makers.html#default_save_key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.dataset_makers.default_save_key" title="Link to this definition"></a></dt>
 <dd><p>Build the storage key for a dataset batch.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">default_save_key</span><span class="p">(</span><span class="s2">&quot;color&quot;</span><span class="p">,</span> <span class="n">include_subdir_prefix</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="go">&#39;color.txt&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">default_save_key</span><span class="p">(</span><span class="s2">&quot;color&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">include_subdir_prefix</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="go">&#39;color_01.txt&#39;</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">default_save_key</span><span class="p">(</span><span class="s2">"color"</span><span class="p">,</span> <span class="n">include_subdir_prefix</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="go">'color.txt'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">default_save_key</span><span class="p">(</span><span class="s2">"color"</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">include_subdir_prefix</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="go">'color_01.txt'</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -129,27 +129,27 @@
 They may generate fewer or more than requested. This is a known issue with LLM
 models.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">store</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">attributes</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;description of color&quot;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">attributes</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="s2">"description of color"</span><span class="p">}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># A deterministic generator keeps this example offline and reproducible;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># omit ``example_generator`` to use the default aix-backed LLM generator.</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">make_semantic_attributes_dataset</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">attributes</span><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <span class="n">n_examples</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">example_generator</span><span class="o">=</span><span class="k">lambda</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">n_examples</span><span class="p">,</span> <span class="o">**</span><span class="n">_</span><span class="p">:</span> <span class="s2">&quot;0 a sample segment&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">example_generator</span><span class="o">=</span><span class="k">lambda</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">n_examples</span><span class="p">,</span> <span class="o">**</span><span class="n">_</span><span class="p">:</span> <span class="s2">"0 a sample segment"</span><span class="p">,</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>  <span class="c1"># Two batches saved</span>
 <span class="go">2</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">store</span>
 <span class="go">{</span>
-<span class="go">    &#39;color/color_00.txt&#39;: &#39;0 The meeting was dull and unproductive, leaving everyone feeling dissatisfied.&#39;</span>
-<span class="go">                          &#39;2 The car was old and rusty, with a paint job that had faded over time, hinting at its once vibrant color.&#39;</span>
-<span class="go">                          &#39;5 The sunset painted the sky in brilliant shades of orange, pink, and purple, creating a breathtaking display of color that captivated all who watched.&#39;</span>
-<span class="go">                          &#39;1 The room felt gloomy, with dark furniture casting shadows, though a hint of blue could be seen in the curtains.  &#39;,</span>
-<span class="go">    &#39;color/color_01.txt&#39;: &#39;0 The meeting was dull and uneventful, lacking any excitement or engagement.&#39;</span>
-<span class="go">                          &#39;1 The car was just an ordinary vehicle, nothing special about its appearance. &#39;</span>
-<span class="go">                          &quot;2 The flowers were vibrant, but I couldn&#39;t quite tell what colors they were. &quot;</span>
-<span class="go">                          &#39;3 The sky turned a beautiful shade of orange as the sun began to set, casting a warm glow.&#39;</span>
-<span class="go">                          &quot;4 She wore a stunning red dress that caught everyone&#39;s attention at the party.&quot;</span>
-<span class="go">                          &#39;5 The ocean sparkled in shades of deep blue and turquoise, a breathtaking view that left us speechless.  &#39;</span>
+<span class="go">    'color/color_00.txt': '0 The meeting was dull and unproductive, leaving everyone feeling dissatisfied.'</span>
+<span class="go">                          '2 The car was old and rusty, with a paint job that had faded over time, hinting at its once vibrant color.'</span>
+<span class="go">                          '5 The sunset painted the sky in brilliant shades of orange, pink, and purple, creating a breathtaking display of color that captivated all who watched.'</span>
+<span class="go">                          '1 The room felt gloomy, with dark furniture casting shadows, though a hint of blue could be seen in the curtains.  ',</span>
+<span class="go">    'color/color_01.txt': '0 The meeting was dull and uneventful, lacking any excitement or engagement.'</span>
+<span class="go">                          '1 The car was just an ordinary vehicle, nothing special about its appearance. '</span>
+<span class="go">                          "2 The flowers were vibrant, but I couldn't quite tell what colors they were. "</span>
+<span class="go">                          '3 The sky turned a beautiful shade of orange as the sun began to set, casting a warm glow.'</span>
+<span class="go">                          "4 She wore a stunning red dress that caught everyone's attention at the party."</span>
+<span class="go">                          '5 The ocean sparkled in shades of deep blue and turquoise, a breathtaking view that left us speechless.  '</span>
 <span class="go">}</span>
 </pre></div>
 </div>
@@ -159,8 +159,8 @@ models.</p>
 <dt class="sig sig-object py" id="mood.dataset_makers.text_lines">
 <span class="sig-prename descclassname"><span class="pre">mood.dataset_makers.</span></span><span class="sig-name descname"><span class="pre">text_lines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mood/dataset_makers.html#text_lines"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mood.dataset_makers.text_lines" title="Link to this definition"></a></dt>
 <dd><p>Yield the non-empty, stripped lines of <code class="docutils literal notranslate"><span class="pre">text</span></code>.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">text_lines</span><span class="p">(</span><span class="s2">&quot;a</span><span class="se">\n\n</span><span class="s2">  b  </span><span class="se">\n</span><span class="s2">c&quot;</span><span class="p">))</span>
-<span class="go">[&#39;a&#39;, &#39;b&#39;, &#39;c&#39;]</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">text_lines</span><span class="p">(</span><span class="s2">"a</span><span class="se">\n\n</span><span class="s2">  b  </span><span class="se">\n</span><span class="s2">c"</span><span class="p">))</span>
+<span class="go">['a', 'b', 'c']</span>
 </pre></div>
 </div>
 </dd></dl>

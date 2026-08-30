@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>mood.learn_sentiments &mdash; mood 0.0.16 documentation</title>
+  <title>mood.learn_sentiments &mdash; mood 0.0.17 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=c7cdf6fe"></script>
+      <script src="../../_static/documentation_options.js?v=63b572e7"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -84,7 +84,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for mood.learn_sentiments</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Learning sentiments from data.&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""Learning sentiments from data."""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogisticRegression</span>
@@ -106,9 +106,9 @@
 <div class="viewcode-block" id="get_binary_y">
 <a class="viewcode-back" href="../../module_docs/mood/learn_sentiments.html#mood.learn_sentiments.get_binary_y">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_binary_y</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">target_y</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Convert a multi-class target array to a binary array for a specific target class.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">binary_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
     <span class="n">binary_y</span><span class="p">[</span><span class="n">y</span> <span class="o">==</span> <span class="n">target_y</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="k">return</span> <span class="n">binary_y</span></div>
@@ -119,7 +119,7 @@
 <a class="viewcode-back" href="../../module_docs/mood/learn_sentiments.html#mood.learn_sentiments.ModelStatistics">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ModelStatistics</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Container for model performance statistics&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Container for model performance statistics"""</span>
 
     <span class="n">accuracy</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">precision</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span>
@@ -134,20 +134,20 @@
     <span class="n">random_state</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;String representation of the statistics&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""String representation of the statistics"""</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_test_performed</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s2">&quot;No validation performed. Statistics unavailable.&quot;</span>
+            <span class="k">return</span> <span class="s2">"No validation performed. Statistics unavailable."</span>
 
-        <span class="n">output</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== Model Performance Statistics ===</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="n">output</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;Accuracy:  </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">accuracy</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="n">output</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;Precision: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">precision</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="n">output</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;Recall:    </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">recall</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="n">output</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;F1 Score:  </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">f1</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="n">output</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;ROC AUC:   </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">roc_auc</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="n">output</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Confusion Matrix:</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">confusion_matrix</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="n">output</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Detailed Classification Report:</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">classification_report</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="n">output</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Test Size: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">test_size</span><span class="si">}</span><span class="s2">, Random State: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="n">output</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;Training Time: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">training_time</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> seconds</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">=== Model Performance Statistics ===</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="n">output</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">"Accuracy:  </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">accuracy</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="n">output</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">"Precision: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">precision</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="n">output</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">"Recall:    </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">recall</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="n">output</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">"F1 Score:  </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">f1</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="n">output</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">"ROC AUC:   </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">roc_auc</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="n">output</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Confusion Matrix:</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">confusion_matrix</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="n">output</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Detailed Classification Report:</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">classification_report</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="n">output</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Test Size: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">test_size</span><span class="si">}</span><span class="s2">, Random State: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="n">output</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">"Training Time: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">training_time</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> seconds</span><span class="se">\n</span><span class="s2">"</span>
         <span class="k">return</span> <span class="n">output</span></div>
 
 
@@ -162,14 +162,14 @@
     <span class="n">random_state</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">42</span><span class="p">,</span>
     <span class="n">c_value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
     <span class="n">max_iter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
-    <span class="n">solver</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;lbfgs&quot;</span><span class="p">,</span>
-    <span class="n">penalty</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;l2&quot;</span><span class="p">,</span>
+    <span class="n">solver</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"lbfgs"</span><span class="p">,</span>
+    <span class="n">penalty</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"l2"</span><span class="p">,</span>
     <span class="n">class_weight</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">fit_intercept</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">skip_validation</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">LogisticRegression</span><span class="p">,</span> <span class="n">ModelStatistics</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Fits a logistic regression model on embedding data for binary classification without feature scaling.</span>
 
 <span class="sd">    Parameters:</span>
@@ -186,12 +186,12 @@
 <span class="sd">        Inverse of regularization strength; smaller values specify stronger regularization.</span>
 <span class="sd">    max_iter : int, default=1000</span>
 <span class="sd">        Maximum number of iterations taken for the solvers to converge.</span>
-<span class="sd">    solver : str, default=&#39;lbfgs&#39;</span>
-<span class="sd">        Algorithm to use in the optimization problem (&#39;newton-cg&#39;, &#39;lbfgs&#39;, &#39;liblinear&#39;, &#39;sag&#39;, &#39;saga&#39;).</span>
-<span class="sd">    penalty : str, default=&#39;l2&#39;</span>
-<span class="sd">        Specify the norm used in the penalization (&#39;l1&#39;, &#39;l2&#39;, &#39;elasticnet&#39;, None).</span>
-<span class="sd">    class_weight : dict or &#39;balanced&#39;, default=None</span>
-<span class="sd">        Weights associated with classes. If &#39;balanced&#39;, uses class frequencies.</span>
+<span class="sd">    solver : str, default='lbfgs'</span>
+<span class="sd">        Algorithm to use in the optimization problem ('newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga').</span>
+<span class="sd">    penalty : str, default='l2'</span>
+<span class="sd">        Specify the norm used in the penalization ('l1', 'l2', 'elasticnet', None).</span>
+<span class="sd">    class_weight : dict or 'balanced', default=None</span>
+<span class="sd">        Weights associated with classes. If 'balanced', uses class frequencies.</span>
 <span class="sd">    fit_intercept : bool, default=True</span>
 <span class="sd">        Whether to fit an intercept term in the model.</span>
 <span class="sd">    skip_validation : bool, default=False</span>
@@ -205,7 +205,7 @@
 <span class="sd">        Trained logistic regression model.</span>
 <span class="sd">    stats : ModelStatistics</span>
 <span class="sd">        Object containing performance statistics.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">stats</span> <span class="o">=</span> <span class="n">ModelStatistics</span><span class="p">()</span>
     <span class="n">stats</span><span class="o">.</span><span class="n">test_size</span> <span class="o">=</span> <span class="n">test_size</span>
@@ -228,14 +228,14 @@
 
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Initializing logistic regression with C=</span><span class="si">{</span><span class="n">c_value</span><span class="si">}</span><span class="s2">, solver=&#39;</span><span class="si">{</span><span class="n">solver</span><span class="si">}</span><span class="s2">&#39;, penalty=&#39;</span><span class="si">{</span><span class="n">penalty</span><span class="si">}</span><span class="s2">&#39;, fit_intercept=</span><span class="si">{</span><span class="n">fit_intercept</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">"Initializing logistic regression with C=</span><span class="si">{</span><span class="n">c_value</span><span class="si">}</span><span class="s2">, solver='</span><span class="si">{</span><span class="n">solver</span><span class="si">}</span><span class="s2">', penalty='</span><span class="si">{</span><span class="n">penalty</span><span class="si">}</span><span class="s2">', fit_intercept=</span><span class="si">{</span><span class="n">fit_intercept</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
 
     <span class="c1"># Perform train/test validation if requested</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_validation</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Performing train/test split with test_size=</span><span class="si">{</span><span class="n">test_size</span><span class="si">}</span><span class="s2">, random_state=</span><span class="si">{</span><span class="n">random_state</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"Performing train/test split with test_size=</span><span class="si">{</span><span class="n">test_size</span><span class="si">}</span><span class="s2">, random_state=</span><span class="si">{</span><span class="n">random_state</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
 
         <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
@@ -244,7 +244,7 @@
 
         <span class="c1"># Fit the model on training data</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Fitting model on training data...&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">"Fitting model on training data..."</span><span class="p">)</span>
 
         <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
 
@@ -263,20 +263,20 @@
         <span class="n">stats</span><span class="o">.</span><span class="n">train_test_performed</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Validation Results:&quot;</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Accuracy:  </span><span class="si">{</span><span class="n">stats</span><span class="o">.</span><span class="n">accuracy</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Precision: </span><span class="si">{</span><span class="n">stats</span><span class="o">.</span><span class="n">precision</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Recall:    </span><span class="si">{</span><span class="n">stats</span><span class="o">.</span><span class="n">recall</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  F1 Score:  </span><span class="si">{</span><span class="n">stats</span><span class="o">.</span><span class="n">f1</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  ROC AUC:   </span><span class="si">{</span><span class="n">stats</span><span class="o">.</span><span class="n">roc_auc</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Now fitting model on all data...&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Validation Results:"</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  Accuracy:  </span><span class="si">{</span><span class="n">stats</span><span class="o">.</span><span class="n">accuracy</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  Precision: </span><span class="si">{</span><span class="n">stats</span><span class="o">.</span><span class="n">precision</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  Recall:    </span><span class="si">{</span><span class="n">stats</span><span class="o">.</span><span class="n">recall</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  F1 Score:  </span><span class="si">{</span><span class="n">stats</span><span class="o">.</span><span class="n">f1</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  ROC AUC:   </span><span class="si">{</span><span class="n">stats</span><span class="o">.</span><span class="n">roc_auc</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Now fitting model on all data..."</span><span class="p">)</span>
 
     <span class="c1"># Fit model on all data</span>
     <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
     <span class="n">stats</span><span class="o">.</span><span class="n">training_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
 
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model fitting completed in </span><span class="si">{</span><span class="n">stats</span><span class="o">.</span><span class="n">training_time</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> seconds&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Model fitting completed in </span><span class="si">{</span><span class="n">stats</span><span class="o">.</span><span class="n">training_time</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> seconds"</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_validation</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">stats</span><span class="p">)</span>
 
@@ -287,7 +287,7 @@
 <div class="viewcode-block" id="predict_with_model">
 <a class="viewcode-back" href="../../module_docs/mood/learn_sentiments.html#mood.learn_sentiments.predict_with_model">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">predict_with_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Helper function to make predictions with a fitted model.</span>
 
 <span class="sd">    Parameters:</span>
@@ -303,7 +303,7 @@
 <span class="sd">        Class predictions (0 or 1).</span>
 <span class="sd">    y_prob : array-like</span>
 <span class="sd">        Probability estimates for class 1.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">y_pred</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
     <span class="n">y_prob</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X</span><span class="p">)[:,</span> <span class="mi">1</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">y_prob</span></div>

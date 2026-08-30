@@ -1,0 +1,171 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>mood.scripts.financial_news_searches &mdash; mood 0.0.17 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=63b572e7"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            mood
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/mood.html">mood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/mood/dataset_makers.html">mood.dataset_makers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/mood/examples.html">mood.examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/mood/learn_sentiments.html">mood.learn_sentiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/mood/model_analysis.html">mood.model_analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/mood/mood_modeling.html">mood.mood_modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/mood/scripts.html">mood.scripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/mood/scripts/financial_news_searches.html">mood.scripts.financial_news_searches</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/mood/sentiment.html">mood.sentiment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/mood/tools.html">mood.tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/mood/util.html">mood.util</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">mood</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">mood.scripts.financial_news_searches</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for mood.scripts.financial_news_searches</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""A script that searches for news and saves the results to a file.</span>
+
+<span class="sd">Meant to be used in a cron on a server to periodically search for news.</span>
+
+<span class="sd">"""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">mood.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">search_and_save_news</span>
+
+<span class="c1">#: CLI flags for each of ``search_and_save_news``'s parameters. Defaults (and the</span>
+<span class="c1">#: defaults shown in ``--help``) are read from the function itself, so the two</span>
+<span class="c1">#: cannot drift apart.</span>
+<span class="n">_FLAGS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"query"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"-q"</span><span class="p">,</span> <span class="s2">"--query"</span><span class="p">),</span>
+    <span class="s2">"source"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"--source"</span><span class="p">,),</span>
+    <span class="s2">"verbose"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"-v"</span><span class="p">,</span> <span class="s2">"--verbose"</span><span class="p">),</span>
+    <span class="s2">"store"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"--store"</span><span class="p">,),</span>
+<span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_make_parser</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Expose :func:`mood.tools.search_and_save_news` as a command line.</span>
+
+<span class="sd">    &gt;&gt;&gt; parser = _make_parser()</span>
+<span class="sd">    &gt;&gt;&gt; args = parser.parse_args(["-q", "AAPL", "--source", "yahoo_finance_headlines"])</span>
+<span class="sd">    &gt;&gt;&gt; args.query, args.source, args.verbose</span>
+<span class="sd">    ('AAPL', 'yahoo_finance_headlines', False)</span>
+<span class="sd">    &gt;&gt;&gt; parser.parse_args(["--verbose"]).verbose</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; parser.parse_args(["--store", "/tmp/elsewhere"]).store</span>
+<span class="sd">    '/tmp/elsewhere'</span>
+<span class="sd">    """</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">prog</span><span class="o">=</span><span class="s2">"financial-news-search"</span><span class="p">)</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">search_and_save_news</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">flags</span> <span class="ow">in</span> <span class="n">_FLAGS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">default</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">default</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"default"</span><span class="p">:</span> <span class="n">default</span><span class="p">,</span> <span class="s2">"help"</span><span class="p">:</span> <span class="nb">repr</span><span class="p">(</span><span class="n">default</span><span class="p">)}</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">"action"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"store_true"</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="o">*</span><span class="n">flags</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">parser</span>
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../../module_docs/mood/scripts/financial_news_searches.html#mood.scripts.financial_news_searches.main">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Parse ``argv`` (default: ``sys.argv[1:]``) and run the search."""</span>
+    <span class="n">search_and_save_news</span><span class="p">(</span><span class="o">**</span><span class="nb">vars</span><span class="p">(</span><span class="n">_make_parser</span><span class="p">()</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">argv</span><span class="p">)))</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

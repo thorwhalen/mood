@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>mood.dataset_makers &mdash; mood 0.0.16 documentation</title>
+  <title>mood.dataset_makers &mdash; mood 0.0.17 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=c7cdf6fe"></script>
+      <script src="../../_static/documentation_options.js?v=63b572e7"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -84,9 +84,9 @@
            <div itemprop="articleBody">
              
   <h1>Source code for mood.dataset_makers</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""</span>
 <span class="sd">Tools to make datasets for training and testing models (for semantic attribute etc.)</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span>
@@ -100,11 +100,11 @@
 <span class="c1"># --------------------------------------------------------------------------------------</span>
 <span class="c1"># Constants</span>
 
-<span class="n">DFLT_SEMANTIC_ATTRIBUTE_DATASET_DIR</span> <span class="o">=</span> <span class="n">djoin</span><span class="p">(</span><span class="s2">&quot;semantic_attributes&quot;</span><span class="p">)</span>
+<span class="n">DFLT_SEMANTIC_ATTRIBUTE_DATASET_DIR</span> <span class="o">=</span> <span class="n">djoin</span><span class="p">(</span><span class="s2">"semantic_attributes"</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">DFLT_SEMANTIC_ATTRIBUTE_DATASET_DIR</span><span class="p">):</span>
     <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">DFLT_SEMANTIC_ATTRIBUTE_DATASET_DIR</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created directory: </span><span class="si">{</span><span class="n">DFLT_SEMANTIC_ATTRIBUTE_DATASET_DIR</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Created directory: </span><span class="si">{</span><span class="n">DFLT_SEMANTIC_ATTRIBUTE_DATASET_DIR</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># --------------------------------------------------------------------------------------</span>
 <span class="c1"># Utils</span>
@@ -117,11 +117,11 @@
 <div class="viewcode-block" id="text_lines">
 <a class="viewcode-back" href="../../module_docs/mood/dataset_makers.html#mood.dataset_makers.text_lines">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">text_lines</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Yield the non-empty, stripped lines of ``text``.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Yield the non-empty, stripped lines of ``text``.</span>
 
-<span class="sd">    &gt;&gt;&gt; list(text_lines(&quot;a\n\n  b  \nc&quot;))</span>
-<span class="sd">    [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;]</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; list(text_lines("a\n\n  b  \nc"))</span>
+<span class="sd">    ['a', 'b', 'c']</span>
+<span class="sd">    """</span>
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">text</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
         <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">line</span><span class="p">:</span>
@@ -133,8 +133,8 @@
     <span class="n">dirpath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">keys_func</span><span class="o">=</span><span class="nb">sorted</span><span class="p">,</span>
-    <span class="n">savefile_extension</span><span class="o">=</span><span class="s2">&quot;.txt&quot;</span><span class="p">,</span>
-    <span class="n">kv_to_item</span><span class="o">=</span><span class="k">lambda</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">text_lines</span><span class="p">(</span><span class="n">v</span><span class="p">)),</span>
+    <span class="n">savefile_extension</span><span class="o">=</span><span class="s2">".txt"</span><span class="p">,</span>
+    <span class="n">kv_to_item</span><span class="o">=</span><span class="k">lambda</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">text_lines</span><span class="p">(</span><span class="n">v</span><span class="p">)),</span>
     <span class="n">assert_all_chunk_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">remove_directory_once_done</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">):</span>
@@ -145,15 +145,15 @@
     <span class="n">save_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parent_dir</span><span class="p">,</span> <span class="n">child_dir</span> <span class="o">+</span> <span class="n">savefile_extension</span><span class="p">)</span>
     <span class="n">store</span> <span class="o">=</span> <span class="n">cache_iter</span><span class="p">(</span><span class="n">TextFiles</span><span class="p">(</span><span class="n">dirpath</span><span class="p">),</span> <span class="n">keys_cache</span><span class="o">=</span><span class="n">keys_func</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">assert_all_chunk_keys</span><span class="p">:</span>
-        <span class="n">is_chunk_key</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">k</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">child_dir</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;_\d+.*&quot;</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+        <span class="n">is_chunk_key</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">k</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">child_dir</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">"_\d+.*"</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">is_chunk_key</span><span class="p">,</span> <span class="n">store</span><span class="p">)),</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Not all keys match the expected pattern: </span><span class="si">{</span><span class="n">child_dir</span><span class="si">}</span><span class="s2">_&lt;number&gt;&quot;</span>
+            <span class="sa">f</span><span class="s2">"Not all keys match the expected pattern: </span><span class="si">{</span><span class="n">child_dir</span><span class="si">}</span><span class="s2">_&lt;number&gt;"</span>
         <span class="p">)</span>
     <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">save_path</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
         <span class="n">store_aggregate</span><span class="p">(</span>
             <span class="n">store</span><span class="p">,</span>
             <span class="n">kv_to_item</span><span class="o">=</span><span class="n">kv_to_item</span><span class="p">,</span>
-            <span class="n">aggregator</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">,</span>
+            <span class="n">aggregator</span><span class="o">=</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">remove_directory_once_done</span><span class="p">:</span>
@@ -162,13 +162,13 @@
 
             <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">dirpath</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Not all files were processed. Keeping </span><span class="si">{</span><span class="n">dirpath</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Not all files were processed. Keeping </span><span class="si">{</span><span class="n">dirpath</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">save_path</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">parse_line</span><span class="p">(</span><span class="n">line</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="n">line_parse_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^(\d+) (.*)$&quot;</span><span class="p">)</span>
+    <span class="n">line_parse_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"^(\d+) (.*)$"</span><span class="p">)</span>
 
     <span class="n">match</span> <span class="o">=</span> <span class="n">line_parse_re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
@@ -187,8 +187,8 @@
 <span class="c1"># --------------------------------------------------------------------------------------</span>
 <span class="c1"># Prompt and AI function</span>
 
-<span class="n">dflt_scoring</span> <span class="o">=</span> <span class="s2">&quot;A semantic score from 0 to 5 (where 0 means “completely lacks the attribute, or is the opposite of it”, and 5 means “maximally expresses the attribute”). The score should reflect the degree to which the concept is present in the text. You should include examples across the full spectrum — some clearly lacking/opposite, some neutral, ambiguous or mixed, and some highly prototypical.&quot;</span>
-<span class="n">dflt_facets_spectrum</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="n">dflt_scoring</span> <span class="o">=</span> <span class="s2">"A semantic score from 0 to 5 (where 0 means “completely lacks the attribute, or is the opposite of it”, and 5 means “maximally expresses the attribute”). The score should reflect the degree to which the concept is present in the text. You should include examples across the full spectrum — some clearly lacking/opposite, some neutral, ambiguous or mixed, and some highly prototypical."</span>
+<span class="n">dflt_facets_spectrum</span> <span class="o">=</span> <span class="s2">"""</span>
 <span class="s2">The examples should be **varied across a wide range of linguistic and contextual dimensions** to avoid bias and ensure semantic generality. Specifically, they should differ:</span>
 
 <span class="s2">* **In style**  </span>
@@ -219,10 +219,10 @@
 <span class="s2">  (e.g. purpose [informing, persuading, questioning, commanding, storytelling, reflecting, speculating], rhetorical stance [assertive, inquisitive, ironic, pleading, declarative], and audience orientation [self-directed, peer-directed, public address])</span>
 
 <span class="s2">This diversity should be naturally embedded in the content and should not be explicitly labeled. The result should be a **rich, heterogeneous dataset** reflecting the wide variability of real-world text expression across all these dimensions.</span>
-<span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">"""</span>
 
 <span class="n">prompt_template_for_dataset_generation</span> <span class="o">=</span> <span class="p">(</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;&quot; \</span>
+<span class="w">    </span><span class="sd">"""" \</span>
 
 <span class="sd">You are tasked with generating labeled training data for a machine learning model that </span>
 <span class="sd">detects a specific semantic property in text. </span>
@@ -233,16 +233,16 @@
 <span class="sd">Please output a list of {n_examples:100} text examples. </span>
 <span class="sd">Each example should include:</span>
 <span class="sd">* short natural language text segment in {language:English}</span>
-<span class="sd">* {scoring:&quot;&quot;&quot;</span>
+<span class="sd">* {scoring:"""</span>
     <span class="o">+</span> <span class="n">dflt_scoring</span>
-    <span class="o">+</span> <span class="s2">&quot;&quot;&quot;}</span>
+    <span class="o">+</span> <span class="s2">"""}</span>
 
 <span class="s2">The score should reflect the degree to which the attribute (</span><span class="si">{attribute}</span><span class="s2">) is present/reflected/represented</span>
 <span class="s2">in the text. </span>
 
-<span class="s2">{facets_spectrum:&quot;&quot;&quot;</span>
+<span class="s2">{facets_spectrum:"""</span>
     <span class="o">+</span> <span class="n">dflt_facets_spectrum</span>
-    <span class="o">+</span> <span class="s2">&quot;&quot;&quot;}</span>
+    <span class="o">+</span> <span class="s2">"""}</span>
 
 <span class="s2">{score_spectrum:You should include examples across the full spectrum — some clearly not matching the attribute, some ambiguous or mixed, and some highly prototypical.}</span>
 
@@ -258,7 +258,7 @@
 <span class="s2">Again, the target attribute is: </span><span class="si">{attribute}</span>
 
 <span class="si">{extras: }</span>
-<span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">"""</span>
 <span class="p">)</span>
 
 <span class="c1"># LLM generation is routed through ``aix`` (the multi-provider facade) rather than a</span>
@@ -267,29 +267,29 @@
 <span class="c1"># injectable default, so ``import mood`` stays offline.</span>
 
 <span class="n">DFLT_TEMPERATURE_FOR_MOOD_DATASET_GEN</span> <span class="o">=</span> <span class="mf">0.7</span>
-<span class="n">DFLT_MODEL_FOR_MOOD_DATASET_GEN</span> <span class="o">=</span> <span class="s2">&quot;gpt-4o-mini&quot;</span>  <span class="c1"># cheapish model</span>
+<span class="n">DFLT_MODEL_FOR_MOOD_DATASET_GEN</span> <span class="o">=</span> <span class="s2">"gpt-4o-mini"</span>  <span class="c1"># cheapish model</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_make_semantic_attribute_examples_for_attribute</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build the dataset-generation prompt function on :mod:`aix` (lazy import).</span>
+<span class="w">    </span><span class="sd">"""Build the dataset-generation prompt function on :mod:`aix` (lazy import).</span>
 
 <span class="sd">    Routes LLM generation through :mod:`aix` (the multi-provider facade) so the model</span>
 <span class="sd">    and provider are switchable. ``aix`` is imported here, on first use, so importing</span>
 <span class="sd">    :mod:`mood` does not pull a provider SDK at import time. ``aix.prompt_func``</span>
 <span class="sd">    understands the ``{name:default}`` template dialect this prompt uses.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">aix</span>
 
     <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">model</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-            <span class="s2">&quot;DFLT_MODEL_FOR_MOOD_DATASET_GEN&quot;</span><span class="p">,</span> <span class="n">DFLT_MODEL_FOR_MOOD_DATASET_GEN</span>
+            <span class="s2">"DFLT_MODEL_FOR_MOOD_DATASET_GEN"</span><span class="p">,</span> <span class="n">DFLT_MODEL_FOR_MOOD_DATASET_GEN</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="n">temperature</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">temperature</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span>
             <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-                <span class="s2">&quot;DFLT_TEMPERATURE_FOR_MOOD_DATASET_GEN&quot;</span><span class="p">,</span>
+                <span class="s2">"DFLT_TEMPERATURE_FOR_MOOD_DATASET_GEN"</span><span class="p">,</span>
                 <span class="n">DFLT_TEMPERATURE_FOR_MOOD_DATASET_GEN</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="p">)</span>
@@ -297,7 +297,7 @@
         <span class="n">prompt_template_for_dataset_generation</span><span class="p">,</span>
         <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
         <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;semantic_attribute_examples_for_attribute&quot;</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"semantic_attribute_examples_for_attribute"</span><span class="p">,</span>
     <span class="p">)</span>
 
 
@@ -305,11 +305,11 @@
     <span class="c1"># PEP 562: preserve the module-level ``semantic_attribute_examples_for_attribute``</span>
     <span class="c1"># name for backward compatibility, but build it lazily so importing this module</span>
     <span class="c1"># stays offline and provider-agnostic.</span>
-    <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;semantic_attribute_examples_for_attribute&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">"semantic_attribute_examples_for_attribute"</span><span class="p">:</span>
         <span class="n">fn</span> <span class="o">=</span> <span class="n">_make_semantic_attribute_examples_for_attribute</span><span class="p">()</span>
         <span class="nb">globals</span><span class="p">()[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">fn</span>  <span class="c1"># cache for subsequent accesses</span>
         <span class="k">return</span> <span class="n">fn</span>
-    <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;module </span><span class="si">{</span><span class="vm">__name__</span><span class="si">!r}</span><span class="s2"> has no attribute </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"module </span><span class="si">{</span><span class="vm">__name__</span><span class="si">!r}</span><span class="s2"> has no attribute </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
 
 
 <span class="c1"># --------------------------------------------------------------------------------------</span>
@@ -323,23 +323,23 @@
     <span class="n">batch_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">include_subdir_prefix</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">counter_key_format</span><span class="o">=</span><span class="s2">&quot;_</span><span class="si">{:02.0f}</span><span class="s2">&quot;</span><span class="p">,</span>
-    <span class="n">extension</span><span class="o">=</span><span class="s2">&quot;.txt&quot;</span><span class="p">,</span>
+    <span class="n">counter_key_format</span><span class="o">=</span><span class="s2">"_</span><span class="si">{:02.0f}</span><span class="s2">"</span><span class="p">,</span>
+    <span class="n">extension</span><span class="o">=</span><span class="s2">".txt"</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build the storage key for a dataset batch.</span>
+<span class="w">    </span><span class="sd">"""Build the storage key for a dataset batch.</span>
 
-<span class="sd">    &gt;&gt;&gt; default_save_key(&quot;color&quot;, include_subdir_prefix=False)</span>
-<span class="sd">    &#39;color.txt&#39;</span>
-<span class="sd">    &gt;&gt;&gt; default_save_key(&quot;color&quot;, 1, include_subdir_prefix=False)</span>
-<span class="sd">    &#39;color_01.txt&#39;</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; default_save_key("color", include_subdir_prefix=False)</span>
+<span class="sd">    'color.txt'</span>
+<span class="sd">    &gt;&gt;&gt; default_save_key("color", 1, include_subdir_prefix=False)</span>
+<span class="sd">    'color_01.txt'</span>
+<span class="sd">    """</span>
     <span class="n">path_sep</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span>
-    <span class="n">suffix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}{</span><span class="n">path_sep</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">include_subdir_prefix</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">suffix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}{</span><span class="n">path_sep</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">include_subdir_prefix</span> <span class="k">else</span> <span class="s2">""</span>
     <span class="k">if</span> <span class="n">batch_idx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">suffix</span><span class="si">}{</span><span class="n">name</span><span class="si">}</span><span class="s2">.txt&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">suffix</span><span class="si">}{</span><span class="n">name</span><span class="si">}</span><span class="s2">.txt"</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">counter_str</span> <span class="o">=</span> <span class="n">counter_key_format</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">batch_idx</span><span class="p">)</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">suffix</span><span class="si">}{</span><span class="n">name</span><span class="si">}{</span><span class="n">counter_str</span><span class="si">}{</span><span class="n">extension</span><span class="si">}</span><span class="s2">&quot;</span></div>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">suffix</span><span class="si">}{</span><span class="n">name</span><span class="si">}{</span><span class="n">counter_str</span><span class="si">}{</span><span class="n">extension</span><span class="si">}</span><span class="s2">"</span></div>
 
 
 
@@ -357,7 +357,7 @@
     <span class="n">example_generator</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">dataset_maker_kwargs</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Gather data for each semantic attribute and save it to the store.</span>
 
 <span class="sd">    Parameters:</span>
@@ -372,38 +372,38 @@
 <span class="sd">      when omitted it is built lazily on ``aix`` (so importing ``mood`` stays offline)</span>
 <span class="sd">    - dataset_maker_kwargs: Additional kwargs passed to the example generator</span>
 
-<span class="sd">    WARNING: Some models aren&#39;t very good at generating the requested number of examples.</span>
+<span class="sd">    WARNING: Some models aren't very good at generating the requested number of examples.</span>
 <span class="sd">    They may generate fewer or more than requested. This is a known issue with LLM</span>
 <span class="sd">    models.</span>
 
 <span class="sd">    &gt;&gt;&gt; store = {}</span>
-<span class="sd">    &gt;&gt;&gt; attributes = {&quot;color&quot;: &quot;description of color&quot;}</span>
+<span class="sd">    &gt;&gt;&gt; attributes = {"color": "description of color"}</span>
 <span class="sd">    &gt;&gt;&gt; # A deterministic generator keeps this example offline and reproducible;</span>
 <span class="sd">    &gt;&gt;&gt; # omit ``example_generator`` to use the default aix-backed LLM generator.</span>
 <span class="sd">    &gt;&gt;&gt; make_semantic_attributes_dataset(</span>
 <span class="sd">    ...     attributes, store, n_examples=3, batch_size=2,</span>
-<span class="sd">    ...     example_generator=lambda attribute, n_examples, **_: &quot;0 a sample segment&quot;,</span>
+<span class="sd">    ...     example_generator=lambda attribute, n_examples, **_: "0 a sample segment",</span>
 <span class="sd">    ... )</span>
 <span class="sd">    &gt;&gt;&gt; len(store)  # Two batches saved</span>
 <span class="sd">    2</span>
 <span class="sd">    &gt;&gt;&gt; store  # doctest: +SKIP</span>
 <span class="sd">    {</span>
-<span class="sd">        &#39;color/color_00.txt&#39;: &#39;0 The meeting was dull and unproductive, leaving everyone feeling dissatisfied.&#39;</span>
-<span class="sd">                              &#39;2 The car was old and rusty, with a paint job that had faded over time, hinting at its once vibrant color.&#39;</span>
-<span class="sd">                              &#39;5 The sunset painted the sky in brilliant shades of orange, pink, and purple, creating a breathtaking display of color that captivated all who watched.&#39;</span>
-<span class="sd">                              &#39;1 The room felt gloomy, with dark furniture casting shadows, though a hint of blue could be seen in the curtains.  &#39;,</span>
-<span class="sd">        &#39;color/color_01.txt&#39;: &#39;0 The meeting was dull and uneventful, lacking any excitement or engagement.&#39;</span>
-<span class="sd">                              &#39;1 The car was just an ordinary vehicle, nothing special about its appearance. &#39;</span>
-<span class="sd">                              &quot;2 The flowers were vibrant, but I couldn&#39;t quite tell what colors they were. &quot;</span>
-<span class="sd">                              &#39;3 The sky turned a beautiful shade of orange as the sun began to set, casting a warm glow.&#39;</span>
-<span class="sd">                              &quot;4 She wore a stunning red dress that caught everyone&#39;s attention at the party.&quot;</span>
-<span class="sd">                              &#39;5 The ocean sparkled in shades of deep blue and turquoise, a breathtaking view that left us speechless.  &#39;</span>
+<span class="sd">        'color/color_00.txt': '0 The meeting was dull and unproductive, leaving everyone feeling dissatisfied.'</span>
+<span class="sd">                              '2 The car was old and rusty, with a paint job that had faded over time, hinting at its once vibrant color.'</span>
+<span class="sd">                              '5 The sunset painted the sky in brilliant shades of orange, pink, and purple, creating a breathtaking display of color that captivated all who watched.'</span>
+<span class="sd">                              '1 The room felt gloomy, with dark furniture casting shadows, though a hint of blue could be seen in the curtains.  ',</span>
+<span class="sd">        'color/color_01.txt': '0 The meeting was dull and uneventful, lacking any excitement or engagement.'</span>
+<span class="sd">                              '1 The car was just an ordinary vehicle, nothing special about its appearance. '</span>
+<span class="sd">                              "2 The flowers were vibrant, but I couldn't quite tell what colors they were. "</span>
+<span class="sd">                              '3 The sky turned a beautiful shade of orange as the sun began to set, casting a warm glow.'</span>
+<span class="sd">                              "4 She wore a stunning red dress that caught everyone's attention at the party."</span>
+<span class="sd">                              '5 The ocean sparkled in shades of deep blue and turquoise, a breathtaking view that left us speechless.  '</span>
 <span class="sd">    }</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">semantic_attributes</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="k">assert</span> <span class="n">semantic_attributes</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.json&quot;</span><span class="p">),</span> <span class="p">(</span>
-            <span class="s2">&quot;string semantic_attributes needs to be a json file&quot;</span>
+        <span class="k">assert</span> <span class="n">semantic_attributes</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">".json"</span><span class="p">),</span> <span class="p">(</span>
+            <span class="s2">"string semantic_attributes needs to be a json file"</span>
         <span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">semantic_attributes</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
@@ -416,10 +416,10 @@
         <span class="n">example_generator</span> <span class="o">=</span> <span class="n">_make_semantic_attribute_examples_for_attribute</span><span class="p">()</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_batch_config</span><span class="p">(</span><span class="n">n_examples</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">start_idx</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Generate batch configuration based on whether batch_size is None or not.</span>
 <span class="sd">        Returns a generator of (batch_idx, current_batch_size) tuples.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">batch_size</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># Single batch mode</span>
             <span class="k">yield</span> <span class="kc">None</span><span class="p">,</span> <span class="n">n_examples</span>
@@ -436,7 +436,7 @@
 
     <span class="k">for</span> <span class="n">attribute_idx</span><span class="p">,</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">attribute</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">semantic_attributes</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="mi">1</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">attribute_idx</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">semantic_attributes</span><span class="p">)</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">attribute_idx</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">semantic_attributes</span><span class="p">)</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="n">current_batch_size</span> <span class="ow">in</span> <span class="n">_get_batch_config</span><span class="p">(</span>
             <span class="n">n_examples</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">start_batch_idx_at</span>
@@ -444,7 +444,7 @@
             <span class="n">_save_key</span> <span class="o">=</span> <span class="n">save_key</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Gathering </span><span class="si">{</span><span class="n">current_batch_size</span><span class="si">}</span><span class="s2"> examples for: </span><span class="si">{</span><span class="n">_save_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  Gathering </span><span class="si">{</span><span class="n">current_batch_size</span><span class="si">}</span><span class="s2"> examples for: </span><span class="si">{</span><span class="n">_save_key</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
             <span class="n">response</span> <span class="o">=</span> <span class="n">example_generator</span><span class="p">(</span>
                 <span class="n">attribute</span><span class="o">=</span><span class="n">attribute</span><span class="p">,</span>
@@ -455,10 +455,47 @@
 
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="kn">import</span><span class="w"> </span><span class="nn">argh</span>
+<span class="c1">#: CLI flags for the parameters of ``make_semantic_attributes_dataset`` that a</span>
+<span class="c1">#: shell can actually supply. ``save_key`` and ``example_generator`` take</span>
+<span class="c1">#: callables and are deliberately absent: no command-line string can produce one.</span>
+<span class="n">_CLI_FLAGS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"store"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"--store"</span><span class="p">,),</span>
+    <span class="s2">"n_examples"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"-n"</span><span class="p">,</span> <span class="s2">"--n-examples"</span><span class="p">),</span>
+    <span class="s2">"batch_size"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"-b"</span><span class="p">,</span> <span class="s2">"--batch-size"</span><span class="p">),</span>
+    <span class="s2">"start_batch_idx_at"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"--start-batch-idx-at"</span><span class="p">,),</span>
+    <span class="s2">"verbose"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"-v"</span><span class="p">,</span> <span class="s2">"--verbose"</span><span class="p">),</span>
+<span class="p">}</span>
 
-    <span class="n">argh</span><span class="o">.</span><span class="n">dispatch_commands</span><span class="p">([</span><span class="n">make_semantic_attributes_dataset</span><span class="p">])</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_cli</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Run :func:`make_semantic_attributes_dataset` from the command line."""</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+
+    <span class="n">fn</span> <span class="o">=</span> <span class="n">make_semantic_attributes_dataset</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">prog</span><span class="o">=</span><span class="s2">"dataset_makers.py"</span><span class="p">)</span>
+    <span class="n">sub</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">add_subparsers</span><span class="p">(</span><span class="n">dest</span><span class="o">=</span><span class="s2">"command"</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">sp</span> <span class="o">=</span> <span class="n">sub</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span>
+        <span class="s2">"make-semantic-attributes-dataset"</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="n">fn</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="n">inspect</span><span class="o">.</span><span class="n">getdoc</span><span class="p">(</span><span class="n">fn</span><span class="p">),</span>
+        <span class="n">formatter_class</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">RawDescriptionHelpFormatter</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">sp</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"semantic_attributes"</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">"semantic-attributes"</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">"-"</span><span class="p">)</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">flags</span> <span class="ow">in</span> <span class="n">_CLI_FLAGS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">default</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">default</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"default"</span><span class="p">:</span> <span class="n">default</span><span class="p">,</span> <span class="s2">"help"</span><span class="p">:</span> <span class="nb">repr</span><span class="p">(</span><span class="n">default</span><span class="p">)}</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">"type"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span>
+        <span class="n">sp</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="o">*</span><span class="n">flags</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">vars</span><span class="p">(</span><span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">argv</span><span class="p">))</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"command"</span><span class="p">)</span>
+    <span class="n">fn</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="n">_cli</span><span class="p">()</span>
 </pre></div>
 
            </div>
