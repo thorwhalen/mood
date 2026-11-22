@@ -1,0 +1,20 @@
+﻿mood
+====
+
+.. automodule:: mood
+
+   
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   dataset_makers
+   learn_sentiments
+   model_analysis
+   mood_modeling
+   scripts
+   sentiment
+   tools
+   util

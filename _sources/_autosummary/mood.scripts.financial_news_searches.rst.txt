@@ -1,0 +1,12 @@
+mood.scripts.financial\_news\_searches
+======================================
+
+.. automodule:: mood.scripts.financial_news_searches
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      main
+   

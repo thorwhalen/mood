@@ -1,0 +1,17 @@
+mood.dataset\_makers
+====================
+
+.. automodule:: mood.dataset_makers
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      default_save_key
+      make_semantic_attributes_dataset
+      mk_concatenation_file
+      parse_line
+      parsed_lines
+      text_lines
+   

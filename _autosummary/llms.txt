@@ -1,0 +1,21 @@
+# mood
+
+> Investigations in financial sentiment analysis
+
+
+## Pages in this subsection
+
+- [mood](mood.html.md): Sentiment analysis for stock market data.
+- [mood.dataset_makers](mood.dataset_makers.html.md): Tools to make datasets for training and testing models (for semantic attribute etc.)
+- [mood.learn_sentiments](mood.learn_sentiments.html.md): Learning sentiments from data.
+- [mood.model_analysis](mood.model_analysis.html.md): Tools for model analysis
+- [mood.mood_modeling](mood.mood_modeling.html.md): Mood Modeling Module
+- [mood.scripts](mood.scripts.html.md): Scripts for mood.
+- [mood.scripts.financial_news_searches](mood.scripts.financial_news_searches.html.md): A script that searches for news and saves the results to a file.
+- [mood.sentiment](mood.sentiment.html.md): Sentiment analysis tools
+- [mood.tools](mood.tools.html.md): Tools for sentiment analysis
+- [mood.util](mood.util.html.md): Utils for mood
+
+## Optional
+
+- [Top-level llms.txt](../llms.txt): Complete documentation index.

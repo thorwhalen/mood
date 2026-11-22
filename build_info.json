@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "built_at": "2026-11-22T21:29:05Z",
+  "package": {
+    "name": "mood",
+    "version": "0.0.19",
+    "display_name": "mood",
+    "source": "pyproject.toml"
+  },
+  "git": {
+    "available": true,
+    "commit": "7e8623cfd486070ab7e10dfde42cfc615bd966b8",
+    "short_commit": "7e8623c",
+    "branch": "main",
+    "tags": [
+      "0.0.19"
+    ],
+    "dirty": false,
+    "remote_url": "https://github.com/thorwhalen/mood",
+    "commit_url": "https://github.com/thorwhalen/mood/commit/7e8623cfd486070ab7e10dfde42cfc615bd966b8",
+    "error": null
+  },
+  "ci": {
+    "provider": "github",
+    "repository": "thorwhalen/mood",
+    "sha": "a76e215efb8459e5a41ea6de65ccde30b0d67de1",
+    "sha_in_history": true,
+    "ref": "refs/heads/main",
+    "ref_name": "main",
+    "run_id": "45072048028",
+    "run_url": "https://github.com/thorwhalen/mood/actions/runs/45072048028",
+    "server_url": "https://github.com"
+  },
+  "tools": {
+    "epythet": "0.2.23",
+    "sphinx": "9.1.1",
+    "docutils": "0.22.4",
+    "python": "3.12.16"
+  },
+  "config": {
+    "theme": "auto",
+    "html_theme": "furo",
+    "accent": "#923144",
+    "mode": "auto",
+    "api_generator": "autosummary",
+    "ignore": [
+      "tests/",
+      "scrap/",
+      "examples/"
+    ],
+    "agent_outputs": true,
+    "aggregates": [
+      "md"
+    ],
+    "ai_artifacts": true,
+    "provenance": true,
+    "docs_dir": "docsrc"
+  },
+  "site": {
+    "modules_documented": 10,
+    "objects_documented": 58
+  },
+  "pypi": {
+    "checked": true,
+    "latest": "0.0.19",
+    "relation": "same",
+    "error": null
+  },
+  "reproduce": "git clone https://github.com/thorwhalen/mood && cd mood\ngit checkout 7e8623cfd486070ab7e10dfde42cfc615bd966b8\npip install \"epythet==0.2.23\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "warnings": [],
+  "alignment": {
+    "aligned": true,
+    "notes": []
+  }
+}

@@ -1,0 +1,15 @@
+mood.tools
+==========
+
+.. automodule:: mood.tools
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      current_time_str
+      get_key
+      mk_filename_safe
+      search_and_save_news
+   

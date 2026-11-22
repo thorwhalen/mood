@@ -1,0 +1,23 @@
+mood.mood\_modeling
+===================
+
+.. automodule:: mood.mood_modeling
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      class_to_path
+      path_to_class
+      x_and_y_with_boolean_y
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      DimensionReducer
+      MoodEstimator
+      MoodModelingManager
+      OrdinalRandomForest
+   

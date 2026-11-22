@@ -1,4 +1,0 @@
-mood
-====
-.. automodule:: mood
-   :members:

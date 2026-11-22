@@ -1,4 +1,0 @@
-mood.model_analysis
-===================
-.. automodule:: mood.model_analysis
-   :members:

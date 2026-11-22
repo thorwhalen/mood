@@ -1,4 +1,0 @@
-mood.learn_sentiments
-=====================
-.. automodule:: mood.learn_sentiments
-   :members:

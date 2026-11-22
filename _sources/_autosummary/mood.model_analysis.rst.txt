@@ -1,0 +1,25 @@
+mood.model\_analysis
+====================
+
+.. automodule:: mood.model_analysis
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      analyze_all
+      analyze_by_data_type
+      analyze_classifiers
+      analyze_regression_models
+      analyze_specific_attribute
+      compare_datasets
+      compare_models_across_datasets
+      compute_model_stats
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      ModelPerformanceAnalyzer
+   

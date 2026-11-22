@@ -1,0 +1,13 @@
+mood.sentiment
+==============
+
+.. automodule:: mood.sentiment
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      flair_sentiment_score
+      sentiment_analysis
+   

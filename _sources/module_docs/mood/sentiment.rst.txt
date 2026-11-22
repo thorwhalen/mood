@@ -1,4 +1,0 @@
-mood.sentiment
-==============
-.. automodule:: mood.sentiment
-   :members:

@@ -1,0 +1,13 @@
+mood.scripts
+============
+
+.. automodule:: mood.scripts
+
+   
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   financial_news_searches

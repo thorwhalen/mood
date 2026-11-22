@@ -1,0 +1,12 @@
+mood.util
+=========
+
+.. automodule:: mood.util
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      add_egress
+   
