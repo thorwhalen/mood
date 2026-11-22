@@ -1,7 +1,7 @@
 {
-  "collection_duration_seconds": 18.48304271697998,
-  "commit_message": "Merge 608dda04235549667e18ca09a1d659f17af578fb into affc7ddb71f5b3af975a536122dd65b9fd610d8e",
-  "commit_sha": "db9b25e6cfbce9e2a831e97878f4c98948c5ade3",
+  "collection_duration_seconds": 23.513320446014404,
+  "commit_message": "test: offline tests for news search-and-save and sentiment seams [skip publish]",
+  "commit_sha": "608dda04235549667e18ca09a1d659f17af578fb",
   "metrics": {
     "coverage": {
       "branch_coverage": 0.0,
@@ -11,32 +11,23 @@
       "statements_total": 0
     },
     "umpyre_stats": {
-      "comment_lines": 147180,
-      "comment_lines_ratio": 0.04995178929427061,
-      "docs_lines": 624326,
-      "empty_lines": 461228,
-      "empty_lines_ratio": 0.15653732757587882,
+      "comment_lines": 141171,
+      "comment_lines_ratio": 0.05024179381543096,
+      "docs_lines": 556104,
+      "empty_lines": 441453,
+      "empty_lines_ratio": 0.15711010480341886,
       "errors": [
-        "_logistic.py: invalid syntax (_logistic.py, line 2337)",
-        "_shape.py: invalid syntax (_shape.py, line 4)",
-        "_array_like.py: invalid syntax (_array_like.py, line 15)",
-        "_nbit.py: invalid syntax (_nbit.py, line 6)",
-        "_scalars.py: invalid syntax (_scalars.py, line 7)",
-        "_char_codes.py: invalid syntax (_char_codes.py, line 3)",
-        "_dtype_like.py: invalid syntax (_dtype_like.py, line 21)",
-        "mypy_plugin.py: invalid syntax (mypy_plugin.py, line 118)",
-        "_cubature.py: invalid syntax (_cubature.py, line 27)",
-        "_array_api.py: invalid syntax (_array_api.py, line 66)"
+        "test_func_inspect_special_encoding.py: 'utf-8' codec can't decode byte 0xa4 in position 64: invalid start byte"
       ],
-      "files_analyzed": 7739,
-      "function_lines": 1843713,
-      "function_lines_ratio": 0.6257423786866936,
-      "mean_lines_per_function": 21.7580631837332,
-      "num_classes": 17773,
-      "num_functions": 84737,
+      "files_analyzed": 7517,
+      "function_lines": 1721842,
+      "function_lines_ratio": 0.6127917968049336,
+      "mean_lines_per_function": 21.65158126375354,
+      "num_classes": 17495,
+      "num_functions": 79525,
       "pypi_version": "0.0.18",
-      "total_errors": 13,
-      "total_lines": 2946441
+      "total_errors": 1,
+      "total_lines": 2809832
     },
     "wily": {
       "cyclomatic_avg": 0.0,
@@ -55,6 +46,6 @@
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-11-22T21:25:02.501517Z",
+  "timestamp": "2026-11-22T21:25:06.885769Z",
   "workflow_status": {}
 }
